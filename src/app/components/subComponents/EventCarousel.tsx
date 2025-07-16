@@ -5,16 +5,26 @@ import { useKeenSlider } from 'keen-slider/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Event } from '@/types/event';
+import { useEffect } from 'react';
 
 interface Props {
   events: Event[];
 }
 
 export default function EventCarousel({ events }: Props) {
-  const [ref] = useKeenSlider<HTMLDivElement>({
+  const [ref, slider] = useKeenSlider<HTMLDivElement>({
     loop: true,
     slides: { perView: 1 },
   });
+
+  useEffect(() => {
+    if (!slider) return;
+    const interval = setInterval(() => {
+      slider.current?.next();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [slider]);
 
   return (
     <div className='w-full space-y-6'>
@@ -32,9 +42,8 @@ export default function EventCarousel({ events }: Props) {
               <Image
                 src={event.bannerUrl || '/default-banner.jpg'}
                 alt={event.title}
-                className='w-full h-full object-cover'
-                width={800}
-                height={400}
+                fill
+                className='object-cover'
               />
             </div>
 

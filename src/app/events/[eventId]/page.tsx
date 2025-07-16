@@ -51,7 +51,7 @@ export default function EventPage() {
     address,
     coordinates,
   } = selectedEvent;
-  const isAdmin = true;
+  const isAdmin = false;
 
   return (
     <div className='max-w-[1280px] mx-auto px-4 space-y-8'>
@@ -69,6 +69,7 @@ export default function EventPage() {
         eventId={eventId as string}
       />
 
+      <EventBookCard eventId={eventId as string} isAdmin={isAdmin} />
       <EventSchedule
         days={selectedEvent.days || []}
         isAdmin={isAdmin}
@@ -82,8 +83,6 @@ export default function EventPage() {
         eventId={eventId as string}
         isAdmin={isAdmin}
       />
-
-      <EventBookCard eventId={eventId as string} isAdmin={isAdmin} />
 
       <EventContactMap
         address={address}
