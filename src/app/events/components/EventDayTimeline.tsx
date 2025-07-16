@@ -67,7 +67,9 @@ export default function EventDayTimeline({ day }: Props) {
                 icon={renderIcon(block.iconName)}
                 iconStyle={{ background: '#3b82f6', color: '#fff' }}
               >
-                <h3 className='text-lg font-bold'>{block.title}</h3>
+                <h3 className='text-lg font-bold text-red-600 dark:font-light'>
+                  {block.title}
+                </h3>
                 <ul className='mt-2 list-disc list-inside text-sm text-gray-600'>
                   {getActivities(block).map((act, i) => (
                     <li key={i}>{act.trim()}</li>

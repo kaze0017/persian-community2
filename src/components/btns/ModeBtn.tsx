@@ -26,7 +26,8 @@ export default function ModeToggle() {
     if (user.themeMode) {
       setTheme(user.themeMode);
     }
-  }, [user.themeMode, setTheme]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.themeMode]);
 
   const handleChangeTheme = async (theme: 'light' | 'dark' | 'system') => {
     dispatch(setThemeMode(theme));

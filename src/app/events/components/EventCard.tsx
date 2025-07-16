@@ -15,8 +15,8 @@ export default function EventCard({ event }: Props) {
     event;
 
   return (
-    <Link href={`/events/${id}`}>
-      <Card className='hover:shadow-lg transition-shadow duration-200 overflow-hidden'>
+    <Link href={`/events/${id}`} className='h-full'>
+      <Card className='h-full flex flex-col'>
         <div className='relative h-48 w-full'>
           <Image
             src={bannerUrl || '/default-banner.jpg'}
@@ -38,7 +38,7 @@ export default function EventCard({ event }: Props) {
           </div>
         </CardHeader>
 
-        <CardContent className='text-sm space-y-1'>
+        <CardContent className='flex-1 flex flex-col justify-end text-sm space-y-1'>
           <div className='flex items-center gap-2 text-muted-foreground'>
             <Calendar className='w-4 h-4' />
             <span>

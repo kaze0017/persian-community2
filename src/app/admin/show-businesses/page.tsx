@@ -9,6 +9,7 @@ import { Business } from '@/types/business';
 import ListHeader from '@/components/ListHeader';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import PanelHeader from '@/components/PanelHeader';
 
 export default function ShowBusinessesPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -50,9 +51,7 @@ export default function ShowBusinessesPage() {
   return (
     <div className='mx-auto p-6'>
       {/* Header */}
-      <div className='flex items-center justify-between mb-6'>
-        <h1 className='text-3xl font-bold'>Businesses</h1>
-      </div>
+      <PanelHeader title='Businesses' />
 
       {/* Filters */}
 

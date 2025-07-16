@@ -55,19 +55,29 @@ export const fetchEvents = createAsyncThunk<
   }
 });
 
+function removeUndefinedFields<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
+}
+
 export const createEvent = createAsyncThunk<
   Event,
   Omit<Event, 'id'>,
   { rejectValue: string }
->('events/createEvent', async (eventData, thunkAPI) => {
-  try {
-    const id = await createDocument(EVENTS_COLLECTION, eventData);
-    return { ...eventData, id };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to create event';
-    return thunkAPI.rejectWithValue(message);
+>(
+  'events/createEvent',
+  async (eventData, thunkAPI) => {
+    console.log('Creating event with data:', eventData);
+    try {
+      const cleanEventData = removeUndefinedFields(eventData);
+      const id = await createDocument(EVENTS_COLLECTION, cleanEventData);
+      return { ...cleanEventData, id };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to create event';
+      return thunkAPI.rejectWithValue(message);
+    }
   }
-});
+);
+
 
 export const updateEvent = createAsyncThunk<
   Event,

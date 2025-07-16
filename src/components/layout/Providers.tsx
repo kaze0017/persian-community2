@@ -37,7 +37,7 @@ function AuthListener({ children }: { children: ReactNode }) {
             displayName: user.displayName,
             photoURL: user.photoURL,
             role: role || null,
-            themeMode: themeMode || 'light',
+            themeMode: themeMode || 'dark',
           })
         );
       } else {
@@ -48,7 +48,7 @@ function AuthListener({ children }: { children: ReactNode }) {
             displayName: null,
             photoURL: null,
             role: null,
-            themeMode: 'light',
+            themeMode: 'dark',
           })
         );
       }

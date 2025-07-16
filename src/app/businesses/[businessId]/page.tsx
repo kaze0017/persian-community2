@@ -6,6 +6,7 @@ import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { fetchBusinessById } from '@/app/lib/businessesSlice';
 import ArtistTemplate from '@/app/businesses/[businessId]/templates/ArtistTemplate';
 import RestaurantTemplate from '@/app/businesses/[businessId]/templates/RestaurantTemplate';
+import TechTemplate from '@/app/businesses/[businessId]/templates/TechTemplate';
 
 interface Props {
   params: Promise<{ businessId: string }>;
@@ -34,6 +35,7 @@ export default function BusinessPage({ params }: Props) {
 
   const isAdmin = false;
 
+  console.log('Business Category:', selectedBusiness.category);
   let content;
   switch (selectedBusiness.category?.toLocaleLowerCase()) {
     case 'art':
@@ -51,11 +53,22 @@ export default function BusinessPage({ params }: Props) {
         />
       );
       break;
+    case 'tech services':
+      content = (
+        <TechTemplate
+          businessId={businessId}
+          isAdmin={isAdmin}
+          business={selectedBusiness}
+        />
+      );
+      break;
 
     default:
       content = (
         <div className='p-4 text-muted-foreground'>
           Business category not supported.
+          <br />
+          Business Category: {selectedBusiness.category}
         </div>
       );
   }

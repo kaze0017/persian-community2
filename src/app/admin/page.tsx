@@ -1,12 +1,16 @@
-import ImageUploader from '@/components/ImageUploader';
+import PanelHeader from '@/components/PanelHeader';
 
-// app/admin/page.tsx
 export default function AdminDashboard() {
   return (
-    <div>
-      <h1 className='text-2xl font-bold mb-4'>Admin Dashboard</h1>
-      <p>Welcome to the admin panel.</p>
-      <ImageUploader />
+    <div className='space-y-2'>
+      <PanelHeader title='Admin Dashboard' />
+      <p className='text-muted-foreground max-w-2xl'>
+        The Admin Console allows you to manage all core aspects of the platform
+        based on your permissions. You can create and manage{' '}
+        <strong>events</strong>, <strong>products</strong>,{' '}
+        <strong>businesses</strong>, and more — with access and actions tailored
+        to your authority level.
+      </p>
     </div>
   );
 }
