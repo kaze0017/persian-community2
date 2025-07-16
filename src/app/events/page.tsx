@@ -80,7 +80,7 @@ export default function EventsPage() {
         <div className='text-center text-gray-500'>No events found.</div>
       )}
 
-      <div className='grid gap-4 sm:grid-cols-2 md:grid-cols-3'>
+      <div className='grid gap-4 sm:grid-cols-2 md:grid-cols-3 auto-rows-fr'>
         {filteredEvents.map((event) => (
           <EventCard key={event.id} event={event} />
         ))}

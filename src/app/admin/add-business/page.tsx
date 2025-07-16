@@ -6,6 +6,7 @@ import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
 import BusinessForm from './components/BusinessForm';
+import PanelHeader from '@/components/PanelHeader';
 
 export type FormData = {
   businessName: string;
@@ -95,7 +96,7 @@ export default function AddBusinessPage() {
 
   return (
     <div className='max-w-3xl mx-auto p-6'>
-      <h1 className='text-2xl font-bold mb-6'>Add a Business</h1>
+      <PanelHeader title='Add New Business' />
       <BusinessForm
         register={register}
         handleSubmit={handleSubmit}

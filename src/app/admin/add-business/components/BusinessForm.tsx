@@ -185,41 +185,48 @@ export default function BusinessForm({
         </div>
       </div>
 
-      {/* Owner Image */}
-      <ImageUploaderWithPreview
-        label='Owner Image'
-        file={ownerImageFile}
-        setFile={setOwnerImageFile}
-        width={128}
-        height={170}
-      />
+      <div className='space-y-6'>
+        {/* Row for first three images */}
+        <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4'>
+          {/* Owner Image */}
+          <ImageUploaderWithPreview
+            label='Owner Image'
+            file={ownerImageFile}
+            setFile={setOwnerImageFile}
+            width={128}
+            height={170}
+          />
 
-      {/* Logo */}
-      <ImageUploaderWithPreview
-        label='Logo'
-        file={logoFile}
-        setFile={setLogoFile}
-        width={128}
-        height={128}
-      />
+          {/* Logo */}
+          <ImageUploaderWithPreview
+            label='Logo'
+            file={logoFile}
+            setFile={setLogoFile}
+            width={128}
+            height={128}
+          />
 
-      {/* Business Card */}
-      <ImageUploaderWithPreview
-        label='Business Card'
-        file={businessCardFile}
-        setFile={setBusinessCardFile}
-        width={256}
-        height={144}
-      />
+          {/* Business Card */}
+          <ImageUploaderWithPreview
+            label='Business Card'
+            file={businessCardFile}
+            setFile={setBusinessCardFile}
+            width={256}
+            height={144}
+          />
+        </div>
 
-      {/* Banner Image (new) */}
-      <ImageUploaderWithPreview
-        label='Banner Image'
-        file={bannerImageFile}
-        setFile={setBannerImageFile}
-        width={800}
-        height={200}
-      />
+        {/* Banner Image full width */}
+        <div>
+          <ImageUploaderWithPreview
+            label='Banner Image'
+            file={bannerImageFile}
+            setFile={setBannerImageFile}
+            width={800}
+            height={200}
+          />
+        </div>
+      </div>
 
       <Button type='submit' disabled={loading}>
         {loading

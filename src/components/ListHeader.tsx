@@ -52,7 +52,7 @@ export default function ListHeader({
   disabled = false,
 }: Props) {
   return (
-    <div className='flex flex-wrap md:flex-nowrap items-center justify-between gap-4'>
+    <div className='flex flex-wrap md:flex-nowrap items-center justify-between gap-4 mb-6'>
       <div className='flex flex-wrap md:flex-nowrap gap-2 items-center flex-1'>
         {showAdd && onAdd && (
           <Button onClick={onAdd} className='min-w-[180px]'>
