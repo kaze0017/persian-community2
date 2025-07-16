@@ -12,19 +12,17 @@ interface Props {
 }
 
 export default function BusinessPage({ params }: Props) {
-  const { businessId } = use(params); // ✅ unwrap Promise using use()
+  const { businessId } = use(params);
 
   const dispatch = useAppDispatch();
   const { selectedBusiness, loading, error } = useAppSelector(
     (state) => state.businesses
   );
-
   useEffect(() => {
-    if (!selectedBusiness || selectedBusiness.id !== businessId) {
+    if (!selectedBusiness?.id || selectedBusiness.id !== businessId) {
       dispatch(fetchBusinessById(businessId));
     }
-    // 👇 Only depend on businessId and dispatch
-  }, [dispatch, businessId, selectedBusiness]);
+  }, [dispatch, businessId]);
 
   if (loading || !selectedBusiness) {
     return <div className='p-4'>Loading business...</div>;
