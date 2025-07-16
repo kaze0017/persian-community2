@@ -62,7 +62,7 @@ export default function EventsPage() {
         filterOptions={categories.map((cat) => cat.name)}
         showAdd={false}
         showSearch
-        showFilter
+        showFilter={true}
         showRefresh
         onRefresh={() => dispatch(fetchEvents())}
         disabled={loading}
