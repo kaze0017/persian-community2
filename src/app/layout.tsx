@@ -31,23 +31,32 @@ export const metadata: Metadata = {
     'local businesses',
     'community events',
   ],
-  authors: [{ name: 'Your Name or Team' }],
+  authors: [{ name: 'Keivan Kazemi' }],
   openGraph: {
     title: 'Persian Community Hub',
     description:
       'Discover local businesses and upcoming events in the Persian community.',
-    url: 'https://yourdomain.com',
+    url: 'https://persian-community2-vhah.vercel.app/',
     siteName: 'Persian Community Hub',
     locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: 'https://persian-community2-vhah.vercel.app/meta.png',
+        width: 1200,
+        height: 630,
+        alt: 'Persian Community Hub',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Persian Community Hub',
     description:
       'Discover local businesses and upcoming events in the Persian community.',
-    site: 'https://keivanarts.com',
-    creator: 'Keivan Kazemi',
+    site: '@keivanarts', // if you don't have a Twitter handle, remove this line
+    creator: '@keivanarts',
+    images: ['https://keivanarts.com/images/og-image.jpg'], // ✅ Same OG image as OpenGraph
   },
 };
 
