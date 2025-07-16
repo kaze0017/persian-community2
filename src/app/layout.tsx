@@ -8,6 +8,7 @@ import { Toaster } from '@/components/ui/sonner';
 
 import Providers from '@/components/layout/Providers';
 import Footer from './components/Footer';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -79,6 +80,7 @@ export default function RootLayout({
           </ThemeProvider>
           {/* </MapProvider> */}
         </Providers>
+        <SpeedInsights />
       </body>
     </html>
   );

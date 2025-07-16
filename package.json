@@ -25,6 +25,7 @@
     "@reduxjs/toolkit": "^2.8.2",
     "@stripe/stripe-js": "^7.4.0",
     "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@vercel/speed-insights": "^1.2.0",
     "axios": "^1.10.0",
     "canvas": "^3.1.2",
     "class-variance-authority": "^0.7.1",
