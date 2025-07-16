@@ -3,14 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { createDocument } from '@/services/firestoreService';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
@@ -46,11 +44,8 @@ export default function AddNewProductTypeDialog({
 
     setLoading(true);
     try {
-      // Create a document reference (must be even number of path segments)
-      // Path: businesses/{businessId}/products/{trimmedType}
       const docRef = doc(db, 'businesses', businessId, 'products', trimmedType);
 
-      // Set the document data
       await setDoc(docRef, { createdAt: Date.now() });
 
       onAdded();

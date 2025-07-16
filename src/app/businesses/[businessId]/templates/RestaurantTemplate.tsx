@@ -3,10 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import {
-  fetchRestaurantProductsWithItems,
-  RestaurantProduct,
-} from '@/app/lib/restaurantProductSlice';
+import { fetchRestaurantProductsWithItems } from '@/app/lib/restaurantProductSlice';
 import RestaurantHeader from './resComponent/RestaurantHeader';
 import TabButton from './resComponent/TabButton';
 import FeaturedSection from './resComponent/FeaturedSection';
@@ -15,6 +12,7 @@ import GoogleReviewsSection from '../../components/GoogleReviewsSection';
 import ContactSection from '../../components/ContactSection';
 import { Business } from '@/types/business';
 import AboutSection from './resComponent/AboutSection';
+import { RestaurantProduct } from '@/types/RestaurantProduct';
 
 interface props {
   businessId: string;
@@ -27,7 +25,10 @@ export default function RestaurantTemplate({
   isAdmin = false,
   business = {
     id: '',
-    name: '',
+    businessName: '',
+    ownerName: '',
+    phone: '',
+    address: '',
     category: '',
     businessConfig: {
       contactConfig: {
@@ -58,15 +59,14 @@ export default function RestaurantTemplate({
     }
   }, [dispatch, businessId, activeTab]);
 
-  const featuredItems = products
-    .flatMap((cat) =>
-      cat.items.map((item) => ({ ...item, categoryId: cat.id }))
-    )
-    .filter((item) => item.featured);
+  const featuredItems = products.filter((item) => item.isFeatured);
 
   return (
     <main className='max-w-6xl mx-auto p-6 space-y-10'>
-      <RestaurantHeader businessId={businessId} business={business} />
+      <RestaurantHeader
+        // businessId={businessId}
+        business={business}
+      />
 
       {/* Tabs */}
       <nav className='flex border-b border-gray-200 dark:border-gray-700 mb-4'>

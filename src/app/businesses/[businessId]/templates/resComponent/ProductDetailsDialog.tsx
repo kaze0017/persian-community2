@@ -17,6 +17,7 @@ import type { RestaurantProduct } from '@/types/RestaurantProduct';
 
 import { Badge } from '@/components/ui/badge';
 import { updateProductItem } from '@/app/admin/products/productsTemplate/restaurantComponents/helpers';
+import { Timestamp } from 'firebase/firestore';
 
 type Props = {
   item: RestaurantProduct;
@@ -53,22 +54,21 @@ export default function ProductDetailsDialog({
       alert('Missing business or product type');
       return;
     }
-    try {
-      // Update in Firestore
-      await updateProductItem(businessId, type, form.id, {
-        ...form,
-        createdAt:
-          typeof form.createdAt === 'string'
-            ? new Date(form.createdAt)
-            : form.createdAt,
-      });
+    if (form.id) {
+      try {
+        // Update in Firestore
+        await updateProductItem(businessId, type, form.id, {
+          ...form,
+          createdAt: Timestamp.now(),
+        });
 
-      onUpdate?.(form);
-      setIsEditing(false);
-      onClose();
-    } catch (error) {
-      console.error('Error updating product:', error);
-      alert('Failed to update product.');
+        onUpdate?.(form);
+        setIsEditing(false);
+        onClose();
+      } catch (error) {
+        console.error('Error updating product:', error);
+        alert('Failed to update product.');
+      }
     }
   };
 

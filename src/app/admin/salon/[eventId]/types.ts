@@ -26,3 +26,5 @@ export type Shape =  {
   points?: number[];
   fill: string;
 }
+
+export type Floor = Shape[];

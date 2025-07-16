@@ -27,7 +27,8 @@ export const getDocument = async (path: string, id: string) => {
   return snapshot.exists() ? snapshot.data() : null;
 };
 
-export const updateDocument = async (path: string, id: string, data: Partial<FirestoreUpdateData>) => {
+export const updateDocument = async <T>(path: string, id: string, data: Partial<T>) => {
+
   return await updateDoc(doc(db, path, id), data);
 };
 

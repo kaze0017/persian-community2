@@ -24,7 +24,7 @@ export default function BusinessPage({ params }: Props) {
       dispatch(fetchBusinessById(businessId));
     }
     // 👇 Only depend on businessId and dispatch
-  }, [dispatch, businessId]);
+  }, [dispatch, businessId, selectedBusiness]);
 
   if (loading || !selectedBusiness) {
     return <div className='p-4'>Loading business...</div>;

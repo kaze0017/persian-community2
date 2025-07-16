@@ -7,6 +7,7 @@ import { db } from '@/lib/firebase';
 import ProductTypeList from './ProductTypeList';
 import AddNewProductTypeDialog from './AddNewProductTypeDialog';
 import AddNewProductDialog from './AddNewProductDialog';
+import { fetchProducts } from './helpers';
 
 type ProductItem = {
   id: string;
@@ -31,52 +32,72 @@ export default function ProductsPage({ businessId }: Props) {
     string | null
   >(null);
 
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      const productsRef = collection(db, 'businesses', businessId, 'products');
-      const typeSnapshot = await getDocs(productsRef);
+  // const fetchProducts = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const productsRef = collection(db, 'businesses', businessId, 'products');
+  //     const typeSnapshot = await getDocs(productsRef);
 
-      const data: ProductsByType = {};
-      for (const typeDoc of typeSnapshot.docs) {
-        const type = typeDoc.id;
-        const itemsRef = collection(
-          db,
-          'businesses',
-          businessId,
-          'products',
-          type,
-          'items'
-        );
-        const itemsSnapshot = await getDocs(itemsRef);
+  //     const data: ProductsByType = {};
+  //     for (const typeDoc of typeSnapshot.docs) {
+  //       const type = typeDoc.id;
+  //       const itemsRef = collection(
+  //         db,
+  //         'businesses',
+  //         businessId,
+  //         'products',
+  //         type,
+  //         'items'
+  //       );
+  //       const itemsSnapshot = await getDocs(itemsRef);
 
-        data[type] = {
-          items: itemsSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          })) as ProductItem[],
-        };
-      }
-      setProductsByType(data);
-    } catch (err) {
-      console.error('Failed to fetch products', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //       data[type] = {
+  //         items: itemsSnapshot.docs.map((doc) => ({
+  //           id: doc.id,
+  //           ...doc.data(),
+  //         })) as ProductItem[],
+  //       };
+  //     }
+  //     setProductsByType(data);
+  //   } catch (err) {
+  //     console.error('Failed to fetch products', err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
-    if (businessId) fetchProducts();
+    const fetchAndSetProducts = async () => {
+      setLoading(true);
+      try {
+        if (businessId) {
+          const products = await fetchProducts(businessId);
+          setProductsByType(products);
+        }
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAndSetProducts();
   }, [businessId]);
 
-  const handleTypeAdded = () => {
+  const handleTypeAdded = async () => {
     setAddTypeDialogOpen(false);
-    fetchProducts();
+    setLoading(true);
+    const products = await fetchProducts(businessId);
+    setProductsByType(products);
+    setLoading(false);
   };
 
-  const handleProductAdded = () => {
+  const handleProductAdded = async () => {
     setAddProductDialogOpen(false);
-    fetchProducts();
+    setLoading(true);
+    const products = await fetchProducts(businessId);
+    setProductsByType(products);
+    setLoading(false);
   };
 
   const handleDeleteType = async (type: string) => {
@@ -99,8 +120,10 @@ export default function ProductsPage({ businessId }: Props) {
 
       const typeDocRef = doc(db, 'businesses', businessId, 'products', type);
       await deleteDoc(typeDocRef);
-
-      fetchProducts();
+      setLoading(true);
+      const products = await fetchProducts(businessId);
+      setProductsByType(products);
+      setLoading(false);
     } catch (err) {
       console.error('Failed to delete type', err);
       alert('Failed to delete product type');

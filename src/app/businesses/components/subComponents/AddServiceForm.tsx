@@ -52,15 +52,16 @@ export default function AddServiceForm({ onSave, onCancel, loading }: Props) {
 
   const handleSubmit = () => {
     if (!form.name) return;
+
     const cleanedForm = Object.fromEntries(
-      Object.entries(form).filter(([, /* _ */ v]) => v !== undefined)
-    );
+      Object.entries(form).filter(([, v]) => v !== undefined)
+    ) as Partial<BusinessService>;
 
     onSave({
       ...cleanedForm,
       id: crypto.randomUUID(),
-      createdAt: null,
-    } as BusinessService);
+      name: form.name, // ✅ explicitly include required field
+    });
   };
 
   return (

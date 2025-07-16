@@ -147,7 +147,7 @@ export default function PlaceTablesTab() {
             <FloorShapes floor={floor} />
             <PlacedTables
               tables={placedTables}
-              selectedId={selectedId}
+              // selectedId={selectedId}
               onSelect={setSelectedId}
               onDragEnd={handleDragEnd}
             />

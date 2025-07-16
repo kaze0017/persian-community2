@@ -18,6 +18,7 @@ export type Event = {
   };
   bannerUrl?: string;
   sponsors?: Business[];
+  ownerImageUrl?: string;
   organizers?: {
     id?: string;
     name: string;

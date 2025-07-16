@@ -11,17 +11,17 @@ import Konva from 'konva';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
-function cleanObject(obj: any): any {
+function cleanObject<T>(obj: T): T {
   if (Array.isArray(obj)) {
-    return obj.map(cleanObject);
+    return obj.map(cleanObject) as T;
   } else if (obj !== null && typeof obj === 'object') {
-    const cleaned: any = {};
+    const cleaned: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(obj)) {
       if (value !== undefined) {
         cleaned[key] = cleanObject(value);
       }
     }
-    return cleaned;
+    return cleaned as T;
   }
   return obj;
 }
@@ -96,7 +96,7 @@ export default function PreviewCanvas() {
             <FloorShapes floor={floor} />
             <PlacedTables
               tables={placedTables}
-              selectedId={null}
+              // selectedId={null}
               onSelect={() => {}}
               onDragEnd={() => {}}
             />

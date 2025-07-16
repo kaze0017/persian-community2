@@ -1,15 +1,19 @@
 'use client';
 
 import Image from 'next/image';
+import { RestaurantProduct } from '@/types/RestaurantProduct';
 
+// type Props = {
+//   item: {
+//     id: string;
+//     name: string;
+//     description?: string;
+//     price?: number;
+//     imageUrl?: string;
+//   };
+// };
 type Props = {
-  item: {
-    id: string;
-    name: string;
-    description?: string;
-    price?: number;
-    imageUrl?: string;
-  };
+  item: RestaurantProduct;
 };
 
 export default function FeaturedCard({ item }: Props) {

@@ -20,17 +20,7 @@ type Props = {
   type: string;
   open: boolean;
   onClose: () => void;
-  onAdded: (newItem: {
-    id: string;
-    name: string;
-    description: string;
-    price: number;
-    options: string;
-    featured: boolean;
-    available: boolean;
-    imageUrl: string;
-    createdAt: string;
-  }) => void;
+  onAdded: (newItem: RestaurantProduct) => void;
 };
 
 export default function AddNewProductDialog({
@@ -96,7 +86,7 @@ export default function AddNewProductDialog({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Product to "{type}"</DialogTitle>
+          <DialogTitle>Add New Product to &quot;{type}&quot;</DialogTitle>
         </DialogHeader>
 
         <div className='grid gap-4 py-4'>

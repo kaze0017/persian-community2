@@ -4,11 +4,12 @@ import Image from 'next/image';
 import { Business } from '@/types/business';
 
 interface props {
-  businessId: string;
+  // businessId: string;
   business: Business;
 }
 
-export default function RestaurantHeader({ businessId, business }: props) {
+// export default function RestaurantHeader({ businessId, business }: props) {
+export default function RestaurantHeader({ business }: props) {
   return (
     <>
       {/* Banner */}

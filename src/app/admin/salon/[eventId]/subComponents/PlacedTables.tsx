@@ -10,14 +10,14 @@ import {
 
 interface PlacedTablesProps {
   tables: Table[];
-  selectedId: string | null;
+  // selectedId: string | null;
   onSelect: (id: string) => void;
   onDragEnd: (id: string, x: number, y: number) => void;
 }
 
 export default function PlacedTables({
   tables,
-  selectedId,
+  // selectedId,
   onSelect,
   onDragEnd,
 }: PlacedTablesProps) {
@@ -53,7 +53,7 @@ export default function PlacedTables({
             : table.y + (table.height ?? 0) / 2;
 
         const seatPositions = getSeats(table);
-        const isSelected = selectedId === table.id;
+        // const isSelected = selectedId === table.id;
 
         return (
           <Group

@@ -15,6 +15,14 @@ export type RestaurantProduct = {
   type?: string; 
   category?: string; 
 };
+export type Category = {
+  id?: string;
+  name: string;
+  description?: string;
+  imageUrl?: string;
+  createdAt?: Timestamp;
+  items?: RestaurantProduct[] | undefined; // Optional items array
+}
 
 // Drink: Juice, Soda, etc.
 // export type Drink = BaseProduct & {

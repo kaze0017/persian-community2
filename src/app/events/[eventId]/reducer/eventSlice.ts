@@ -1,5 +1,5 @@
 // src/app/admin/events/reducer/eventSlice.ts
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Event } from '@/types/event';
 import {
   createDocument,
@@ -17,24 +17,40 @@ export const fetchEvents = createAsyncThunk('events/fetchAll', async () => {
 
 export const fetchEventById = createAsyncThunk(
   'events/fetchById',
-  async (id: string) => {
-    const data = await getDocument(collectionPath, id);
+  async (idi: string) => {
+    const data = await getDocument(collectionPath, idi);
     if (!data) throw new Error('Event not found');
-    return { id, ...(data as Event) };
+
+    // Destructure to exclude the id property from data
+    const { id, ...rest } = data as Event;
+
+    return { id, ...rest };
   }
 );
 
-export const createEvent = createAsyncThunk(
+
+
+export const createEvent = createAsyncThunk<
+  Event,
+  Omit<Event, 'id'>,
+  { rejectValue: unknown }
+>(
   'events/create',
-  async (event: Omit<Event, 'id'>, { rejectWithValue }) => {
+  async (event, { rejectWithValue }) => {
     try {
-      const id = await createDocument<Omit<Event, 'id'>>(collectionPath, event);
+
+      const id = await createDocument<Event>(collectionPath, event);
       return { id, ...event };
-    } catch (err) {
-      return rejectWithValue(err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        return rejectWithValue(err.message);
+      }
+      return rejectWithValue('Unknown error occurred');
     }
   }
 );
+
+
 
 export const updateEvent = createAsyncThunk(
   'events/update',

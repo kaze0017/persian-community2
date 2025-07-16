@@ -4,12 +4,10 @@ import { useState, useEffect } from 'react';
 import SectionPanel from '@/app/businesses/components/subComponents/SectionPanel';
 import AdminControlsPanel from '@/app/businesses/components/subComponents/AdminControlsPanel';
 import { Card } from '@/components/ui/card';
-import { MapPin, Edit2, Check, X } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import MapDisplay from '@/app/admin/MapDisplay';
 import MapSelector from '@/app/admin/MapSelector'; // Assuming you have this to pick location
-
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { updateDocument } from '@/services/firestoreService';
 
 type Props = {
@@ -84,14 +82,14 @@ export default function EventContactMap({
             ? [
                 {
                   label: editing ? 'Cancel' : 'Edit',
-                  variant: editing ? 'outline' : undefined,
+                  // variant: editing ? 'outline' : undefined,
                   onClick: () => setEditing((e) => !e),
                 },
                 ...(editing
                   ? [
                       {
                         label: 'Save',
-                        variant: 'primary',
+                        // variant: 'primary',
                         onClick: handleSave,
                       },
                     ]
@@ -121,7 +119,7 @@ export default function EventContactMap({
         <div className='w-full md:w-1/2 rounded-xl overflow-hidden min-h-[220px]'>
           {editing ? (
             <MapSelector
-              coordinates={coordinates}
+              // coordinates={coordinates}
               onChange={(coords, addr) => {
                 setCoordinates(coords);
                 if (addr) setAddress(addr);

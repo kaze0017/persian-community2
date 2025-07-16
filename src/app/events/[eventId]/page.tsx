@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
@@ -12,8 +12,6 @@ import EventDescription from './components/EventDescription';
 import EventSchedule from './components/EventSchedule';
 import EventTagsSponsorsOrganizers from './components/EventTagsSponsorsOrganizers';
 import EventContactMap from './components/EventContactMap';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import EventBookCard from './components/EventBookCard';
 
 export default function EventPage() {

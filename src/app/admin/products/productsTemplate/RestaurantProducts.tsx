@@ -14,11 +14,10 @@ import { Plus, Loader2 } from 'lucide-react';
 import { createDocument } from '@/services/firestoreService';
 
 type Props = {
-  businessId: string;
   onAddType: (newType: string) => void;
 };
 
-export default function AddNewProductType({ businessId, onAddType }: Props) {
+export default function AddNewProductType({ onAddType }: Props) {
   const [open, setOpen] = useState(false);
   const [newType, setNewType] = useState('');
   const [loading, setLoading] = useState(false);
