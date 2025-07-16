@@ -3,11 +3,11 @@
 import HeaderSection from '@/app/businesses/components/HeaderSection';
 import AboutSection from '@/app/businesses/components/AboutSection';
 import ContactSection from '@/app/businesses/components/ContactSection';
-import GallerySection from '@/app/businesses/components/GallerySection';
+// import GallerySection from '@/app/businesses/components/GallerySection';
 import ServicesSection from '../../components/ServicesSection';
-import AwardsSection from '../../components/AwardsSection';
-import ClientsSection from '../../components/ClientsSection';
-import GoogleReviewsSection from '../../components/GoogleReviewsSection';
+// import AwardsSection from '../../components/AwardsSection';
+// import ClientsSection from '../../components/ClientsSection';
+// import GoogleReviewsSection from '../../components/GoogleReviewsSection';
 import SectionTitle from '../../components/subComponents/SectionTitle';
 import { Business } from '@/types/business';
 
