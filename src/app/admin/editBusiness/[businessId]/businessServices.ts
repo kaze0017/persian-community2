@@ -1,24 +1,25 @@
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { uploadImage } from '@/services/storageService';
+import { Business } from '@/types/business';
 
 export const getBusinessById = async (id: string) => {
   const ref = doc(db, 'businesses', id);
   const snap = await getDoc(ref);
   if (!snap.exists()) return null;
-  return { id: snap.id, ...snap.data() } as any;
+  return { id: snap.id, ...snap.data() } as Business;
 };
 
 export const updateBusiness = async (
   id: string,
-  data: any,
+  data: Partial<Business>,
   files: {
     logoFile?: File | null;
     ownerImageFile?: File | null;
     businessCardFile?: File | null;
   }
 ) => {
-  const updateData: any = { ...data };
+  const updateData: Partial<Business> = { ...data };
 
   if (files.logoFile) {
     updateData.logoUrl = await uploadImage(files.logoFile, `logos/${id}`);

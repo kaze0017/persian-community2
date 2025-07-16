@@ -94,7 +94,7 @@ const salonSlice = createSlice({
     addTableToAvailableGroups: (state, action: PayloadAction<Table>) => {
       const table = action.payload;
       const key = makeGroupKey(table);
-      let group = state.availableGroups.find((g) => g.key === key);
+      const group = state.availableGroups.find((g) => g.key === key);
       if (group) {
         group.tables.push(table);
       } else {

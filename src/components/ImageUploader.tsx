@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/lib/firebase';
+import Image from 'next/image';
 
 export default function ImageUploader() {
   const [imageURL, setImageURL] = useState('');
@@ -32,7 +33,13 @@ export default function ImageUploader() {
       {imageURL && (
         <div>
           <p>Image uploaded:</p>
-          <img src={imageURL} alt='Uploaded' style={{ maxWidth: 200 }} />
+          <Image
+            src={imageURL}
+            alt='Uploaded'
+            width={200}
+            height={200}
+            style={{ maxWidth: '100%', height: 'auto' }}
+          />
         </div>
       )}
     </div>

@@ -12,7 +12,7 @@ const  getRectSeatPositions = ( width: number,
     const sides = ['top', 'right', 'bottom', 'left'];
     let seatIndex = 0;
     const maxPerSide = Math.ceil(seats / 4);
-    let sideCounts = [0, 0, 0, 0];
+    const sideCounts = [0, 0, 0, 0];
 
     while (seatIndex < seats) {
       for (let s = 0; s < 4 && seatIndex < seats; s++) {

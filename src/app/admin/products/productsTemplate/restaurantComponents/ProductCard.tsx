@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 
 type ProductItem = {
   id: string;
@@ -22,12 +23,19 @@ export default function ProductCard({ product }: Props) {
     <div className='flex max-w-xl border rounded-md p-4 gap-4 shadow-sm'>
       {/* Image */}
       {product.imageUrl ? (
-        <img
+        <Image
           src={product.imageUrl}
           alt={product.name}
+          width={96}
+          height={96}
           className='w-24 h-24 object-cover rounded'
         />
       ) : (
+        // <img
+        //   src={product.imageUrl}
+        //   alt={product.name}
+        //   className='w-24 h-24 object-cover rounded'
+        // />
         <div className='w-24 h-24 bg-gray-200 rounded flex items-center justify-center text-gray-400'>
           No Image
         </div>

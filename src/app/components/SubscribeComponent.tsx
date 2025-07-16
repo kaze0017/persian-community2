@@ -46,9 +46,15 @@ const SubscribeComponent = ({ priceId, price, description }: Props) => {
       await stripe.redirectToCheckout({
         sessionId: result.id,
       });
-    } catch (error: any) {
-      console.error('Stripe checkout error:', error?.message || error);
-      alert(`Payment error: ${error?.message || 'Unknown error'}`);
+    } catch (error: unknown) {
+      let message = 'Unknown error';
+
+      if (error instanceof Error) {
+        message = error.message;
+      }
+
+      console.error('Stripe checkout error:', message);
+      alert(`Payment error: ${message}`);
     } finally {
       setLoading(false);
     }

@@ -5,13 +5,7 @@ import EventLayoutPreview from './components/EventLayoutPreview';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import SubscribeComponent from '@/app/components/SubscribeComponent';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardFooter,
-} from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 export default function BookSeatsPage() {
   const { eventId } = useParams();

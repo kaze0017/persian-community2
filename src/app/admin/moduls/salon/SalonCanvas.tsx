@@ -6,7 +6,7 @@ import { Stage, Layer, Rect, Circle } from 'react-konva';
 import { useState } from 'react';
 
 export default function SalonEditorPage() {
-  const [shapes, setShapes] = useState([
+  const [shapes] = useState([
     {
       id: '1',
       type: 'rect',

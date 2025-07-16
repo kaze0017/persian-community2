@@ -9,6 +9,7 @@ import { db } from '@/lib/firebase';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Konva from 'konva';
+import { Floor, Table } from '@/app/admin/salon/[eventId]/types';
 
 interface EventLayoutPreviewProps {
   eventId: string;
@@ -17,8 +18,8 @@ interface EventLayoutPreviewProps {
 export default function EventLayoutPreview({
   eventId,
 }: EventLayoutPreviewProps) {
-  const [floor, setFloor] = useState<any[]>([]);
-  const [placedTables, setPlacedTables] = useState<any[]>([]);
+  const [floor, setFloor] = useState<Floor>([]);
+  const [placedTables, setPlacedTables] = useState<Table[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -116,7 +117,7 @@ export default function EventLayoutPreview({
                   <FloorShapes floor={floor} />
                   <PlacedTables
                     tables={placedTables}
-                    selectedId={null}
+                    // selectedId={null}
                     onSelect={() => {}}
                     onDragEnd={() => {}}
                   />

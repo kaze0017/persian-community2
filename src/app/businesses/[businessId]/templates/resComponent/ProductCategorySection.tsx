@@ -8,7 +8,6 @@ import ProductCard from './ProductCard';
 import ProductDetailsDialog from './ProductDetailsDialog';
 
 import type { RestaurantProduct, Category } from '@/types/RestaurantProduct';
-import { updateProductItem } from '@/app/admin/products/productsTemplate/restaurantComponents/helpers'; // assuming you have this helper
 
 type Props = {
   category: Category;
@@ -25,7 +24,7 @@ export default function ProductCategorySection({
   const [selectedItem, setSelectedItem] = useState<RestaurantProduct | null>(
     null
   );
-  const [items, setItems] = useState<RestaurantProduct[]>(category.items);
+  const [items, setItems] = useState<RestaurantProduct[]>(category.items ?? []);
 
   const handleProductAdded = (newItem: RestaurantProduct) => {
     setItems((prev) => [newItem, ...prev]);
@@ -52,21 +51,22 @@ export default function ProductCategorySection({
               {
                 label: 'Add Item',
                 onClick: () => setAddNewItemDialogOpen(true),
-                icon: 'plus',
+                // icon: 'plus',
               },
             ]}
           />
-
-          <AddNewProductDialog
-            businessId={businessId}
-            type={category.id}
-            open={addNewItemDialogOpen}
-            onClose={() => setAddNewItemDialogOpen(false)}
-            onAdded={(newItem: RestaurantProduct) => {
-              setAddNewItemDialogOpen(false);
-              handleProductAdded(newItem);
-            }}
-          />
+          {category.id && (
+            <AddNewProductDialog
+              businessId={businessId}
+              type={category.id}
+              open={addNewItemDialogOpen}
+              onClose={() => setAddNewItemDialogOpen(false)}
+              onAdded={(newItem: RestaurantProduct) => {
+                setAddNewItemDialogOpen(false);
+                handleProductAdded(newItem);
+              }}
+            />
+          )}
         </SectionPanel>
       ) : (
         <h3 className='text-lg font-bold capitalize mb-6'>{title}</h3>

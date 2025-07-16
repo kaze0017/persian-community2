@@ -5,20 +5,22 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import { RestaurantProduct } from '@/types/RestaurantProduct';
 
 import FeaturedCard from './FeaturedCard';
 
-type Item = {
-  id: string;
-  name: string;
-  description?: string;
-  price?: number;
-  imageUrl?: string;
-  categoryId?: string;
-};
+// type Item = {
+//   id: string;
+//   name: string;
+//   description?: string;
+//   price?: number;
+//   imageUrl?: string;
+//   categoryId?: string;
+// };
 
 type Props = {
-  featuredItems: Item[];
+  // featuredItems: Item[];
+  featuredItems: RestaurantProduct[];
 };
 
 export default function FeaturedSection({ featuredItems }: Props) {

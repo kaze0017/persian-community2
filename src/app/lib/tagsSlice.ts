@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { collection, getDocs, addDoc, updateDoc, doc } from 'firebase/firestore';
-import { db } from '../../lib/firebase'; // Adjust path
-import { Tag } from '@/types/tag'; // Adjust path
+import { db } from '../../lib/firebase';
+import { Tag } from '../../types/tags'; 
+
 
 interface TagsState {
   tags: Tag[];

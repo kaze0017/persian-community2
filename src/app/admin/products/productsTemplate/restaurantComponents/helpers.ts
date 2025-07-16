@@ -5,6 +5,7 @@ import { uploadImage } from '@/services/storageService'; // Your image upload se
 import { createDocument } from '../../services';
 import type { RestaurantProduct } from '@/types/RestaurantProduct';
 import { v4 as uuidv4 } from 'uuid';
+import { ProductItem } from '@/app/lib/restaurantProductSlice';
 
 
 export async function fetchAllProductsByType(businessId: string) {
@@ -12,7 +13,7 @@ export async function fetchAllProductsByType(businessId: string) {
   const productsRef = collection(db, 'businesses', businessId, 'products');
   const productsSnapshot = await getDocs(productsRef);
 
-  const products: Record<string, { items: any[] }> = {};
+  const products: Record<string, { items: Partial<RestaurantProduct>[] }> = {};
 
   for (const productDoc of productsSnapshot.docs) {
     const type = productDoc.id;
@@ -41,7 +42,7 @@ export async function fetchAllProductsByType(businessId: string) {
 export async function addProductItem(
   businessId: string,
   type: string,
-  itemData: any
+  itemData: Partial<RestaurantProduct>
 ) {
   const itemsRef = collection(
     db,
@@ -62,7 +63,7 @@ export async function updateProductItem(
   businessId: string,
   type: string,
   itemId: string,
-  updatedData: any
+  updatedData: Partial<RestaurantProduct> & { createdAt?: Timestamp | string }
 ) {
 
 
@@ -127,3 +128,29 @@ export async function addProductWithImage(
     fsId: docId,
   };
 }
+
+type ProductsByType = Record<string, { items: ProductItem[] }>;
+
+export const fetchProducts = async (businessId: string): Promise<ProductsByType> => {
+  const data: ProductsByType = {};
+  try {
+    const productsRef = collection(db, 'businesses', businessId, 'products');
+    const typeSnapshot = await getDocs(productsRef);
+
+    for (const typeDoc of typeSnapshot.docs) {
+      const type = typeDoc.id;
+      const itemsRef = collection(db, 'businesses', businessId, 'products', type, 'items');
+      const itemsSnapshot = await getDocs(itemsRef);
+
+      data[type] = {
+        items: itemsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...(doc.data() as Omit<ProductItem, 'id'>),
+        })),
+      };
+    }
+  } catch (err) {
+    console.error('Failed to fetch products', err);
+  }
+  return data;
+};

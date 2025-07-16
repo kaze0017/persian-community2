@@ -95,7 +95,7 @@ const DraggableTableSummary: FC<DraggableTableSummaryProps> = ({
             {availableGroups.map(({ tables }) => {
               if (!tables.length) return null;
               const firstTable = tables[0];
-              const { shape, seats, id } = firstTable;
+              const { shape, seats } = firstTable;
               const key = `${shape}-${seats}`;
 
               return (
