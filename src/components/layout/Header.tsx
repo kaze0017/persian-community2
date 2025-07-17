@@ -97,6 +97,14 @@ export default function Header() {
                 Events
               </NavigationMenuLink>
             </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink
+                href='/workshops'
+                className={navigationMenuTriggerStyle()}
+              >
+                Workshops
+              </NavigationMenuLink>
+            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
       </div>
