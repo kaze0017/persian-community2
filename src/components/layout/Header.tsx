@@ -129,8 +129,9 @@ export default function Header() {
               </SheetHeader>
               <nav className='flex flex-col gap-4'>
                 <Link href='/'>Home</Link>
-                <Link href='/'>Businesses</Link>
-                <Link href='/'>Events</Link>
+                <Link href='/businesses'>Businesses</Link>
+                <Link href='/events'>Events</Link>
+                <Link href='/workshops'>Workshops</Link>
                 {/* <Link href='/docs'>Docs</Link> */}
                 {/* <Link href='/components'>Components</Link> */}
                 {/* <Link href='/themes'>Themes</Link> */}
