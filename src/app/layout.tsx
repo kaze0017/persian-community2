@@ -70,9 +70,7 @@ export default function RootLayout({
       <body
         className={`
     ${geistSans.variable} ${geistMono.variable}
-    antialiased bg-no-repeat bg-cover bg-center
-    bg-[url('/bg-light.png')] dark:bg-[url('/bg-dark.png')]
-  `}
+    antialiased bg-no-repeat bg-cover bg-center `}
       >
         <Providers>
           {/* <MapProvider> */}

@@ -1,65 +1,68 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  BookOpenCheck,
-  Palette,
-  Briefcase,
-  HeartPulse,
-  Music3,
-  Construction,
-} from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import WorkshopsList from './_components/WorkshopsList';
+import { useAppSelector, useAppDispatch } from '../hooks';
+import { useEffect, useMemo, useState } from 'react';
+import ListHeader from '@/components/ListHeader';
+import { fetchWorkshops } from '../admin/workshops/workshopSlice';
 
 export default function WorkshopsPage() {
+  const { workshops } = useAppSelector((state) => state.workshops);
+  const dispatch = useAppDispatch();
+
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState<string | undefined>(undefined);
+  const categories = ['Tech', 'Design', 'Marketing'];
+
+  // Filter workshops based on search and category
+  const filteredWorkshops = useMemo(() => {
+    return workshops.filter((workshop) => {
+      const matchesSearch = search
+        ? workshop.title.toLowerCase().includes(search.toLowerCase()) ||
+          workshop.description?.toLowerCase().includes(search.toLowerCase())
+        : true;
+      const matchesCategory = category ? workshop.category === category : true;
+      return matchesSearch && matchesCategory;
+    });
+  }, [workshops, search, category]);
+
+  useEffect(() => {
+    dispatch(fetchWorkshops());
+  }, [dispatch]);
+
   return (
-    <div className='max-w-4xl mx-auto p-6 space-y-8'>
-      <h1 className='text-3xl font-bold'>Workshops & Courses</h1>
-      <p className='text-muted-foreground'>
-        This page will showcase a variety of courses, workshops, and training
-        opportunities offered by our Persian community in Ottawa.
-      </p>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className='flex items-center gap-2'>
-            <Construction className='h-5 w-5 text-yellow-500' /> Under
-            Construction
-          </CardTitle>
-        </CardHeader>
-        <CardContent className='space-y-6 text-muted-foreground'>
-          <p className='text-base'>
-            We are preparing a directory of educational opportunities tailored
-            for our community, including:
-          </p>
-
-          <ul className='space-y-4'>
-            <li className='flex items-center gap-3'>
-              <BookOpenCheck className='h-5 w-5 text-primary' />
-              <span>Persian language classes for children and adults</span>
-            </li>
-            <li className='flex items-center gap-3'>
-              <Palette className='h-5 w-5 text-pink-500' />
-              <span>Art, dance, and cultural workshops</span>
-            </li>
-            <li className='flex items-center gap-3'>
-              <Briefcase className='h-5 w-5 text-blue-500' />
-              <span>Professional development & career training</span>
-            </li>
-            <li className='flex items-center gap-3'>
-              <HeartPulse className='h-5 w-5 text-rose-500' />
-              <span>Community wellness and mental health programs</span>
-            </li>
-            <li className='flex items-center gap-3'>
-              <Music3 className='h-5 w-5 text-violet-500' />
-              <span>Seasonal events like music and poetry workshops</span>
-            </li>
-          </ul>
-
-          <p className='text-sm text-muted-foreground'>
-            📅 Stay tuned — this page is actively being developed.
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+    <main className='container mx-auto py-10'>
+      <h1 className='text-3xl font-bold mb-6'>Workshops</h1>
+      <ListHeader
+        showAdd={false}
+        search={search}
+        onSearchChange={(val) => {
+          setSearch(val);
+        }}
+        searchPlaceholder='Search...'
+        showSearch={true}
+        filterValue={category}
+        onFilterChange={(val) => {
+          setCategory(val);
+        }}
+        filterOptions={categories}
+        showFilter={true}
+        showRefresh={false}
+        disabled={false}
+      />
+      <Tabs defaultValue='list' className='w-full'>
+        <TabsList>
+          <TabsTrigger value='list'>List View</TabsTrigger>
+          {/* <TabsTrigger value='calendar'>Calendar View</TabsTrigger> */}
+        </TabsList>
+        <TabsContent value='list'>
+          <WorkshopsList workshops={filteredWorkshops} />
+        </TabsContent>
+        {/* <TabsContent value='calendar'>
+          <WorkshopsCalendar workshops={filteredWorkshops} />
+        </TabsContent> */}
+      </Tabs>
+    </main>
   );
 }

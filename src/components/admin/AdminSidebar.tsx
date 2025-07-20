@@ -22,7 +22,12 @@ const links = [
   { href: '/admin/manage-users', label: 'Manage Users' },
   { href: '/admin/products', label: 'My Products' },
 
-  // { href: '/admin/settings', label: 'Settings' },
+  { href: '/admin/workshops', label: 'Workshops' },
+  { href: '/admin/people', label: 'People' },
+  // { href: '/admin/help', label: 'Help' },
+  // { href: '/admin/help', label: 'Help' },
+  // { href: '/admin/help', label: 'Help' },
+  // { href: '/admin/help', label: 'Help' },
   // { href: '/admin/help', label: 'Help' },
 ];
 

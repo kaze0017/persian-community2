@@ -9,6 +9,8 @@ import occasionReducer from './occasionsSlice';
 import productsReducer from './productsSlice';
 import productsRestaurantReducer from './restaurantProductSlice';
 import tablesReducer from '@/app/admin/salon/salonSlice';
+import peopleReducer from '@/app/admin/people/peopleSlice';
+import workshopsReducer from '@/app/admin/workshops/workshopSlice';
 
 
 
@@ -23,6 +25,8 @@ export const store = configureStore({
     products: productsReducer,
     restaurantProducts: productsRestaurantReducer,
     tables: tablesReducer,
+    people: peopleReducer,
+    workshops: workshopsReducer,
 
   },
   // middleware: (getDefaultMiddleware) =>
