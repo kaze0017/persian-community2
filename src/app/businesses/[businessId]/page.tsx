@@ -23,6 +23,7 @@ export default function BusinessPage({ params }: Props) {
     if (!selectedBusiness?.id || selectedBusiness.id !== businessId) {
       dispatch(fetchBusinessById(businessId));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, businessId]);
 
   if (loading || !selectedBusiness) {
