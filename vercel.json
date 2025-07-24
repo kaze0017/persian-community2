@@ -1,0 +1,9 @@
+{
+  "ignoreCommand": "echo 'Skipping Firebase functions from build'",
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  },
+  "excludeFiles": ["functions/**"]
+}
