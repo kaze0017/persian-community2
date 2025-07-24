@@ -71,11 +71,6 @@ export default function CreateEventForm() {
 
   const onSubmit = async (data: CreateEventFormValues) => {
     try {
-      if (bannerFile) {
-        const url = await uploadImage(bannerFile, 'banners');
-        data.bannerUrl = url;
-      }
-
       // 🔁 Parse activity strings to arrays
       if (Array.isArray(data.days)) {
         data.days = data.days.map((day) => ({
@@ -85,7 +80,7 @@ export default function CreateEventForm() {
                 ...block,
                 activities:
                   typeof block.activities === 'string'
-                    ? (block.activities as string)
+                    ? block.activities
                         .split(',')
                         .map((a) => a.trim())
                         .filter((a) => a.length > 0)
@@ -95,12 +90,14 @@ export default function CreateEventForm() {
         }));
       }
 
-      const resultAction = await dispatch(createEvent(data));
+      const resultAction = await dispatch(
+        createEvent({ event: data, bannerFile: bannerFile ?? undefined })
+      );
       if (createEvent.fulfilled.match(resultAction)) {
         router.push('/admin/events');
       }
     } catch (error) {
-      console.error('Image upload failed:', error);
+      console.error('Error submitting event:', error);
     }
   };
 

@@ -39,8 +39,8 @@ export default function EventsPage() {
         event.category.toLowerCase() === filterCategory.toLowerCase();
 
       const matchSearch = event.title
-        .toLowerCase()
-        .includes(search.toLowerCase());
+        ? event.title.toLowerCase().includes(search.toLowerCase())
+        : false;
       return matchCategory && matchSearch;
     });
   }, [events, filterCategory, search]);

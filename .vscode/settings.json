@@ -3,5 +3,9 @@
         "firestore",
         "konva",
         "uuidv"
-    ]
-}
+    ],
+     "eslint.workingDirectories": [
+    { "directory": "./" },
+    { "directory": "./functions" }
+  ]
+},

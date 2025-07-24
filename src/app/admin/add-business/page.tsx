@@ -7,6 +7,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase';
 import BusinessForm from './components/BusinessForm';
 import PanelHeader from '@/components/PanelHeader';
+import { uploadImage } from '@/services/storageService';
 
 export type FormData = {
   businessName: string;
@@ -41,12 +42,12 @@ export default function AddBusinessPage() {
     formState: { errors },
   } = useForm<FormData>();
 
-  const uploadImage = async (file: File, path: string): Promise<string> => {
-    const fileName = `${Date.now()}_${file.name}`;
-    const storageRef = ref(storage, `${path}/${fileName}`);
-    const snapshot = await uploadBytes(storageRef, file);
-    return await getDownloadURL(snapshot.ref);
-  };
+  // const uploadImage = async (file: File, path: string): Promise<string> => {
+  //   const fileName = `${Date.now()}_${file.name}`;
+  //   const storageRef = ref(storage, `${path}/${fileName}`);
+  //   const snapshot = await uploadBytes(storageRef, file);
+  //   return await getDownloadURL(snapshot.ref);
+  // };
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
@@ -58,28 +59,50 @@ export default function AddBusinessPage() {
 
       const businessId = docRef.id;
 
-      const ownerImageUrl = ownerImageFile
-        ? await uploadImage(ownerImageFile, `businesses/${businessId}/owner`)
-        : null;
+      const imageFiles = [
+        {
+          key: 'ownerImageUrl',
+          file: ownerImageFile,
+          path: 'owner',
+          name: 'profile.jpg',
+          optName: 'profile.webp',
+        },
+        {
+          key: 'businessCardUrl',
+          file: businessCardFile,
+          path: 'card',
+          name: 'card.jpg',
+          optName: 'card.webp',
+        },
+        {
+          key: 'logoUrl',
+          file: logoFile,
+          path: 'logo',
+          name: 'logo.jpg',
+          optName: 'logo.webp',
+        },
+        {
+          key: 'bannerImageUrl',
+          file: bannerImageFile,
+          path: 'banner',
+          name: 'banner.jpg',
+          optName: 'banner.webp',
+        },
+      ];
 
-      const businessCardUrl = businessCardFile
-        ? await uploadImage(businessCardFile, `businesses/${businessId}/card`)
-        : null;
+      const urls: Record<string, string | null> = {};
 
-      const logoUrl = logoFile
-        ? await uploadImage(logoFile, `businesses/${businessId}/logo`)
-        : null;
+      for (const { key, file, path, name, optName } of imageFiles) {
+        urls[key] = file
+          ? (
+              await uploadImage(file, `businesses/${businessId}/${path}`, name)
+            ).replace(name, optName)
+          : null;
+      }
 
-      const bannerImageUrl = bannerImageFile
-        ? await uploadImage(bannerImageFile, `businesses/${businessId}/banner`)
-        : null;
+      await updateDoc(doc(db, 'businesses', businessId), urls);
 
-      await updateDoc(doc(db, 'businesses', businessId), {
-        ownerImageUrl,
-        businessCardUrl,
-        logoUrl,
-        bannerImageUrl, // NEW
-      });
+      await updateDoc(doc(db, 'businesses', businessId), urls);
 
       setSuccessMessage('Business added successfully!');
       reset();

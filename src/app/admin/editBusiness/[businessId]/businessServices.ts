@@ -3,6 +3,11 @@ import { db } from '@/lib/firebase';
 import { uploadImage } from '@/services/storageService';
 import { Business } from '@/types/business';
 
+
+
+
+
+
 export const getBusinessById = async (id: string) => {
   const ref = doc(db, 'businesses', id);
   const snap = await getDoc(ref);
@@ -17,19 +22,57 @@ export const updateBusiness = async (
     logoFile?: File | null;
     ownerImageFile?: File | null;
     businessCardFile?: File | null;
+    bannerImageFile?: File | null;
   }
 ) => {
-  const updateData: Partial<Business> = { ...data };
 
-  if (files.logoFile) {
-    updateData.logoUrl = await uploadImage(files.logoFile, `logos/${id}`);
-  }
-  if (files.ownerImageFile) {
-    updateData.ownerImageUrl = await uploadImage(files.ownerImageFile, `owners/${id}`);
-  }
-  if (files.businessCardFile) {
-    updateData.businessCardUrl = await uploadImage(files.businessCardFile, `cards/${id}`);
-  }
 
-  await updateDoc(doc(db, 'businesses', id), updateData);
+
+  console.log('Updating business:', id, data, files);
+        const businessId = id;
+
+      const imageFiles = [
+        {
+          key: 'ownerImageUrl',
+          file: files.ownerImageFile,
+          path: 'owner',
+          name: 'profile.jpg',
+          optName: 'profile.webp',
+        },
+        {
+          key: 'businessCardUrl',
+          file: files.businessCardFile,
+          path: 'card',
+          name: 'card.jpg',
+          optName: 'card.webp',
+        },
+        {
+          key: 'logoUrl',
+          file: files.logoFile,
+          path: 'logo',
+          name: 'logo.jpg',
+          optName: 'logo.webp',
+        },
+        {
+          key: 'bannerImageUrl',
+          file: files.bannerImageFile,
+          path: 'banner',
+          name: 'banner.jpg',
+          optName: 'banner.webp',
+        },
+      ];
+
+       const urls: Record<string, string | null> = {};
+
+      for (const { key, file, path, name, optName } of imageFiles) {
+        console.log('Uploading image:', file, path, name);
+        urls[key] = file
+          ? (
+              (await uploadImage(file, `businesses/${businessId}/${path}`, name)).replace(name, optName)
+            )
+          : null;
+      }
+      console.log('Image URLs:', urls);
+
+      await updateDoc(doc(db, 'businesses', businessId), urls);
 };
