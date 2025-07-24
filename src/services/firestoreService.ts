@@ -75,3 +75,11 @@ export const getCollection = async <T>(
     const docRef = doc(db, path, id);
     return await updateDoc(docRef, data);
   };
+
+import {   setDoc } from 'firebase/firestore';
+
+export async function createDocumentWithId<T extends Record<string, any>>(collectionPath: string, data: T) {
+  const newDocRef = doc(collection(db, collectionPath));
+  await setDoc(newDocRef, data);
+  return newDocRef.id;
+}

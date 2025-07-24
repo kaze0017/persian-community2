@@ -2,11 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { PersonForm } from './components/PersonForm';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
 import PeopleList from './components/PeopleList';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { fetchPeople } from '@/app/admin/people/peopleSlice';
+import { fetchPeople } from './peopleThunks';
+import { createPerson, editPerson } from '@/app/admin/people/peopleThunks';
 import { Person } from '@/types/person';
 import ListHeader from '@/components/ListHeader';
 
@@ -26,15 +25,33 @@ export default function PersonList() {
   if (loading) return <div>Loading people...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  const handleSave = async (data: Partial<Person>) => {
+  const handleSave = async (data: Partial<Person> & { file?: File }) => {
     if (editingPerson) {
-      const personRef = doc(db, 'people', editingPerson.id);
-      await updateDoc(personRef, { ...data });
+      await dispatch(
+        editPerson({
+          id: editingPerson.id,
+          updates: {
+            name: data.name,
+            bio: data.bio,
+            email: data.email,
+            linkedInUrl: data.linkedInUrl,
+          },
+          file: data.file,
+        })
+      );
     } else {
-      await addDoc(collection(db, 'people'), {
-        ...data,
-        connectedWithLinkedIn: false,
-      });
+      await dispatch(
+        createPerson({
+          personData: {
+            name: data.name ?? '',
+            bio: data.bio,
+            email: data.email,
+            linkedInUrl: data.linkedInUrl,
+            connectedWithLinkedIn: false,
+          },
+          file: data.file,
+        })
+      );
     }
 
     dispatch(fetchPeople());

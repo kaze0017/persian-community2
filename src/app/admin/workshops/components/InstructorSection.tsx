@@ -3,7 +3,7 @@ import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { fetchPeople } from '@/app/admin/people/peopleSlice';
+import { fetchPeople } from '@/app/admin/people/peopleThunks';
 import {
   Select,
   SelectTrigger,

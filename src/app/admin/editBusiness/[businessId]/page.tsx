@@ -71,6 +71,7 @@ export default function EditBusinessPage() {
       logoFile,
       ownerImageFile,
       businessCardFile,
+      bannerImageFile,
     });
     setLoading(false);
     // Optionally navigate or show toast

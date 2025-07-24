@@ -1,26 +1,63 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Person } from '@/types/person';
+import Image from 'next/image';
 
 interface PersonFormProps {
   initialData?: Partial<Person>;
-  onSave: (data: Partial<Person>) => void;
+  onSave: (data: Partial<Person> & { file?: File }) => void;
   onCancel: () => void;
 }
+
+const MAX_FILE_SIZE_MB = 2;
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 export function PersonForm({ initialData, onSave, onCancel }: PersonFormProps) {
   const { register, handleSubmit } = useForm<Partial<Person>>({
     defaultValues: initialData || {},
   });
 
+  const [file, setFile] = useState<File | undefined>();
+  const [previewUrl, setPreviewUrl] = useState<string | undefined>(
+    initialData?.photoUrl
+  );
+
+  useEffect(() => {
+    if (!file) {
+      setPreviewUrl(initialData?.photoUrl);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [file, initialData?.photoUrl]);
+
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
+
+    if (!ALLOWED_TYPES.includes(selectedFile.type)) {
+      alert('Only JPG, PNG, or WEBP images are allowed.');
+      e.target.value = '';
+      return;
+    }
+    if (selectedFile.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      alert(`Maximum image size is ${MAX_FILE_SIZE_MB} MB.`);
+      e.target.value = '';
+      return;
+    }
+
+    setFile(selectedFile);
+  };
+
   const onSubmit = (data: Partial<Person>) => {
-    onSave(data);
+    onSave({ ...data, file });
   };
 
   return (
@@ -36,8 +73,17 @@ export function PersonForm({ initialData, onSave, onCancel }: PersonFormProps) {
       </div>
 
       <div>
-        <Label>Photo URL</Label>
-        <Input {...register('photoUrl')} type='url' />
+        <Label>Profile Photo</Label>
+        <Input type='file' accept='image/*' onChange={onFileChange} />
+        {previewUrl && (
+          <Image
+            width={128}
+            height={128}
+            className='mt-2 w-32 h-32 object-cover rounded-md border'
+            src={previewUrl}
+            alt='Preview'
+          />
+        )}
       </div>
 
       <div>

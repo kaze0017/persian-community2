@@ -7,11 +7,13 @@ import {
   updateDoc,
   deleteDoc,
 } from 'firebase/firestore';
-import { db } from '@/lib/firebase'; // adjust import path
+import { db } from '@/lib/firebase';
 import { Workshop } from '@/types/workshop';
 import { Timestamp } from 'firebase/firestore';
-
-type FirestoreWorkshopData = Omit<Workshop, 'id' | 'createdAt' | 'updatedAt'> & {
+type FirestoreWorkshopData = Omit<
+  Workshop,
+  'id' | 'createdAt' | 'updatedAt'
+> & {
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
 };
@@ -29,39 +31,45 @@ const initialState: WorkshopsState = {
 
 // Async thunk: fetch all workshops
 export const fetchWorkshops = createAsyncThunk<
-  Workshop[],         // Return type
-  void,               // Argument type
-  { rejectValue: string } // thunkAPI.rejectWithValue type
->(
-  'workshops/fetchAll',
-  async (_, thunkAPI) => {
-    try {
-      const querySnapshot = await getDocs(collection(db, 'workshops'));
-      const workshops: Workshop[] = [];
+  Workshop[],
+  void,
+  { rejectValue: string }
+>('workshops/fetchAll', async (_, thunkAPI) => {
+  try {
+    const querySnapshot = await getDocs(collection(db, 'workshops'));
+    const workshops: Workshop[] = [];
 
-      querySnapshot.forEach((docSnap) => {
-        const data = docSnap.data() as FirestoreWorkshopData;
-         workshops.push({
-    id: docSnap.id,
-    ...data,
-    createdAt: data.createdAt?.toDate().toISOString() ?? '',
-    updatedAt: data.updatedAt?.toDate().toISOString() ?? '',
-  });
+    querySnapshot.forEach((docSnap) => {
+      const data = docSnap.data() as FirestoreWorkshopData;
+      workshops.push({
+        id: docSnap.id,
+        ...data,
+        createdAt:
+          data.createdAt instanceof Timestamp
+            ? data.createdAt.toDate().toISOString()
+            : typeof data.createdAt === 'string'
+              ? data.createdAt
+              : '',
+        updatedAt:
+          data.updatedAt instanceof Timestamp
+            ? data.updatedAt.toDate().toISOString()
+            : typeof data.updatedAt === 'string'
+              ? data.updatedAt
+              : '',
       });
+    });
 
-      return workshops;
-    } catch (error: unknown) {
-      let message = 'Unknown error';
+    return workshops;
+  } catch (error: unknown) {
+    let message = 'Unknown error';
 
-      if (error instanceof Error) {
-        message = error.message;
-      }
-
-      return thunkAPI.rejectWithValue(message);
+    if (error instanceof Error) {
+      message = error.message;
     }
-  }
-);
 
+    return thunkAPI.rejectWithValue(message);
+  }
+});
 
 // Async thunk: add new workshop
 export const addWorkshop = createAsyncThunk(
@@ -129,10 +137,13 @@ const workshopsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchWorkshops.fulfilled, (state, action: PayloadAction<Workshop[]>) => {
-        state.loading = false;
-        state.workshops = action.payload;
-      })
+      .addCase(
+        fetchWorkshops.fulfilled,
+        (state, action: PayloadAction<Workshop[]>) => {
+          state.loading = false;
+          state.workshops = action.payload;
+        }
+      )
       .addCase(fetchWorkshops.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
@@ -143,10 +154,13 @@ const workshopsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(addWorkshop.fulfilled, (state, action: PayloadAction<Workshop>) => {
-        state.loading = false;
-        state.workshops.push(action.payload);
-      })
+      .addCase(
+        addWorkshop.fulfilled,
+        (state, action: PayloadAction<Workshop>) => {
+          state.loading = false;
+          state.workshops.push(action.payload);
+        }
+      )
       .addCase(addWorkshop.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
@@ -159,11 +173,19 @@ const workshopsSlice = createSlice({
       })
       .addCase(
         updateWorkshop.fulfilled,
-        (state, action: PayloadAction<{ id: string; data: Partial<Workshop> }>) => {
+        (
+          state,
+          action: PayloadAction<{ id: string; data: Partial<Workshop> }>
+        ) => {
           state.loading = false;
-          const index = state.workshops.findIndex((w) => w.id === action.payload.id);
+          const index = state.workshops.findIndex(
+            (w) => w.id === action.payload.id
+          );
           if (index !== -1) {
-            state.workshops[index] = { ...state.workshops[index], ...action.payload.data };
+            state.workshops[index] = {
+              ...state.workshops[index],
+              ...action.payload.data,
+            };
           }
         }
       )
@@ -177,10 +199,15 @@ const workshopsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(deleteWorkshop.fulfilled, (state, action: PayloadAction<string>) => {
-        state.loading = false;
-        state.workshops = state.workshops.filter((w) => w.id !== action.payload);
-      })
+      .addCase(
+        deleteWorkshop.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          state.loading = false;
+          state.workshops = state.workshops.filter(
+            (w) => w.id !== action.payload
+          );
+        }
+      )
       .addCase(deleteWorkshop.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
