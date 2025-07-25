@@ -56,7 +56,7 @@ export const metadata: Metadata = {
       'Discover local businesses and upcoming events in the Persian community.',
     site: '@keivanarts', // if you don't have a Twitter handle, remove this line
     creator: '@keivanarts',
-    images: ['https://keivanarts.com/images/og-image.jpg'], // ✅ Same OG image as OpenGraph
+    images: ['https://keivanarts.com/images/og-image.jpg'],
   },
 };
 
@@ -70,7 +70,9 @@ export default function RootLayout({
       <body
         className={`
     ${geistSans.variable} ${geistMono.variable}
-    antialiased bg-no-repeat bg-cover bg-center `}
+    antialiased bg-no-repeat bg-cover bg-center
+    overflow-y-scroll
+  `}
       >
         <Providers>
           {/* <MapProvider> */}
@@ -82,7 +84,7 @@ export default function RootLayout({
           >
             <Toaster position='top-center' />
             <Header />
-            <div className='max-w-[1280px] mx-auto px-4'>{children}</div>
+            <div className='max-w-[1280px] mx-full m-auto px-4'>{children}</div>
             <Footer />
           </ThemeProvider>
           {/* </MapProvider> */}
