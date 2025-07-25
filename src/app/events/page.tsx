@@ -2,33 +2,31 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-
 import { fetchEvents } from '@/app/admin/events/reducer/eventsSlice';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import EventCard from './components/EventCard';
 import ListHeader from '@/components/ListHeader';
 import { fetchCategories } from '@/app/lib/categoriesSlice';
-
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { CalendarDays, ListIcon } from 'lucide-react';
 import Calendar from './components/Calendar';
+import { useMediaQuery } from '../utils/useMediaQuery';
+import { useMedia } from 'use-media';
 
 export default function EventsPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-
   const { events, loading, error } = useAppSelector((state) => state.events);
+  const { categories } = useAppSelector((state) => state.categories);
 
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
-
-  const { categories } = useAppSelector((state) => state.categories);
+  const [view, setView] = useState<'list' | 'calendar'>('list');
+  const isLargeScreen = useMedia({ minWidth: 1024 }); // Tailwind lg breakpoint
 
   useEffect(() => {
     dispatch(fetchCategories());
-  }, [dispatch]);
-
-  useEffect(() => {
     dispatch(fetchEvents());
   }, [dispatch]);
 
@@ -46,63 +44,72 @@ export default function EventsPage() {
     });
   }, [events, filterCategory, search]);
 
+  const ViewButtons = (
+    <div className='flex justify-center gap-2'>
+      <Button
+        variant={'outline'}
+        onClick={() => setView('list')}
+        className={isLargeScreen ? 'w-40' : 'w-25'}
+      >
+        <ListIcon className='mr-2 h-4 w-4' />
+        {isLargeScreen ? 'List View' : 'List'}
+      </Button>
+      <Button
+        variant={'outline'}
+        onClick={() => setView('calendar')}
+        className={isLargeScreen ? 'w-40' : 'w-25'}
+      >
+        <CalendarDays className='mr-2 h-4 w-4' />
+        {isLargeScreen ? 'Calendar View' : 'Calendar'}
+      </Button>
+    </div>
+  );
+
   return (
-    <Tabs defaultValue='list' className='w-full max-w-6xl mx-auto p-6'>
-      <TabsList className='grid w-full grid-cols-2 mb-6'>
-        <TabsTrigger value='list'>List View</TabsTrigger>
-        <TabsTrigger value='calendar'>Calendar View</TabsTrigger>
-      </TabsList>
+    <>
+      <ListHeader
+        addLabel='Add Event'
+        onAdd={() => router.push('/admin/events/add-event')}
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder='Search events...'
+        filterValue={filterCategory}
+        onFilterChange={setFilterCategory}
+        filterOptions={categories.map((cat) => cat.name)}
+        showAdd={false}
+        showSearch
+        showFilter
+        showRefresh
+        onRefresh={() => dispatch(fetchEvents())}
+        disabled={loading}
+        buttons={ViewButtons}
+      />
 
-      <TabsContent value='list'>
-        <Card className='p-6'>
-          <div className='space-y-8'>
-            <div className='flex items-center justify-between mb-6'>
-              <h1 className='text-3xl font-bold'>Events</h1>
-            </div>
+      {view === 'list' && (
+        <>
+          {error && (
+            <div className='text-red-600 font-semibold'>Error: {error}</div>
+          )}
 
-            <ListHeader
-              addLabel='Add Event'
-              onAdd={() => router.push('/admin/events/add-event')}
-              search={search}
-              onSearchChange={setSearch}
-              searchPlaceholder='Search events...'
-              filterValue={filterCategory}
-              onFilterChange={setFilterCategory}
-              filterOptions={categories.map((cat) => cat.name)}
-              showAdd={false}
-              showSearch
-              showFilter={true}
-              showRefresh
-              onRefresh={() => dispatch(fetchEvents())}
-              disabled={loading}
-            />
+          {loading && (
+            <div className='text-center font-medium'>Loading events...</div>
+          )}
 
-            {error && (
-              <div className='text-red-600 font-semibold'>Error: {error}</div>
-            )}
+          {!loading && filteredEvents.length === 0 && (
+            <div className='text-center text-gray-500'>No events found.</div>
+          )}
 
-            {loading && (
-              <div className='text-center font-medium'>Loading events...</div>
-            )}
-
-            {!loading && filteredEvents.length === 0 && (
-              <div className='text-center text-gray-500'>No events found.</div>
-            )}
-
+          {!loading && !error && filteredEvents.length > 0 && (
             <div className='grid gap-4 sm:grid-cols-2 md:grid-cols-3 auto-rows-fr'>
               {filteredEvents.map((event) => (
                 <EventCard key={event.id} event={event} />
               ))}
             </div>
-          </div>
-        </Card>
-      </TabsContent>
+          )}
+        </>
+      )}
 
-      <TabsContent value='calendar'>
-        <Card className='p-6 text-center text-muted-foreground'>
-          <Calendar events={events} />
-        </Card>
-      </TabsContent>
-    </Tabs>
+      {view === 'calendar' && <Calendar events={filteredEvents} />}
+    </>
   );
 }

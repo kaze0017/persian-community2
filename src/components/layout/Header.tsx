@@ -24,15 +24,26 @@ import AuthDropdown from '@/components/auth/AuthDropdown';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const isActive = (href: string) => pathname === href;
 
   const handleNavClick = (href: string) => {
-    setIsOpen(false); // ✅ close the menu
-    router.push(href); // ✅ navigate
+    setIsOpen(false);
+    router.push(href);
   };
+  function cn(
+    arg0: string,
+    arg1: string,
+    arg2: string | boolean
+  ): string | undefined {
+    throw new Error('Function not implemented.');
+  }
+
   return (
     <header className='relative flex items-center justify-between px-4 py-2 border-b bg-background'>
       {/* ✅ Left: Logo */}
@@ -52,46 +63,22 @@ export default function Header() {
       <div className='hidden md:flex justify-center absolute left-1/2 -translate-x-1/2'>
         <NavigationMenu>
           <NavigationMenuList className='flex gap-4'>
-            <NavigationMenuItem>
-              <Link href='/' className={navigationMenuTriggerStyle()}>
-                <NavigationMenuLink
-                  // href='/'
-                  className={`${navigationMenuTriggerStyle()} w-[120px] text-center`}
-                >
-                  Home
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <Link href='/businesses'>
-                <NavigationMenuLink
-                  // href='/businesses'
-                  className={`${navigationMenuTriggerStyle()} w-[120px] text-center`}
-                >
-                  Businesses
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <Link href='/events'>
-                <NavigationMenuLink
-                  // href='/events'
-                  className={`${navigationMenuTriggerStyle()} w-[120px] text-center`}
-                >
-                  Events
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <Link href='/workshops'>
-                <NavigationMenuLink
-                  // href='/workshops'
-                  className={`${navigationMenuTriggerStyle()} w-[120px] text-center`}
-                >
-                  Workshops
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
+            {[
+              { label: 'Home', href: '/' },
+              { label: 'Businesses', href: '/businesses' },
+              { label: 'Events', href: '/events' },
+              { label: 'Workshops', href: '/workshops' },
+            ].map(({ label, href }) => (
+              <NavigationMenuItem key={href}>
+                <Link href={href}>
+                  <NavigationMenuLink
+                    className={'width-[120px] ' + navigationMenuTriggerStyle()}
+                  >
+                    {label}
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+            ))}
           </NavigationMenuList>
         </NavigationMenu>
       </div>

@@ -72,6 +72,7 @@ export default function RootLayout({
     ${geistSans.variable} ${geistMono.variable}
     antialiased bg-no-repeat bg-cover bg-center
     overflow-y-scroll
+    min-h-screen flex flex-col w-full
   `}
       >
         <Providers>
@@ -84,7 +85,9 @@ export default function RootLayout({
           >
             <Toaster position='top-center' />
             <Header />
-            <div className='max-w-[1280px] mx-full m-auto px-4'>{children}</div>
+            <div className='max-w-[1280px]  flex flex-col grow w-full mx-auto px-4'>
+              {children}
+            </div>
             <Footer />
           </ThemeProvider>
           {/* </MapProvider> */}
