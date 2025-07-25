@@ -16,7 +16,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import EventReviewCard from './EventReviewCaed';
+import EventReviewCard from './EventReviewCard';
 
 interface CalendarProps {
   events: Event[];

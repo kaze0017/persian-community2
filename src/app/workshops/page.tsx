@@ -22,7 +22,13 @@ export default function WorkshopsPage() {
         ? workshop.title.toLowerCase().includes(search.toLowerCase()) ||
           workshop.description?.toLowerCase().includes(search.toLowerCase())
         : true;
-      const matchesCategory = category ? workshop.category === category : true;
+      const matchesCategory =
+        !category ||
+        workshop.category === category ||
+        category?.toLocaleLowerCase() === 'all'
+          ? true
+          : false;
+
       return matchesSearch && matchesCategory;
     });
   }, [workshops, search, category]);
@@ -32,8 +38,8 @@ export default function WorkshopsPage() {
   }, [dispatch]);
 
   return (
-    <main className='container mx-auto py-10'>
-      <h1 className='text-3xl font-bold mb-6'>Workshops</h1>
+    <>
+      {/* <h1 className='text-3xl font-bold mb-6'>Workshops</h1> */}
       <ListHeader
         showAdd={false}
         search={search}
@@ -52,10 +58,10 @@ export default function WorkshopsPage() {
         disabled={false}
       />
       <Tabs defaultValue='list' className='w-full'>
-        <TabsList>
-          <TabsTrigger value='list'>List View</TabsTrigger>
-          {/* <TabsTrigger value='calendar'>Calendar View</TabsTrigger> */}
-        </TabsList>
+        {/* <TabsList>
+          <TabsTrigger value='list'>List View</TabsTrigger> */}
+        {/* <TabsTrigger value='calendar'>Calendar View</TabsTrigger> */}
+        {/* </TabsList> */}
         <TabsContent value='list'>
           <WorkshopsList workshops={filteredWorkshops} />
         </TabsContent>
@@ -63,6 +69,7 @@ export default function WorkshopsPage() {
           <WorkshopsCalendar workshops={filteredWorkshops} />
         </TabsContent> */}
       </Tabs>
-    </main>
+    </>
+    // </main>
   );
 }

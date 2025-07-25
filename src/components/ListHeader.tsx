@@ -9,6 +9,7 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 import { Plus, RefreshCcw } from 'lucide-react';
+import React from 'react';
 
 type Props = {
   addLabel?: string;
@@ -27,6 +28,8 @@ type Props = {
 
   onRefresh?: () => void;
   showRefresh?: boolean;
+
+  buttons?: React.ReactNode;
 
   disabled?: boolean;
 };
@@ -50,6 +53,7 @@ export default function ListHeader({
   showRefresh = true,
 
   disabled = false,
+  buttons = [],
 }: Props) {
   return (
     <div className='flex flex-wrap md:flex-nowrap items-center justify-between gap-4 mb-6'>
@@ -65,10 +69,9 @@ export default function ListHeader({
             placeholder={searchPlaceholder}
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            className='w-full md:max-w-xs'
+            className='w-[250px] md:max-w-xs'
           />
         )}
-
         {showFilter && onFilterChange && (
           <Select value={filterValue} onValueChange={onFilterChange}>
             <SelectTrigger className='w-40'>
@@ -84,6 +87,10 @@ export default function ListHeader({
           </Select>
         )}
       </div>
+      <div className='flex-1' />
+      {buttons}
+
+      {/* Refresh button */}
 
       {showRefresh && onRefresh && (
         <div className='flex items-center'>
