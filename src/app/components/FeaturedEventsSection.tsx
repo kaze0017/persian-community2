@@ -19,7 +19,7 @@ export default function FeaturedEventsSection() {
   if (events.length === 0) return <p>No featured events available.</p>;
 
   return (
-    <div className='p-2 w-full border border-amber-300'>
+    <div className='p-2 w-full'>
       <EventCarousel events={events} />
     </div>
   );
