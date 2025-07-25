@@ -22,8 +22,17 @@ import {
 import ModeBtn from '@/components/btns/ModeBtn';
 import AuthDropdown from '@/components/auth/AuthDropdown';
 import Image from 'next/image';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Header() {
+  const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+
+  const handleNavClick = (href: string) => {
+    setIsOpen(false); // ✅ close the menu
+    router.push(href); // ✅ navigate
+  };
   return (
     <header className='relative flex items-center justify-between px-4 py-2 border-b bg-background'>
       {/* ✅ Left: Logo */}
@@ -43,67 +52,45 @@ export default function Header() {
       <div className='hidden md:flex justify-center absolute left-1/2 -translate-x-1/2'>
         <NavigationMenu>
           <NavigationMenuList className='flex gap-4'>
-            {/* <NavigationMenuItem>
-              <NavigationMenuTrigger>Home</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className='w-[300px] p-4 space-y-2'>
-                  <ListItem href='/' title='Welcome'>
-                    Intro content here
-                  </ListItem>
-                  <ListItem href='/docs' title='Docs'>
-                    Documentation
-                  </ListItem>
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem> */}
-
-            {/* <NavigationMenuItem>
-              <NavigationMenuTrigger>Components</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className='grid w-[400px] gap-2 md:grid-cols-2 p-4'>
-                  {[
-                    { title: 'Tabs', href: '/tabs' },
-                    { title: 'Progress', href: '/progress' },
-                  ].map((item) => (
-                    <ListItem key={item.title} {...item}>
-                      Description for {item.title}
-                    </ListItem>
-                  ))}
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem> */}
-
             <NavigationMenuItem>
-              <NavigationMenuLink
-                href='/'
-                className={navigationMenuTriggerStyle()}
-              >
-                Home
-              </NavigationMenuLink>
+              <Link href='/' className={navigationMenuTriggerStyle()}>
+                <NavigationMenuLink
+                  // href='/'
+                  className={`${navigationMenuTriggerStyle()} w-[120px] text-center`}
+                >
+                  Home
+                </NavigationMenuLink>
+              </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink
-                href='/businesses'
-                className={navigationMenuTriggerStyle()}
-              >
-                Businesses
-              </NavigationMenuLink>
+              <Link href='/businesses'>
+                <NavigationMenuLink
+                  // href='/businesses'
+                  className={`${navigationMenuTriggerStyle()} w-[120px] text-center`}
+                >
+                  Businesses
+                </NavigationMenuLink>
+              </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink
-                href='/events'
-                className={navigationMenuTriggerStyle()}
-              >
-                Events
-              </NavigationMenuLink>
+              <Link href='/events'>
+                <NavigationMenuLink
+                  // href='/events'
+                  className={`${navigationMenuTriggerStyle()} w-[120px] text-center`}
+                >
+                  Events
+                </NavigationMenuLink>
+              </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink
-                href='/workshops'
-                className={navigationMenuTriggerStyle()}
-              >
-                Workshops
-              </NavigationMenuLink>
+              <Link href='/workshops'>
+                <NavigationMenuLink
+                  // href='/workshops'
+                  className={`${navigationMenuTriggerStyle()} w-[120px] text-center`}
+                >
+                  Workshops
+                </NavigationMenuLink>
+              </Link>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
@@ -116,7 +103,7 @@ export default function Header() {
 
         {/* Desktop Menu */}
         <div className='md:hidden'>
-          <Sheet>
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button variant='ghost' size='icon'>
                 <Menu />
@@ -125,16 +112,18 @@ export default function Header() {
             <SheetContent side='left' className='p-4'>
               <SheetHeader>
                 <SheetTitle>Menu</SheetTitle>
-                {/* optional: <SheetDescription>Navigation links</SheetDescription> */}
               </SheetHeader>
               <nav className='flex flex-col gap-4'>
-                <Link href='/'>Home</Link>
-                <Link href='/businesses'>Businesses</Link>
-                <Link href='/events'>Events</Link>
-                <Link href='/workshops'>Workshops</Link>
-                {/* <Link href='/docs'>Docs</Link> */}
-                {/* <Link href='/components'>Components</Link> */}
-                {/* <Link href='/themes'>Themes</Link> */}
+                <Button onClick={() => handleNavClick('/')}>Home</Button>
+                <Button onClick={() => handleNavClick('/businesses')}>
+                  Businesses
+                </Button>
+                <Button onClick={() => handleNavClick('/events')}>
+                  Events
+                </Button>
+                <Button onClick={() => handleNavClick('/workshops')}>
+                  Workshops
+                </Button>
               </nav>
             </SheetContent>
           </Sheet>
@@ -143,24 +132,3 @@ export default function Header() {
     </header>
   );
 }
-
-// function ListItem({
-//   title,
-//   children,
-//   href,
-// }: {
-//   title: string;
-//   children: React.ReactNode;
-//   href: string;
-// }) {
-//   return (
-//     <li>
-//       <NavigationMenuLink asChild>
-//         <Link href={href} className='block text-sm font-medium'>
-//           <div>{title}</div>
-//           <p className='text-xs text-muted-foreground'>{children}</p>
-//         </Link>
-//       </NavigationMenuLink>
-//     </li>
-//   );
-// }
