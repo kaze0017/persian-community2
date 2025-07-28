@@ -63,7 +63,12 @@ export default function BusinessAboutSection({
     if (!e.target.files?.[0]) return;
     setUpdating(true);
     try {
-      const url = await uploadImage(e.target.files[0], `owners/${businessId}`);
+      const baseName = 'profile';
+      const fileName = `${baseName}.jpg`;
+      const path = `businesses/${businessId}/owner/`;
+      const url = (
+        await uploadImage(e.target.files[0], path, fileName)
+      ).replace(fileName, `${baseName}.webp`);
       await updateDocument('businesses', businessId, { ownerImageUrl: url });
       setOwnerImageUrl(url); // update local preview
     } catch (err) {

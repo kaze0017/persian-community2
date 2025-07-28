@@ -10,6 +10,7 @@ import SectionPanel from './subComponents/SectionPanel';
 import { uploadImage } from '@/services/storageService';
 import { updateDocument } from '@/services/firestoreService';
 import AdminControlsPanel from './subComponents/AdminControlsPanel';
+import Link from 'next/link';
 
 interface Props {
   businessId: string;
@@ -68,37 +69,34 @@ export default function HeaderSection({
     updateHeaderConfigField('bannerEnabled', !bannerEnabled);
   };
 
-  // Upload new logo, update Firestore logoUrl
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: 'logo' | 'banner'
+  ) => {
     if (!e.target.files?.[0]) return;
     setUpdating(true);
     try {
       const file = e.target.files[0];
-      const url = await uploadImage(file, `logos/${businessId}`);
-      await updateDocument('businesses', businessId, { logoUrl: url });
-      setLogoUrl(url); // Update local state
+      const path = `businesses/${businessId}/${type}`;
+      const url = (await uploadImage(file, path, `${type}.jpg`)).replace(
+        `${type}.jpg`,
+        `${type}.webp`
+      );
+
+      if (type === 'logo') {
+        await updateDocument('businesses', businessId, { logoUrl: url });
+        setLogoUrl(url);
+      } else {
+        await updateDocument('businesses', businessId, { bannerImageUrl: url });
+        setBannerImageUrl(url);
+      }
     } catch (err) {
-      console.error('Error uploading logo:', err);
+      console.error(`Error uploading ${type}:`, err);
     } finally {
       setUpdating(false);
     }
   };
 
-  // Upload new banner, update Firestore bannerImageUrl
-  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.[0]) return;
-    setUpdating(true);
-    try {
-      const file = e.target.files[0];
-      const url = await uploadImage(file, `banners/${businessId}`);
-      await updateDocument('businesses', businessId, { bannerImageUrl: url });
-      setBannerImageUrl(url); // Update local state
-    } catch (err) {
-      console.error('Error uploading banner:', err);
-    } finally {
-      setUpdating(false);
-    }
-  };
   // Save slogan in nested headerConfig.slogan
   const saveSlogan = async () => {
     setUpdating(true);
@@ -137,12 +135,12 @@ export default function HeaderSection({
           {
             label: 'Choose Logo',
             inputRef: logoInputRef,
-            onChange: handleLogoUpload,
+            onChange: (e) => handleImageUpload(e, 'logo'),
           },
           {
             label: 'Choose Banner',
             inputRef: bannerInputRef,
-            onChange: handleBannerUpload,
+            onChange: (e) => handleImageUpload(e, 'banner'),
           },
         ]}
       />
@@ -168,7 +166,7 @@ export default function HeaderSection({
                 asChild
                 className='text-muted-foreground hover:text-primary'
               >
-                <a href={`#${label.toLowerCase()}`}>{label}</a>
+                <Link href={`#${label.toLowerCase()}`}>{label}</Link>
               </Button>
             ))}
           </div>

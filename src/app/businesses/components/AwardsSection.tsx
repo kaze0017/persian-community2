@@ -118,6 +118,7 @@ export default function AwardsSection({
           onSave={handleSaveReward}
           onCancel={handleCancelAdd}
           loading={updating}
+          businessId={businessId}
         />
       )}
 

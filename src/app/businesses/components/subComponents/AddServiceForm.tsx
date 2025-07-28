@@ -8,14 +8,21 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import Image from 'next/image';
 import { uploadImage } from '@/services/storageService';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
   onSave: (service: BusinessService) => void;
   onCancel: () => void;
   loading?: boolean;
+  businessId?: string;
 }
 
-export default function AddServiceForm({ onSave, onCancel, loading }: Props) {
+export default function AddServiceForm({
+  onSave,
+  onCancel,
+  loading,
+  businessId,
+}: Props) {
   const [form, setForm] = useState<Partial<BusinessService>>({
     name: '',
     description: '',
@@ -42,8 +49,15 @@ export default function AddServiceForm({ onSave, onCancel, loading }: Props) {
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const path = `businesses/${businessId}/services/`;
+    const baseName =
+      field === 'iconUrl' ? `icons_${uuidv4()}` : `images_${uuidv4()}`;
+    const fileName = `${baseName}.jpg`;
     try {
-      const url = await uploadImage(file, `services/${crypto.randomUUID()}`);
+      const url = (await uploadImage(file, path, fileName)).replace(
+        fileName,
+        `${baseName}_thumb.webp`
+      );
       handleChange(field, url);
     } catch (err) {
       console.error(`Error uploading ${field}:`, err);

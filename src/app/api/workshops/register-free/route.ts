@@ -4,8 +4,7 @@ import { collection, addDoc } from 'firebase/firestore';
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
-  console.log('Registering for free workshop');
-  
+ 
   const formData = await req.formData();
   const workshopId = formData.get('workshopId');
   const name = formData.get('name');

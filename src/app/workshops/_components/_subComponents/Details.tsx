@@ -6,6 +6,7 @@ import { format, parseISO } from 'date-fns';
 import { ExternalLinkIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface DetailsProps {
   workshop: Workshop;
@@ -40,7 +41,7 @@ export default function Details({ workshop }: DetailsProps) {
       <div className='flex gap-6 items-start'>
         {/* Instructor Image */}
         {workshop.instructor?.photoUrl && (
-          <a
+          <Link
             href={workshop.instructor.linkedInUrl ?? '#'}
             target='_blank'
             rel='noopener noreferrer'
@@ -54,7 +55,7 @@ export default function Details({ workshop }: DetailsProps) {
               height={64}
               className='object-cover w-full h-full'
             />
-          </a>
+          </Link>
         )}
 
         {/* Workshop Info */}
@@ -62,14 +63,14 @@ export default function Details({ workshop }: DetailsProps) {
           <div>
             <strong>Instructor:</strong> {workshop.instructor?.name ?? 'N/A'}
             {workshop.instructor?.linkedInUrl && (
-              <a
+              <Link
                 href={workshop.instructor.linkedInUrl}
                 target='_blank'
                 rel='noopener noreferrer'
                 className='ml-1 inline-block text-blue-500'
               >
                 <ExternalLinkIcon className='inline w-3 h-3' />
-              </a>
+              </Link>
             )}
           </div>
           <div>

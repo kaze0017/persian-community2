@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 interface EmailTemplateProps {
   firstName?: string;
   connectionLink: string;
@@ -15,9 +17,9 @@ export function EmailTemplate({
         platform:
       </p>
       <p>
-        <a href={connectionLink} target='_blank' rel='noopener noreferrer'>
+        <Link href={connectionLink} target='_blank' rel='noopener noreferrer'>
           Connect LinkedIn
-        </a>
+        </Link>
       </p>
       <p>Thanks,</p>
       <p>Your App Team</p>

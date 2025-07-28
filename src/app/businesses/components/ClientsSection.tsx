@@ -137,6 +137,7 @@ export default function ClientSection({
           onSave={handleSaveClient}
           onCancel={handleCancelAdd}
           loading={updating}
+          businessId={businessId}
         />
       )}
 

@@ -10,7 +10,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { v4 as uuidv4 } from 'uuid';
+
+const MAX_FILE_SIZE = 1 * 1024 * 1024; // 2 MB
+const MAX_TOTAL_SIZE = 10 * 1024 * 1024; // 10 MB total
 
 interface GalleryImageForm {
   file: File;
@@ -36,13 +38,34 @@ export default function GalleryUploader({
     description?: string;
   }>();
 
+  const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
+
+  const MAX_TOTAL_SIZE = 10 * 1024 * 1024; // 10 MB total
+
   const onDrop = (acceptedFiles: File[]) => {
+    const totalSize = images.reduce((sum, img) => sum + img.file.size, 0);
+    const newFilesSize = acceptedFiles.reduce(
+      (sum, file) => sum + file.size,
+      0
+    );
+
+    if (totalSize + newFilesSize > MAX_TOTAL_SIZE) {
+      alert('Total gallery size cannot exceed 10 MB.');
+      return;
+    }
+
     const newImages = acceptedFiles.map((file) => ({
       file,
       previewUrl: URL.createObjectURL(file),
     }));
     setImages((prev) => [...prev, ...newImages]);
   };
+
+  // const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  //   onDrop,
+  //   maxSize: MAX_FILE_SIZE, // ensures react-dropzone rejects large files
+  //   accept: { 'image/*': [] },
+  // });
 
   // Clean up preview URLs on unmount or when images change
   useEffect(() => {
@@ -79,13 +102,27 @@ export default function GalleryUploader({
 
     setUploading(true);
     try {
+      //delete the old gallery if it exists
+      const galleryDocRef = doc(
+        db,
+        'businesses',
+        businessId,
+        'gallery',
+        businessId
+      );
+      await setDoc(galleryDocRef, {}, { merge: true });
+      // Upload each image
       const uploaded = await Promise.all(
-        images.map(async (img) => {
-          const imageId = uuidv4();
-          const path = `galleries/${businessId}/${imageId}`;
-          const url = await uploadImage(img.file, path);
+        images.map(async (img, index) => {
+          // const imageId = uuidv4();
+          const path = `businesses/${businessId}/gallery/`;
+          const url = await uploadImage(img.file, path, `${index}.jpg`);
           return {
-            url,
+            urls: {
+              original: url,
+              slide: url.replace(`${index}.jpg`, `${index}_slide.webp`),
+              thumbnail: url.replace(`${index}.jpg`, `${index}_thumb.webp`),
+            },
             title: img.title || '',
             caption: img.caption || '',
             photographer: img.photographer || '',
@@ -94,13 +131,13 @@ export default function GalleryUploader({
         })
       );
 
-      const galleryDocRef = doc(
-        db,
-        'businesses',
-        businessId,
-        'gallery',
-        businessId
-      );
+      // const galleryDocRef = doc(
+      //   db,
+      //   'businesses',
+      //   businessId,
+      //   'gallery',
+      //   businessId
+      // );
       await setDoc(galleryDocRef, {
         title: formData.galleryTitle,
         description: formData.description || '',

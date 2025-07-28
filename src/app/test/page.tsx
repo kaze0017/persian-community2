@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { storage } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import Link from 'next/link';
 
 const ImageUploader = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -39,9 +40,9 @@ const ImageUploader = () => {
       {uploadUrl && (
         <p className='text-green-600'>
           Uploaded:{' '}
-          <a href={uploadUrl} target='_blank'>
+          <Link href={uploadUrl} target='_blank'>
             {uploadUrl}
-          </a>
+          </Link>
         </p>
       )}
     </div>
