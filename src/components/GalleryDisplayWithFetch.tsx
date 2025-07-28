@@ -11,7 +11,11 @@ interface Props {
 }
 
 interface GalleryImage {
-  url: string;
+  urls: {
+    original: string;
+    slide: string;
+    thumbnail: string;
+  };
   title?: string;
   caption?: string;
   photographer?: string;
@@ -82,7 +86,7 @@ export default function GalleryDisplayWithFetch({
       photographer={gallery.photographer}
       date={gallery.date}
       images={gallery.images.map((img) => ({
-        src: img.url,
+        urls: img.urls,
         width: 1,
         height: 1,
         title: img.title,

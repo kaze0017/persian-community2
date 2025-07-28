@@ -17,7 +17,6 @@ export async function saveWorkshop(
 ) {
   const workshopId = selectedWorkshopId ?? doc(collection(db, 'workshops')).id;
 let bannerUrl = existingBannerUrl || '';
-console.log('**:', workshopId, existingBannerUrl);
 
 if (bannerFile) {
   const uploadedUrl = await uploadImage(
@@ -26,13 +25,9 @@ if (bannerFile) {
     `banner.jpg`
   );
 
-  console.log('**Uploaded banner URL:', workshopId, uploadedUrl);
-
-  // Replace .jpg or .jpeg (case insensitive) with .webp in the URL
 bannerUrl = uploadedUrl.replace('banner.jpg', 'banner.webp');
 }
 
-console.log('**Final banner URL:', workshopId, bannerUrl);
 
 
   const { bannerFile: _discard, ...dataWithoutBannerFile } = data as any;
@@ -82,7 +77,6 @@ console.log('**Final banner URL:', workshopId, bannerUrl);
   if (selectedWorkshopId) {
     // Update Firestore with serverTimestamp
     const docRef = doc(db, 'workshops', workshopId);
-    console.log('Updating workshop:', workshopId, firestoreData);
     await updateDoc(docRef, firestoreData);
 
     // Update Redux with serializable data

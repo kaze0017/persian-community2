@@ -7,14 +7,21 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { uploadImage } from '@/services/storageService'; // Your upload helper
 import Image from 'next/image';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
   onSave: (reward: BusinessReward) => void;
   onCancel: () => void;
   loading?: boolean;
+  businessId: string;
 }
 
-export default function AddRewardForm({ onSave, onCancel, loading }: Props) {
+export default function AddRewardForm({
+  onSave,
+  onCancel,
+  loading,
+  businessId,
+}: Props) {
   const [form, setForm] = useState<Partial<BusinessReward>>({
     name: '',
     description: '',
@@ -38,7 +45,14 @@ export default function AddRewardForm({ onSave, onCancel, loading }: Props) {
     setUploading(true);
     try {
       // Upload the file to your storage and get URL
-      const url = await uploadImage(file, 'rewards'); // Adjust path as needed
+      const baseName = `${uuidv4()}`;
+      const fileName = `${baseName}.jpg`;
+      const path = `businesses/${businessId}/rewards/`;
+
+      const url = (await uploadImage(file, path, fileName)).replace(
+        fileName,
+        `${baseName}_thumb.webp`
+      );
       setForm((prev) => ({ ...prev, imageUrl: url }));
     } catch (error) {
       console.error('Image upload failed:', error);
@@ -90,8 +104,8 @@ export default function AddRewardForm({ onSave, onCancel, loading }: Props) {
           {uploading
             ? 'Uploading...'
             : form.imageUrl
-            ? 'Change Image'
-            : 'Upload Image'}
+              ? 'Change Image'
+              : 'Upload Image'}
         </Button>
         {form.imageUrl && (
           <Image src={form.imageUrl} alt='Reward' width={100} height={100} />

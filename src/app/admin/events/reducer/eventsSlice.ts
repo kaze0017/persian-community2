@@ -80,9 +80,6 @@ export const createEvent = createAsyncThunk<
       bannerUrl = uploadedUrl.replace('banner.jpg', 'banner.webp');
       await updateDocument(EVENTS_COLLECTION, id, { bannerUrl });
     }
-    console.log('***Event created with ID:', id);
-    console.log('***Banner URL:', bannerUrl);
-    console.log('***Event data:', cleanEventData);
 
     return { ...cleanEventData, bannerUrl, id };
   } catch (error) {

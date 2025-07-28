@@ -108,11 +108,6 @@ const salonSlice = createSlice({
 ) => {
   const { key, id } = action.payload;
 
-  console.log('🔄 Attempting to remove table from available groups');
-  console.log('➡ Key:', key);
-  console.log('➡ ID:', id);
-  console.log('🔍 State before:', JSON.parse(JSON.stringify(state.availableGroups)));
-
   const group = state.availableGroups.find((g) => g.key === key);
   if (!group) {
     console.warn(`❌ Group not found for key: ${key}`);
@@ -133,7 +128,6 @@ const salonSlice = createSlice({
     state.availableGroups = state.availableGroups.filter((g) => g.key !== key);
   }
 
-  console.log('✅ Updated availableGroups:', JSON.parse(JSON.stringify(state.availableGroups)));
 }
 
   },

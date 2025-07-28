@@ -7,14 +7,20 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { uploadImage } from '@/services/storageService';
 import { Textarea } from '@/components/ui/textarea';
-
+import { v4 as uuidv4 } from 'uuid';
 interface Props {
   onSave: (client: BusinessClient) => void;
   onCancel: () => void;
   loading?: boolean;
+  businessId: string;
 }
 
-export default function AddClientForm({ onSave, onCancel, loading }: Props) {
+export default function AddClientForm({
+  onSave,
+  onCancel,
+  loading,
+  businessId,
+}: Props) {
   const [form, setForm] = useState<Partial<BusinessClient>>({
     name: '',
     email: '',
@@ -36,7 +42,14 @@ export default function AddClientForm({ onSave, onCancel, loading }: Props) {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      const url = await uploadImage(file, `clients/${crypto.randomUUID()}`);
+      const path = `businesses/${businessId}/clients/`;
+      const baseName = `${uuidv4()}`;
+      const fileName = `${baseName}.jpg`;
+
+      const url = (await uploadImage(file, path, fileName)).replace(
+        fileName,
+        `${baseName}_thumb.webp`
+      );
       handleChange('logoUrl', url);
     } catch (err) {
       console.error('Error uploading logo:', err);

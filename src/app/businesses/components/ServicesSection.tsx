@@ -115,6 +115,7 @@ export default function ServicesSection({
           onSave={handleSaveService}
           onCancel={handleCancelAdd}
           loading={updating}
+          businessId={businessId}
         />
       )}
 

@@ -1,6 +1,6 @@
 'use client';
 import { Workshop } from '@/types/workshop';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -95,6 +95,7 @@ export default function WorkshopCardDetailsDialog({
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className='sm:max-w-2xl'>
+          <DialogTitle>Workshop Details</DialogTitle>
           <div className='mt-4'>
             <Details workshop={workshop} />
             <h4 className='font-semibold text-sm mb-2'>Schedule</h4>

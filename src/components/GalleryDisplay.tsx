@@ -11,7 +11,11 @@ import { Button } from '@/components/ui/button';
 import { Camera, Calendar } from 'lucide-react';
 
 type GalleryImage = {
-  src: string;
+  urls: {
+    original: string;
+    slide: string;
+    thumbnail: string;
+  };
   width: number;
   height: number;
   title?: string;
@@ -73,7 +77,7 @@ export default function GalleryDisplay({
               >
                 <div className='relative w-full md:w-64 aspect-square rounded-xl overflow-hidden shadow'>
                   <Image
-                    src={img.src}
+                    src={img.urls.thumbnail || img.urls.original}
                     alt={img.title ?? `image-${i}`}
                     fill
                     className='object-cover'
@@ -155,7 +159,7 @@ export default function GalleryDisplay({
         close={() => setIndex(-1)}
         index={index}
         slides={images.map((img, i) => ({
-          src: img.src,
+          src: img.urls?.slide || img.urls?.original,
           description: (
             <div key={i} className='text-sm text-white space-y-1'>
               {img.title && <div className='font-semibold'>{img.title}</div>}
@@ -193,7 +197,7 @@ function ImageCard({
       onClick={() => onClick(index)}
     >
       <Image
-        src={img.src}
+        src={img.urls?.thumbnail || img.urls?.original}
         alt={img.title ?? `image-${index}`}
         fill
         className='object-cover transition-transform hover:scale-105 duration-300'

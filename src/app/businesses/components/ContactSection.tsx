@@ -30,8 +30,6 @@ export default function ContactSection({
     };
   }, [business?.businessConfig?.contactConfig]);
 
-  console.log('business', business);
-
   const initialEnabled = useMemo(() => {
     return business?.businessConfig?.contactConfig?.isEnabled ?? true;
   }, [business?.businessConfig?.contactConfig?.isEnabled]);

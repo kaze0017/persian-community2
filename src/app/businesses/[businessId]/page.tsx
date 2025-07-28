@@ -35,8 +35,6 @@ export default function BusinessPage({ params }: Props) {
   }
 
   const isAdmin = false;
-
-  console.log('Business Category:', selectedBusiness.category);
   let content;
   switch (selectedBusiness.category?.toLocaleLowerCase()) {
     case 'art':
