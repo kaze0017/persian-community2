@@ -10,7 +10,7 @@ export default function Footer() {
             href='mailto:64kazemi@gmail.com'
             className='text-blue-600 hover:underline'
           >
-            your-email@example.com
+            64kazemi@gmail.com
           </a>
         </div>
       </div>
