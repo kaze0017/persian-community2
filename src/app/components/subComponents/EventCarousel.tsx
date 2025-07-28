@@ -22,45 +22,45 @@ export default function EventCarousel({ events }: Props) {
     const interval = setInterval(() => {
       slider.current?.next();
     }, 3000);
-
     return () => clearInterval(interval);
   }, [slider]);
 
   return (
     <div className='w-full space-y-6'>
       {/* Main Carousel */}
-      <div
-        ref={ref}
-        className='keen-slider w-full h-[250px] sm:h-[300px] md:h-[400px] rounded-xl overflow-hidden'
-      >
+      <div ref={ref} className='keen-slider w-full rounded-xl overflow-hidden'>
         {events.map((event) => (
           <div
             key={event.id}
-            className='keen-slider__slide relative flex items-end justify-between px-4 py-2 bg-gradient-to-t from-black/60 via-black/30 to-transparent text-white'
+            className='keen-slider__slide relative bg-gray-200'
           >
-            <div className='absolute inset-0'>
+            {/* Aspect ratio wrapper to prevent CLS */}
+            <div className='relative w-full aspect-[16/9] sm:aspect-[2/1] md:aspect-[5/2]'>
               <Image
                 src={event.bannerUrl || '/default-banner.jpg'}
                 alt={event.title}
                 fill
+                priority
                 className='object-cover'
+                sizes='100vw'
               />
-            </div>
 
-            <div className='relative z-10 flex w-full items-end justify-between p-4'>
-              <div>
-                <div className='font-semibold text-lg'>{event.title}</div>
-                <div className='text-xs'>
-                  {new Date(event.date).toLocaleDateString()}
+              {/* Overlay */}
+              <div className='absolute inset-0 flex items-end justify-between p-4 bg-gradient-to-t from-black/60 via-black/30 to-transparent text-white'>
+                <div>
+                  <div className='font-semibold text-lg'>{event.title}</div>
+                  <div className='text-xs'>
+                    {new Date(event.date).toLocaleDateString()}
+                  </div>
                 </div>
-              </div>
 
-              <Link
-                href={`/events/${event.id}`}
-                className='bg-white text-black text-xs font-semibold px-3 py-1 rounded hover:bg-gray-200 transition'
-              >
-                Check It Out
-              </Link>
+                <Link
+                  href={`/events/${event.id}`}
+                  className='bg-white text-black text-xs font-semibold px-3 py-1 rounded hover:bg-gray-200 transition'
+                >
+                  Check It Out
+                </Link>
+              </div>
             </div>
           </div>
         ))}
@@ -78,7 +78,7 @@ export default function EventCarousel({ events }: Props) {
           </Link>
         </div>
 
-        {/* File strip */}
+        {/* Thumbnails */}
         <div className='flex overflow-x-auto gap-4 pb-1'>
           {events.map((event) => (
             <Link
@@ -86,13 +86,15 @@ export default function EventCarousel({ events }: Props) {
               key={`strip-${event.id}`}
               className='flex-none w-[100px] sm:w-[120px] rounded-md overflow-hidden border border-gray-200 hover:shadow-md transition'
             >
-              <Image
-                src={event.bannerUrl || '/default-banner.jpg'}
-                alt={event.title}
-                width={120}
-                height={80}
-                className='w-full h-[60px] object-cover'
-              />
+              <div className='relative w-full aspect-[16/9] bg-gray-200'>
+                <Image
+                  src={event.bannerUrl || '/default-banner.jpg'}
+                  alt={event.title}
+                  fill
+                  className='object-cover'
+                  sizes='(max-width: 640px) 100px, 120px'
+                />
+              </div>
               <div className='text-xs p-1 truncate'>{event.title}</div>
             </Link>
           ))}
