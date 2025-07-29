@@ -1,26 +1,20 @@
-'use client';
-
-import { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../hooks';
-import { fetchEvents } from '@/app/admin/events/reducer/eventsSlice';
 import EventCarousel from './subComponents/EventCarousel';
+import EventCarouselSkeleton from './subComponents/EventCarouselSkeleton';
+import { getFeaturedEvents } from '@/lib/events';
+import { HydrateEvents } from './subComponents/HydrateEvents';
 
-export default function FeaturedEventsSection() {
-  const dispatch = useAppDispatch();
-  const { events, loading } = useAppSelector((state) => state.events);
+export default async function FeaturedEventsSection() {
+  const events = await getFeaturedEvents();
 
-  useEffect(() => {
-    if (events.length === 0) {
-      dispatch(fetchEvents());
-    }
-  }, [dispatch, events.length]);
-
-  if (loading) return <p>Loading featured events...</p>;
-  if (events.length === 0) return <p>No featured events available.</p>;
+  if (!events || events.length === 0) {
+    return <p>No featured events available.</p>;
+  }
 
   return (
     <div className='p-2 w-full'>
-      <EventCarousel events={events} />
+      <HydrateEvents events={events}>
+        <EventCarousel events={events} />
+      </HydrateEvents>
     </div>
   );
 }

@@ -1,44 +1,22 @@
-'use client';
-
-import { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../hooks';
-import { RootState } from '@/app/lib/store';
-import { fetchBusinesses } from '@/app/lib/businessesSlice';
+import { getBusinesses } from '@/lib/businesses';
+import { HydrateBusinesses } from './subComponents/HydrateBusinesses';
 import BusinessesCarousel from './subComponents/BusinessesCarousel';
 import Link from 'next/link';
+import SectionWrapper from './subComponents/SectionWrapper';
 
-export default function NewBusinessesSection() {
-  const dispatch = useAppDispatch();
-
-  const { items: businesses, loading } = useAppSelector(
-    (state: RootState) => state.businesses
-  );
-
+export default async function FeaturedBusinessesSection() {
+  const businesses = await getBusinesses();
   const sponsored = businesses.filter((b) => b.isSponsored);
 
-  useEffect(() => {
-    dispatch(fetchBusinesses());
-  }, [dispatch]);
+  if (!businesses || businesses.length === 0) {
+    return <p>No businesses available.</p>;
+  }
 
   return (
-    <div className='max-w-5xl mx-auto p-6 space-y-8'>
-      <div className='flex items-center justify-between'>
-        <h2 className='text-2xl font-semibold'>New in Ottawa</h2>
-        <Link
-          href='/businesses'
-          className='text-sm font-medium text-blue-600 hover:underline'
-        >
-          View All Businesses
-        </Link>
-      </div>
-
-      {loading ? (
-        <p>Loading...</p>
-      ) : sponsored.length === 0 ? (
-        <p className='text-gray-500'>No sponsored businesses available.</p>
-      ) : (
+    <SectionWrapper title='New in Ottawa'>
+      <HydrateBusinesses businesses={sponsored}>
         <BusinessesCarousel businesses={sponsored} imageOnLeft={false} />
-      )}
-    </div>
+      </HydrateBusinesses>
+    </SectionWrapper>
   );
 }
