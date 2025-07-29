@@ -1,4 +1,3 @@
-'use client';
 import * as React from 'react';
 import FeaturedEventsSection from './components/FeaturedEventsSection';
 import SponsoredBusinessesCarousel from './components/SponsorsSection';

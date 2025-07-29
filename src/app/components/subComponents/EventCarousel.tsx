@@ -69,10 +69,10 @@ export default function EventCarousel({ events }: Props) {
       {/* Header & Strip */}
       <div className='flex flex-col gap-2'>
         <div className='flex justify-between items-center'>
-          <h3 className='text-lg font-semibold'>Events</h3>
+          <h3 className='text-lg font-semibold text-foreground'>Events</h3>
           <Link
             href='/events'
-            className='text-sm font-medium text-blue-600 hover:underline'
+            className='text-sm font-medium text-primary hover:underline'
           >
             View All Events
           </Link>

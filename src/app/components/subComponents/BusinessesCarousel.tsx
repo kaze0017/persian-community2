@@ -94,7 +94,7 @@ function BusinessInfo({ business }: { business: Business }) {
       )}
       <Link
         href={`/businesses/${business.id}`}
-        className='mt-2 inline-block text-blue-600 hover:underline font-semibold'
+        className='mt-2 inline-block text-primary hover:underline font-semibold'
       >
         Check Us Out →
       </Link>
