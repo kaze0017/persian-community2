@@ -21,7 +21,6 @@ import {
 } from '@/components/ui/select';
 import { Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { uploadImage } from '@/services/storageService';
 import Image from 'next/image';
 import { fetchCategories } from '@/app/lib/categoriesSlice';
 import EventDaysBuilder from './EventDaysBuilder';

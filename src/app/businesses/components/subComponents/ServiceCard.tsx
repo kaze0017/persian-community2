@@ -12,7 +12,7 @@ interface ServiceCardProps {
 
 export default function ServiceCard({
   service,
-  isAdmin = false,
+  isAdmin = true,
   onDelete,
 }: ServiceCardProps) {
   return (

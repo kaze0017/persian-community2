@@ -1,6 +1,7 @@
 import { Timestamp } from 'firebase/firestore';
 import { Business } from './business';
 import { Occasion } from './occasions';
+import { Banner } from './banner';
 
 export type Event = {
   id: string;
@@ -16,7 +17,7 @@ export type Event = {
     lat: number;
     lng: number;
   };
-  bannerUrl?: string;
+  bannerUrls?: Banner;
   sponsors?: Business[];
   ownerImageUrl?: string;
   organizers?: {

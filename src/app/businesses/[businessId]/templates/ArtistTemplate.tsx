@@ -17,7 +17,7 @@ interface Props {
 }
 
 export default function ArtistTemplate({ business, businessId }: Props) {
-  const isAdmin: boolean = false;
+  const isAdmin: boolean = true;
 
   return (
     <main className='max-w-4xl mx-auto p-6 space-y-8'>
