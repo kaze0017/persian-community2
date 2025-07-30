@@ -18,7 +18,6 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 
-// 👇 import your dark mode button
 import ModeBtn from '@/components/btns/ModeBtn';
 import AuthDropdown from '@/components/auth/AuthDropdown';
 import Image from 'next/image';
@@ -30,19 +29,18 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-  const isActive = (href: string) => pathname === href;
+
+  const navItems = [
+    { label: 'Home', href: '/' },
+    { label: 'Businesses', href: '/businesses' },
+    { label: 'Events', href: '/events' },
+    { label: 'Workshops', href: '/workshops' },
+  ];
 
   const handleNavClick = (href: string) => {
     setIsOpen(false);
     router.push(href);
   };
-  function cn(
-    arg0: string,
-    arg1: string,
-    arg2: string | boolean
-  ): string | undefined {
-    throw new Error('Function not implemented.');
-  }
 
   return (
     <header className='relative flex items-center justify-between px-4 py-2 border-b bg-background'>
@@ -63,20 +61,14 @@ export default function Header() {
       <div className='hidden md:flex justify-center absolute left-1/2 -translate-x-1/2'>
         <NavigationMenu>
           <NavigationMenuList className='flex gap-4'>
-            {[
-              { label: 'Home', href: '/' },
-              { label: 'Businesses', href: '/businesses' },
-              { label: 'Events', href: '/events' },
-              { label: 'Workshops', href: '/workshops' },
-            ].map(({ label, href }) => (
+            {navItems.map(({ label, href }) => (
               <NavigationMenuItem key={href}>
-                <Link href={href}>
-                  <NavigationMenuLink
-                    className={'width-[120px] ' + navigationMenuTriggerStyle()}
-                  >
-                    {label}
-                  </NavigationMenuLink>
-                </Link>
+                <NavigationMenuLink
+                  asChild
+                  className={'width-[120px] ' + navigationMenuTriggerStyle()}
+                >
+                  <Link href={href}>{label}</Link>
+                </NavigationMenuLink>
               </NavigationMenuItem>
             ))}
           </NavigationMenuList>
@@ -88,7 +80,7 @@ export default function Header() {
         <ModeBtn />
         <AuthDropdown />
 
-        {/* Desktop Menu */}
+        {/* Mobile Menu */}
         <div className='md:hidden'>
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
@@ -101,16 +93,11 @@ export default function Header() {
                 <SheetTitle>Menu</SheetTitle>
               </SheetHeader>
               <nav className='flex flex-col gap-4'>
-                <Button onClick={() => handleNavClick('/')}>Home</Button>
-                <Button onClick={() => handleNavClick('/businesses')}>
-                  Businesses
-                </Button>
-                <Button onClick={() => handleNavClick('/events')}>
-                  Events
-                </Button>
-                <Button onClick={() => handleNavClick('/workshops')}>
-                  Workshops
-                </Button>
+                {navItems.map(({ label, href }) => (
+                  <Button key={href} onClick={() => handleNavClick(href)}>
+                    {label}
+                  </Button>
+                ))}
               </nav>
             </SheetContent>
           </Sheet>
