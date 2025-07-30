@@ -23,12 +23,12 @@ export default function EventReviewCard({ ev }: EventReviewCardProps) {
       onClick={handleNavigate}
       className='flex items-center gap-4 border rounded-md p-2 hover:bg-muted/30 transition cursor-pointer'
     >
-      {ev.bannerUrl && (
+      {ev.bannerUrls?.sizes?.small && (
         <Image
           src={
-            ev.bannerUrl.startsWith('http')
-              ? ev.bannerUrl
-              : `/images/events/${ev.bannerUrl}`
+            ev.bannerUrls?.sizes?.small
+              ? ev.bannerUrls?.sizes?.small
+              : `/images/events/${ev.bannerUrls?.original || 'default.jpg'}`
           }
           alt={ev.title}
           width={64}
