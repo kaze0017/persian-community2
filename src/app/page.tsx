@@ -13,11 +13,19 @@ export default async function Home() {
     { condition: 'isSponsored', title: 'Sponsored Businesses' },
     { condition: 'isNew', title: 'New Businesses' },
     { condition: 'isTrusted', title: 'Trusted Businesses' },
-    { condition: 'isSponsored', title: 'New Promotions' },
+    { condition: 'isPromotions', title: 'New Promotions' },
   ] as const;
 
   const businesses = await getBusinesses();
   const events = await getFeaturedEvents();
+
+  const sections = businessSections.map(({ condition, title }) => ({
+    title,
+    condition,
+    businesses: businesses.filter(
+      (biz) => biz[condition as keyof Business] === true
+    ),
+  }));
 
   return (
     <>
@@ -26,16 +34,16 @@ export default async function Home() {
       </HydrateEvents>
 
       <HydrateBusinesses businesses={businesses}>
-        {businessSections.map(({ condition, title }, idx) => (
-          <SectionWrapper title={title} key={condition + idx}>
-            <BusinessesCarousel
-              businesses={businesses.filter(
-                (biz) => biz[condition as keyof Business] === true
-              )}
-              imageOnLeft={idx % 2 === 0}
-            />
-          </SectionWrapper>
-        ))}
+        {sections.map(({ title, businesses }, idx) =>
+          businesses.length > 0 ? (
+            <SectionWrapper title={title} key={title}>
+              <BusinessesCarousel
+                businesses={businesses}
+                imageOnLeft={idx % 2 === 0}
+              />
+            </SectionWrapper>
+          ) : null
+        )}
       </HydrateBusinesses>
     </>
   );
