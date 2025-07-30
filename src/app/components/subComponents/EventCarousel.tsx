@@ -6,7 +6,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Event } from '@/types/event';
 import { useEffect } from 'react';
-import { Banner } from '@/types/banner'; // Assuming you have a Banner type defined
 import OptimizedBanner from '../OptimizedBanner';
 
 interface Props {
@@ -23,7 +22,7 @@ export default function EventCarousel({ events }: Props) {
     if (!slider) return;
     const interval = setInterval(() => {
       slider.current?.next();
-    }, 3000);
+    }, 300000);
     return () => clearInterval(interval);
   }, [slider]);
 

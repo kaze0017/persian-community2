@@ -10,9 +10,5 @@ export default async function FeaturedEventsSection({
     return <p>No featured events available.</p>;
   }
 
-  return (
-    <div className='p-2 w-full'>
-      <EventCarousel events={events} />
-    </div>
-  );
+  return <EventCarousel events={events} />;
 }
