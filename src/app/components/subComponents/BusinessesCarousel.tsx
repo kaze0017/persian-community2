@@ -3,13 +3,13 @@
 import 'keen-slider/keen-slider.min.css';
 import { useKeenSlider } from 'keen-slider/react';
 import Image from 'next/image';
-import { useRef } from 'react';
+import { useEffect, useRef, memo } from 'react';
 import { Business } from '@/types/business';
 import Link from 'next/link';
 
 interface Props {
   businesses: Business[];
-  imageOnLeft?: boolean; // default true
+  imageOnLeft?: boolean;
 }
 
 export default function BusinessesCarousel({
@@ -21,21 +21,23 @@ export default function BusinessesCarousel({
   const [ref, slider] = useKeenSlider<HTMLDivElement>({
     loop: true,
     slides: { perView: 1 },
-    created: () => {
+  });
+
+  // ✅ Start autoplay only if more than 1 slide
+  useEffect(() => {
+    if (slider.current && businesses.length > 1) {
       timerRef.current = setInterval(() => {
         slider.current?.next();
-      }, 8000); // 8000 ms = 8 sec
-    },
-    destroyed: () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    },
-  });
+      }, 8000);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [slider, businesses.length]);
 
   return (
     <div ref={ref} className='keen-slider w-full rounded-xl overflow-hidden'>
-      {businesses.map((business) => (
+      {businesses.map((business, idx) => (
         <div
           key={business.id}
           className='keen-slider__slide shadow-md rounded-lg overflow-hidden grid grid-cols-1 md:grid-cols-2'
@@ -48,19 +50,21 @@ export default function BusinessesCarousel({
                   alt={business.businessName}
                   fill
                   className='object-cover'
+                  loading={idx === 0 ? 'eager' : 'lazy'} // ✅ First one eager for LCP
                 />
               </div>
-              <BusinessInfo business={business} />
+              <MemoBusinessInfo business={business} />
             </>
           ) : (
             <>
-              <BusinessInfo business={business} />
+              <MemoBusinessInfo business={business} />
               <div className='relative w-full h-64 md:h-full'>
                 <Image
                   src={business.bannerImageUrl || '/default-banner.jpg'}
                   alt={business.businessName}
                   fill
                   className='object-cover'
+                  loading={idx === 0 ? 'eager' : 'lazy'}
                 />
               </div>
             </>
@@ -71,7 +75,8 @@ export default function BusinessesCarousel({
   );
 }
 
-function BusinessInfo({ business }: { business: Business }) {
+// ✅ Memoized to prevent unnecessary re-renders
+const BusinessInfo = ({ business }: { business: Business }) => {
   return (
     <div className='p-6 flex flex-col justify-center gap-4'>
       <div className='flex items-center gap-4'>
@@ -82,6 +87,7 @@ function BusinessInfo({ business }: { business: Business }) {
             width={48}
             height={48}
             className='rounded-full object-cover'
+            loading='lazy'
           />
         )}
         <h3 className='text-lg font-semibold'>{business.ownerName}</h3>
@@ -100,4 +106,6 @@ function BusinessInfo({ business }: { business: Business }) {
       </Link>
     </div>
   );
-}
+};
+
+const MemoBusinessInfo = memo(BusinessInfo);

@@ -9,7 +9,7 @@ import { useEffect } from 'react';
 import OptimizedBanner from '../OptimizedBanner';
 
 interface Props {
-  events: Event[]; // Assuming events have a banner property with Banner type
+  events: Event[];
 }
 
 export default function EventCarousel({ events }: Props) {
@@ -19,51 +19,49 @@ export default function EventCarousel({ events }: Props) {
   });
 
   useEffect(() => {
-    if (!slider) return;
+    if (!slider || events.length <= 1) return;
     const interval = setInterval(() => {
       slider.current?.next();
-    }, 300000);
+    }, 8000); // autoplay every 8s
     return () => clearInterval(interval);
-  }, [slider]);
+  }, [slider, events.length]);
 
   return (
     <div className='w-full space-y-6'>
       {/* Main Carousel */}
       <div ref={ref} className='keen-slider w-full rounded-xl overflow-hidden'>
-        {events.map((event) => {
-          return (
-            <div
-              key={event.id}
-              className='keen-slider__slide relative bg-gray-200'
-            >
-              <div className='relative w-full aspect-[16/9] sm:aspect-[2/1] md:aspect-[5/2]'>
-                <OptimizedBanner
-                  banner={event.bannerUrls}
-                  alt={event.title}
-                  className='object-cover brightness-50'
-                  loading='lazy'
-                />
+        {events.map((event, idx) => (
+          <div
+            key={event.id}
+            className='keen-slider__slide relative bg-gray-200'
+          >
+            <div className='relative w-full aspect-[16/9] sm:aspect-[2/1] md:aspect-[5/2]'>
+              <OptimizedBanner
+                banner={event.bannerUrls}
+                alt={event.title}
+                className='object-cover brightness-50'
+                loading={idx === 0 ? 'eager' : 'lazy'}
+              />
 
-                {/* Overlay */}
-                <div className='absolute inset-0 flex items-end justify-between p-4 bg-gradient-to-t from-black/60 via-black/30 to-transparent text-white'>
-                  <div>
-                    <div className='font-semibold text-lg'>{event.title}</div>
-                    <div className='text-xs'>
-                      {new Date(event.date).toLocaleDateString()}
-                    </div>
+              {/* Overlay */}
+              <div className='absolute inset-0 flex items-end justify-between p-4 bg-gradient-to-t from-black/60 via-black/30 to-transparent text-white'>
+                <div>
+                  <div className='font-semibold text-lg'>{event.title}</div>
+                  <div className='text-xs'>
+                    {new Date(event.date).toLocaleDateString()}
                   </div>
-
-                  <Link
-                    href={`/events/${event.id}`}
-                    className='bg-white text-black text-xs font-semibold px-3 py-1 rounded hover:bg-gray-200 transition'
-                  >
-                    Check It Out
-                  </Link>
                 </div>
+
+                <Link
+                  href={`/events/${event.id}`}
+                  className='bg-white text-black text-xs font-semibold px-3 py-1 rounded hover:bg-gray-200 transition'
+                >
+                  Check It Out
+                </Link>
               </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       {/* Header & Strip */}
@@ -87,7 +85,6 @@ export default function EventCarousel({ events }: Props) {
               className='flex-none w-[100px] sm:w-[120px] rounded-md overflow-hidden border border-gray-200 hover:shadow-md transition'
             >
               <div className='relative w-full aspect-[16/9] bg-gray-200'>
-                {/* Using Next.js Image with sizes and fill */}
                 <Image
                   src={
                     (event as any).banner?.sizes?.small ||
@@ -98,7 +95,7 @@ export default function EventCarousel({ events }: Props) {
                   fill
                   className='object-cover'
                   sizes='(max-width: 640px) 100px, 120px'
-                  priority={false}
+                  loading='lazy'
                 />
               </div>
               <div className='text-xs p-1 truncate'>{event.title}</div>
