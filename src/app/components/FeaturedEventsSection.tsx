@@ -1,20 +1,18 @@
 import EventCarousel from './subComponents/EventCarousel';
-import EventCarouselSkeleton from './subComponents/EventCarouselSkeleton';
-import { getFeaturedEvents } from '@/lib/events';
-import { HydrateEvents } from './subComponents/HydrateEvents';
+import { Event } from '@/types/event';
 
-export default async function FeaturedEventsSection() {
-  const events = await getFeaturedEvents();
-
+export default async function FeaturedEventsSection({
+  events,
+}: {
+  events: Event[];
+}) {
   if (!events || events.length === 0) {
     return <p>No featured events available.</p>;
   }
 
   return (
     <div className='p-2 w-full'>
-      <HydrateEvents events={events}>
-        <EventCarousel events={events} />
-      </HydrateEvents>
+      <EventCarousel events={events} />
     </div>
   );
 }

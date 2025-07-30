@@ -1,11 +1,12 @@
-import { getBusinesses } from '@/lib/businesses';
-import { HydrateBusinesses } from './subComponents/HydrateBusinesses';
 import BusinessesCarousel from './subComponents/BusinessesCarousel';
-import Link from 'next/link';
 import SectionWrapper from './subComponents/SectionWrapper';
+import { Business } from '@/types/business';
 
-export default async function FeaturedBusinessesSection() {
-  const businesses = await getBusinesses();
+export default function FeaturedBusinessesSection({
+  businesses,
+}: {
+  businesses: Business[];
+}) {
   const sponsored = businesses.filter((b) => b.isSponsored);
 
   if (!businesses || businesses.length === 0) {
@@ -14,9 +15,7 @@ export default async function FeaturedBusinessesSection() {
 
   return (
     <SectionWrapper title='New in Ottawa'>
-      <HydrateBusinesses businesses={sponsored}>
-        <BusinessesCarousel businesses={sponsored} imageOnLeft={false} />
-      </HydrateBusinesses>
+      <BusinessesCarousel businesses={sponsored} imageOnLeft={false} />
     </SectionWrapper>
   );
 }
