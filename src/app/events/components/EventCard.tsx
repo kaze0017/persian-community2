@@ -11,7 +11,7 @@ type Props = {
 };
 
 export default function EventCard({ event }: Props) {
-  const { id, title, date, time, location, bannerUrl, category, isFeatured } =
+  const { id, title, date, time, location, bannerUrls, category, isFeatured } =
     event;
 
   return (
@@ -19,7 +19,7 @@ export default function EventCard({ event }: Props) {
       <Card className='h-full flex flex-col'>
         <div className='relative h-48 w-full'>
           <Image
-            src={bannerUrl || '/default-banner.jpg'}
+            src={bannerUrls?.sizes?.small || '/default-banner.jpg'}
             alt={title}
             fill
             className='object-cover'
