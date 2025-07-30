@@ -1,22 +1,25 @@
-import { getBusinesses } from '@/lib/businesses';
-import { HydrateBusinesses } from './subComponents/HydrateBusinesses';
 import BusinessesCarousel from './subComponents/BusinessesCarousel';
-import Link from 'next/link';
 import SectionWrapper from './subComponents/SectionWrapper';
+import { Business } from '@/types/business';
 
-export default async function FeaturedBusinessesSection() {
-  const businesses = await getBusinesses();
-  const sponsored = businesses.filter((b) => b.isSponsored);
-
+export default function FeaturedBusinessesSection({
+  businesses,
+}: {
+  businesses: Business[];
+}) {
   if (!businesses || businesses.length === 0) {
     return <p>No businesses available.</p>;
   }
 
+  const sponsored = businesses.filter((b) => b.isSponsored);
+
+  if (sponsored.length === 0) {
+    return <p>No sponsored businesses available.</p>;
+  }
+
   return (
     <SectionWrapper title='Sponsors'>
-      <HydrateBusinesses businesses={sponsored}>
-        <BusinessesCarousel businesses={sponsored} imageOnLeft={true} />
-      </HydrateBusinesses>
+      <BusinessesCarousel businesses={sponsored} imageOnLeft={true} />
     </SectionWrapper>
   );
 }
