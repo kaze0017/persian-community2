@@ -11,6 +11,7 @@ import {
   createDocumentWithId
 } from '@/services/firestoreService';
 import { uploadImage } from '@/services/storageService';
+import { Banner } from '@/types/banner';
 
 const EVENTS_COLLECTION = 'events';
 
@@ -66,22 +67,32 @@ export const createEvent = createAsyncThunk<
   { event: Omit<Event, 'id'>; bannerFile?: File },
   { rejectValue: string }
 >('events/createEvent', async ({ event, bannerFile }, thunkAPI) => {
+  console.log('Creating event with data:', event);
   try {
     const cleanEventData = removeUndefinedFields(event);
     const id = await createDocumentWithId(EVENTS_COLLECTION, cleanEventData);
 
-    let bannerUrl = '';
+    let bannerUrls: Banner | undefined;
     if (bannerFile) {
       const uploadedUrl = await uploadImage(
         bannerFile,
         `events/${id}/banner`,
         'banner.jpg'
       );
-      bannerUrl = uploadedUrl.replace('banner.jpg', 'banner.webp');
-      await updateDocument(EVENTS_COLLECTION, id, { bannerUrl });
+      bannerUrls = {
+        original: uploadedUrl,
+        sizes: {
+          small: uploadedUrl.replace('.jpg', '_small.webp'),
+          medium: uploadedUrl.replace('.jpg', '_medium.webp'),
+          large: uploadedUrl.replace('.jpg', '_large.webp'),
+          xlarge: uploadedUrl.replace('.jpg', '_xlarge.webp'),
+        },
+      };
+      console.log(`Banner uploaded for event ${id}:`, bannerUrls);
+      await updateDocument(EVENTS_COLLECTION, id, { bannerUrls });
     }
 
-    return { ...cleanEventData, bannerUrl, id };
+    return { ...cleanEventData, bannerUrls, id };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to create event';
     return thunkAPI.rejectWithValue(message);

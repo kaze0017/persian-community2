@@ -43,7 +43,7 @@ export default function EventPage() {
   const {
     title,
     date,
-    bannerUrl,
+    bannerUrls,
     description,
     sponsors,
     tags,
@@ -51,14 +51,14 @@ export default function EventPage() {
     address,
     coordinates,
   } = selectedEvent;
-  const isAdmin = false;
+  const isAdmin = true;
 
   return (
     <div className='max-w-[1280px] mx-auto px-4 space-y-8'>
       <EventHeaderBanner
         title={title}
         date={date}
-        bannerUrl={bannerUrl}
+        bannerUrls={bannerUrls}
         eventId={eventId as string}
         isAdmin={isAdmin}
       />
