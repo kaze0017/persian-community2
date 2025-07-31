@@ -89,13 +89,25 @@ export const optimizeBusinessImages = onObjectFinalized({
         await saveOptimized(filePath, optimizedBuffer, uploadOptions);
         break;
 
-      case 'banner':
-        optimizedBuffer = await sharp(buffer)
-          .resize(1600, 400, { fit: 'cover' })
-          .webp({ quality: 80 })
-          .toBuffer();
-        await saveOptimized(filePath, optimizedBuffer, uploadOptions);
+      case 'banner': {
+        const sizes = [
+          { suffix: 'small', width: 480 },
+          { suffix: 'medium', width: 768 },
+          { suffix: 'large', width: 1080 },
+          { suffix: 'xlarge', width: 1440 },
+        ];
+
+        for (const { suffix, width } of sizes) {
+          const optimizedBuffer = await sharp(buffer)
+            .resize(width, null, { fit: 'inside' })
+            .webp({ quality: 80 })
+            .toBuffer();
+
+          await saveOptimized(`${basePath}_${suffix}.webp`, optimizedBuffer, uploadOptions);
+        }
+
         break;
+      }
 
       case 'card':
         optimizedBuffer = await sharp(buffer)

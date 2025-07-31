@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { Business } from '@/types/business';
+import OptimizedBanner from '@/app/components/OptimizedBanner';
 
 interface props {
   // businessId: string;
@@ -14,6 +15,12 @@ export default function RestaurantHeader({ business }: props) {
     <>
       {/* Banner */}
       <div className='relative w-full h-52 rounded-lg overflow-hidden bg-gray-300 dark:bg-gray-700 mb-6'>
+        <OptimizedBanner
+          banner={business?.bannerImageUrls}
+          alt='Restaurant Banner'
+        />
+
+        {/*           
         <Image
           src={business?.bannerImageUrl || '/default-banner.jpg'}
           alt='Restaurant Banner'
@@ -22,7 +29,7 @@ export default function RestaurantHeader({ business }: props) {
           sizes='100vw'
           priority
           quality={90}
-        />
+        /> */}
       </div>
 
       {/* Logo and Info */}

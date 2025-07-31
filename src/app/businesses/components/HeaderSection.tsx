@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef } from 'react';
-
 import Image from 'next/image';
 import { Business } from '@/types/business';
 import { Button } from '@/components/ui/button';
@@ -11,6 +10,7 @@ import { uploadImage } from '@/services/storageService';
 import { updateDocument } from '@/services/firestoreService';
 import AdminControlsPanel from './subComponents/AdminControlsPanel';
 import Link from 'next/link';
+import { Banner } from '@/types/banner';
 
 interface Props {
   businessId: string;
@@ -35,13 +35,15 @@ export default function HeaderSection({
   const [editingSlogan, setEditingSlogan] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [logoUrl, setLogoUrl] = useState(business?.logoUrl || '');
-  const [bannerImageUrl, setBannerImageUrl] = useState(
-    business?.bannerImageUrl || ''
+
+  // ✅ Support new Banner type
+  const [bannerUrls, setBannerUrls] = useState<Banner | null>(
+    business?.bannerImageUrls || null
   );
+
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
 
-  // Persist toggle changes for logoEnabled and bannerEnabled
   const updateHeaderConfigField = async (
     field: keyof typeof initialHeaderConfig,
     value: boolean | string
@@ -60,14 +62,10 @@ export default function HeaderSection({
     }
   };
 
-  // Handlers for toggles that update Firestore and local state
-  const handleToggleLogo = () => {
+  const handleToggleLogo = () =>
     updateHeaderConfigField('logoEnabled', !logoEnabled);
-  };
-
-  const handleToggleBanner = () => {
+  const handleToggleBanner = () =>
     updateHeaderConfigField('bannerEnabled', !bannerEnabled);
-  };
 
   const handleImageUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -77,18 +75,36 @@ export default function HeaderSection({
     setUpdating(true);
     try {
       const file = e.target.files[0];
-      const path = `businesses/${businessId}/${type}`;
-      const url = (await uploadImage(file, path, `${type}.jpg`)).replace(
-        `${type}.jpg`,
-        `${type}.webp`
-      );
 
       if (type === 'logo') {
+        const url = (
+          await uploadImage(file, `businesses/${businessId}/logo`, 'logo.jpg')
+        ).replace('logo.jpg', 'logo.webp');
         await updateDocument('businesses', businessId, { logoUrl: url });
         setLogoUrl(url);
       } else {
-        await updateDocument('businesses', businessId, { bannerImageUrl: url });
-        setBannerImageUrl(url);
+        const originalUrl = await uploadImage(
+          file,
+          `businesses/${businessId}/banner`,
+          'banner.jpg'
+        );
+
+        // ✅ Build Banner object with responsive sizes
+        const bannerData: Banner = {
+          original: originalUrl.replace('banner.jpg', 'banner.webp'),
+          sizes: {
+            small: originalUrl.replace('banner.jpg', 'banner_small.webp'),
+            medium: originalUrl.replace('banner.jpg', 'banner_medium.webp'),
+            large: originalUrl.replace('banner.jpg', 'banner_large.webp'),
+            xlarge: originalUrl.replace('banner.jpg', 'banner_xlarge.webp'),
+          },
+          createdAt: Date.now(),
+        };
+
+        await updateDocument('businesses', businessId, {
+          bannerImageUrls: bannerData,
+        });
+        setBannerUrls(bannerData);
       }
     } catch (err) {
       console.error(`Error uploading ${type}:`, err);
@@ -97,14 +113,12 @@ export default function HeaderSection({
     }
   };
 
-  // Save slogan in nested headerConfig.slogan
   const saveSlogan = async () => {
     setUpdating(true);
     try {
       await updateDocument('businesses', businessId, {
         'businessConfig.headerConfig.slogan': slogan,
       });
-
       setEditingSlogan(false);
     } catch (err) {
       console.error('Error updating slogan:', err);
@@ -176,11 +190,17 @@ export default function HeaderSection({
       {bannerEnabled && (
         <div className='relative h-56 w-full'>
           <Image
-            src={bannerImageUrl || '/default-banner.jpg'}
+            src={
+              bannerUrls?.sizes.large ||
+              bannerUrls?.sizes.medium ||
+              bannerUrls?.original || // ✅ Fallback for old data
+              '/default-banner.jpg'
+            }
             alt='Banner'
             fill
             className='object-cover rounded-b-xl'
             priority
+            sizes='(max-width: 768px) 100vw, 100vw'
           />
           <div className='absolute inset-0 bg-black/40 flex flex-col justify-center items-center text-white text-center px-4'>
             <h1 className='text-3xl font-bold'>{business?.businessName}</h1>

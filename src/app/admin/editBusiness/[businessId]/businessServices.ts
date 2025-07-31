@@ -2,6 +2,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { uploadImage } from '@/services/storageService';
 import { Business } from '@/types/business';
+import { Banner } from '@/types/banner';
 
 export const getBusinessById = async (id: string) => {
   const ref = doc(db, 'businesses', id);
@@ -45,7 +46,7 @@ export const updateBusiness = async (
       optName: 'logo.webp',
     },
     {
-      key: 'bannerImageUrl',
+      key: 'bannerImageUrls',
       file: files.bannerImageFile,
       path: 'banner',
       name: 'banner.jpg',
@@ -53,14 +54,36 @@ export const updateBusiness = async (
     },
   ];
 
-  const urls: Record<string, string | null> = {};
+  const urls: Record<string, string | Banner> = {};
 
   for (const { key, file, path, name, optName } of imageFiles) {
-    urls[key] = file
-      ? (
-          await uploadImage(file, `businesses/${businessId}/${path}`, name)
-        ).replace(name, optName)
-      : null;
+    if (!file) continue; // ✅ skip if no new file
+
+    if (key === 'bannerImageUrls') {
+      const originalUrl = await uploadImage(file, `businesses/${businessId}/${path}`, name);
+
+      const bannerUrls: Banner = {
+        original: originalUrl.replace(name, optName),
+        sizes: {
+          small: originalUrl.replace(name, 'banner_small.webp'),
+          medium: originalUrl.replace(name, 'banner_medium.webp'),
+          large: originalUrl.replace(name, 'banner_large.webp'),
+          xlarge: originalUrl.replace(name, 'banner_xlarge.webp'),
+        },
+        createdAt: Date.now(),
+      };
+
+      urls[key] = bannerUrls;
+    } else {
+      urls[key] = (
+        await uploadImage(file, `businesses/${businessId}/${path}`, name)
+      ).replace(name, optName);
+    }
   }
-  await updateDoc(doc(db, 'businesses', businessId), urls);
+
+  // ✅ Merge new data & URLs
+  await updateDoc(doc(db, 'businesses', businessId), {
+    ...data,
+    ...urls,
+  });
 };
