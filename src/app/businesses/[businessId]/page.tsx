@@ -34,7 +34,7 @@ export default function BusinessPage({ params }: Props) {
     return <div className='p-4 text-red-500'>Error: {error}</div>;
   }
 
-  const isAdmin = true;
+  const isAdmin = false;
   let content;
   switch (selectedBusiness.category?.toLocaleLowerCase()) {
     case 'art':

@@ -1,3 +1,4 @@
+import { Banner } from "./banner";
 import { RestaurantProduct } from "./RestaurantProduct";
 
 // src/types/business.ts
@@ -15,7 +16,7 @@ export type Business = {
   category?: string;
   ownerImageUrl?: string;
   logoUrl?: string;
-  bannerImageUrl?: string;
+  bannerImageUrls?:Banner 
   businessCardUrl?: string;
   // createdAt?: Timestamp | null;
   businessConfig?: BusinessConfig;

@@ -51,7 +51,7 @@ export default function EventPage() {
     address,
     coordinates,
   } = selectedEvent;
-  const isAdmin = true;
+  const isAdmin = false;
 
   return (
     <div className='max-w-[1280px] mx-auto px-4 space-y-8'>

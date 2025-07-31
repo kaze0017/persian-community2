@@ -37,40 +37,48 @@ export default function BusinessesCarousel({
 
   return (
     <div ref={ref} className='keen-slider w-full rounded-xl overflow-hidden'>
-      {businesses.map((business, idx) => (
-        <div
-          key={business.id}
-          className='keen-slider__slide shadow-md rounded-lg overflow-hidden grid grid-cols-1 md:grid-cols-2'
-        >
-          {imageOnLeft ? (
-            <>
-              <div className='relative w-full h-64 md:h-full'>
-                <Image
-                  src={business.bannerImageUrl || '/default-banner.jpg'}
-                  alt={business.businessName}
-                  fill
-                  className='object-cover'
-                  loading={idx === 0 ? 'eager' : 'lazy'} // ✅ First one eager for LCP
-                />
-              </div>
-              <MemoBusinessInfo business={business} />
-            </>
-          ) : (
-            <>
-              <MemoBusinessInfo business={business} />
-              <div className='relative w-full h-64 md:h-full'>
-                <Image
-                  src={business.bannerImageUrl || '/default-banner.jpg'}
-                  alt={business.businessName}
-                  fill
-                  className='object-cover'
-                  loading={idx === 0 ? 'eager' : 'lazy'}
-                />
-              </div>
-            </>
-          )}
-        </div>
-      ))}
+      {businesses.map((business, idx) => {
+        const banner = business.bannerImageUrls;
+        const imageSrc =
+          banner?.sizes.medium || banner?.sizes.small || '/default-banner.jpg';
+
+        return (
+          <div
+            key={business.id}
+            className='keen-slider__slide shadow-md rounded-lg overflow-hidden grid grid-cols-1 md:grid-cols-2'
+          >
+            {imageOnLeft ? (
+              <>
+                <div className='relative w-full h-64 md:h-[400px]'>
+                  <Image
+                    src={imageSrc}
+                    alt={business.businessName}
+                    fill
+                    className='object-cover'
+                    sizes='(max-width: 768px) 100vw, 50vw'
+                    loading={idx === 0 ? 'eager' : 'lazy'}
+                  />
+                </div>
+                <MemoBusinessInfo business={business} />
+              </>
+            ) : (
+              <>
+                <MemoBusinessInfo business={business} />
+                <div className='relative w-full h-64 md:h-[400px]'>
+                  <Image
+                    src={imageSrc}
+                    alt={business.businessName}
+                    fill
+                    className='object-cover'
+                    sizes='(max-width: 768px) 100vw, 50vw'
+                    loading={idx === 0 ? 'eager' : 'lazy'}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import BusinessForm from './components/BusinessForm';
 import PanelHeader from '@/components/PanelHeader';
 import { uploadImage } from '@/services/storageService';
+import { Banner } from '@/types/banner';
 
 export type FormData = {
   businessName: string;
@@ -32,7 +32,7 @@ export default function AddBusinessPage() {
   const [ownerImageFile, setOwnerImageFile] = useState<File | null>(null);
   const [businessCardFile, setBusinessCardFile] = useState<File | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [bannerImageFile, setBannerImageFile] = useState<File | null>(null); // NEW
+  const [bannerImageFile, setBannerImageFile] = useState<File | null>(null);
 
   const {
     register,
@@ -42,23 +42,19 @@ export default function AddBusinessPage() {
     formState: { errors },
   } = useForm<FormData>();
 
-  // const uploadImage = async (file: File, path: string): Promise<string> => {
-  //   const fileName = `${Date.now()}_${file.name}`;
-  //   const storageRef = ref(storage, `${path}/${fileName}`);
-  //   const snapshot = await uploadBytes(storageRef, file);
-  //   return await getDownloadURL(snapshot.ref);
-  // };
-
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     setSuccessMessage('');
+
     try {
+      // 1️⃣ Add initial business doc
       const docRef = await addDoc(collection(db, 'businesses'), {
         ...data,
       });
 
       const businessId = docRef.id;
 
+      // 2️⃣ Prepare files list
       const imageFiles = [
         {
           key: 'ownerImageUrl',
@@ -82,7 +78,7 @@ export default function AddBusinessPage() {
           optName: 'logo.webp',
         },
         {
-          key: 'bannerImageUrl',
+          key: 'bannerImageUrls',
           file: bannerImageFile,
           path: 'banner',
           name: 'banner.jpg',
@@ -90,30 +86,61 @@ export default function AddBusinessPage() {
         },
       ];
 
-      const urls: Record<string, string | null> = {};
+      // 3️⃣ Mixed URL object
+      const urls: Record<string, string | Banner | null> = {};
 
       for (const { key, file, path, name, optName } of imageFiles) {
-        urls[key] = file
-          ? (
-              await uploadImage(file, `businesses/${businessId}/${path}`, name)
-            ).replace(name, optName)
-          : null;
+        if (key === 'bannerImageUrls') {
+          if (file) {
+            const originalUrl = await uploadImage(
+              file,
+              `businesses/${businessId}/${path}`,
+              name
+            );
+
+            const bannerUrls: Banner = {
+              original: originalUrl.replace(name, optName),
+              sizes: {
+                small: originalUrl.replace(name, 'banner_small.webp'),
+                medium: originalUrl.replace(name, 'banner_medium.webp'),
+                large: originalUrl.replace(name, 'banner_large.webp'),
+                xlarge: originalUrl.replace(name, 'banner_xlarge.webp'),
+              },
+              createdAt: Date.now(),
+            };
+
+            urls[key] = bannerUrls;
+          } else {
+            urls[key] = null;
+          }
+        } else {
+          urls[key] = file
+            ? (
+                await uploadImage(
+                  file,
+                  `businesses/${businessId}/${path}`,
+                  name
+                )
+              ).replace(name, optName)
+            : null;
+        }
       }
 
+      // 4️⃣ Update doc with image URLs
       await updateDoc(doc(db, 'businesses', businessId), urls);
 
-      await updateDoc(doc(db, 'businesses', businessId), urls);
-
+      // ✅ Success
       setSuccessMessage('Business added successfully!');
       reset();
       setOwnerImageFile(null);
       setBusinessCardFile(null);
       setLogoFile(null);
-      setBannerImageFile(null); // NEW
+      setBannerImageFile(null);
     } catch (error) {
       console.error('Error adding business:', error);
       alert('Failed to add business. Please try again.');
     }
+
     setLoading(false);
   };
 
@@ -133,8 +160,8 @@ export default function AddBusinessPage() {
         setBusinessCardFile={setBusinessCardFile}
         logoFile={logoFile}
         setLogoFile={setLogoFile}
-        bannerImageFile={bannerImageFile} // NEW
-        setBannerImageFile={setBannerImageFile} // NEW
+        bannerImageFile={bannerImageFile}
+        setBannerImageFile={setBannerImageFile}
       />
       {successMessage && (
         <p className='mt-4 text-green-600 font-semibold'>{successMessage}</p>
