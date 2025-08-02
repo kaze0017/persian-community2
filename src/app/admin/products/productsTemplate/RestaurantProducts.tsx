@@ -32,7 +32,7 @@ export default function AddNewProductType({ onAddType }: Props) {
     setLoading(true);
     try {
       const docPath = `businesses/AtvzoHHD9hhRPLM9zIKw/products/${trimmedType}`;
-      await createDocument(docPath, { createdAt: Date.now() });
+      await createDocument(docPath, {});
 
       onAddType(trimmedType);
       setNewType('');

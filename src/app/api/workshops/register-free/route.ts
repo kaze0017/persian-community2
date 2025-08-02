@@ -2,6 +2,7 @@
 import { db } from '@/lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { NextResponse } from 'next/server';
+import { serverTimestamp } from 'firebase/firestore';
 
 export async function POST(req: Request) {
  
@@ -27,7 +28,6 @@ export async function POST(req: Request) {
 
   try {
     await addDoc(collection(db, `workshops/${workshopId}/registrations`), {
-      createdAt: new Date().toISOString(),
       status: 'confirmed',
       type: 'free',
       name,

@@ -10,6 +10,7 @@ import ClientsSection from '../../components/ClientsSection';
 import GoogleReviewsSection from '../../components/GoogleReviewsSection';
 import SectionTitle from '../../components/subComponents/SectionTitle';
 import { Business } from '@/types/business';
+import { useAppSelector } from '@/app/hooks';
 
 interface Props {
   business: Business;
@@ -17,7 +18,7 @@ interface Props {
 }
 
 export default function ArtistTemplate({ business, businessId }: Props) {
-  const isAdmin: boolean = true;
+  const isAdmin = useAppSelector((state) => state.user.role === 'admin');
 
   return (
     <main className='max-w-4xl mx-auto p-6 space-y-8'>

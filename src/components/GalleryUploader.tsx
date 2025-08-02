@@ -142,7 +142,6 @@ export default function GalleryUploader({
         title: formData.galleryTitle,
         description: formData.description || '',
         images: uploaded,
-        // createdAt: new Date(),
       });
 
       if (onComplete) onComplete();

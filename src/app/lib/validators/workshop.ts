@@ -30,8 +30,7 @@ const personSchema = z.object({
   linkedInId: z.string().optional(),
   email: z.string().email().optional(),
   connectedWithLinkedIn: z.boolean().optional(),
-  createdAt: z.string().optional(),
-  updatedAt: z.string().optional(),
+
 });
 
 export const workshopSchema = z

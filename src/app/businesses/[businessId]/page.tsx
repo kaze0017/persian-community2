@@ -19,6 +19,7 @@ export default function BusinessPage({ params }: Props) {
   const { selectedBusiness, loading, error } = useAppSelector(
     (state) => state.businesses
   );
+  const { role } = useAppSelector((state) => state.user);
   useEffect(() => {
     if (!selectedBusiness?.id || selectedBusiness.id !== businessId) {
       dispatch(fetchBusinessById(businessId));
@@ -34,7 +35,7 @@ export default function BusinessPage({ params }: Props) {
     return <div className='p-4 text-red-500'>Error: {error}</div>;
   }
 
-  const isAdmin = false;
+  const isAdmin = role === 'admin';
   let content;
   switch (selectedBusiness.category?.toLocaleLowerCase()) {
     case 'art':

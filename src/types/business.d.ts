@@ -18,7 +18,6 @@ export type Business = {
   logoUrl?: string;
   bannerImageUrls?:Banner 
   businessCardUrl?: string;
-  // createdAt?: Timestamp | null;
   businessConfig?: BusinessConfig;
   isSponsored?: boolean;
   hasPromotions?: boolean;
@@ -71,7 +70,6 @@ export type BusinessService = {
   price?: number;
   duration?: number;
   isAvailable?: boolean;
-  // createdAt?: Timestamp | null;
   iconUrl?: string;
   imageUrl?: string;
 }
@@ -100,7 +98,6 @@ export type BusinessClient = {
   phone: string;
   email?: string;
   address?: string;
-  // createdAt?: Timestamp | null;
 };
 export type BusinessGoogleReviewsConfig = {
   isEnabled?: boolean;

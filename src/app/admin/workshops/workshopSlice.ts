@@ -9,14 +9,10 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Workshop } from '@/types/workshop';
-import { Timestamp } from 'firebase/firestore';
-type FirestoreWorkshopData = Omit<
-  Workshop,
-  'id' | 'createdAt' | 'updatedAt'
-> & {
-  createdAt?: Timestamp;
-  updatedAt?: Timestamp;
-};
+
+// Firestore raw data type if you need to map fields later
+type FirestoreWorkshopData = Omit<Workshop, 'id'>;
+
 interface WorkshopsState {
   workshops: Workshop[];
   loading: boolean;
@@ -29,7 +25,7 @@ const initialState: WorkshopsState = {
   error: null,
 };
 
-// Async thunk: fetch all workshops
+// ✅ Fetch all workshops
 export const fetchWorkshops = createAsyncThunk<
   Workshop[],
   void,
@@ -44,173 +40,132 @@ export const fetchWorkshops = createAsyncThunk<
       workshops.push({
         id: docSnap.id,
         ...data,
-        createdAt:
-          data.createdAt instanceof Timestamp
-            ? data.createdAt.toDate().toISOString()
-            : typeof data.createdAt === 'string'
-              ? data.createdAt
-              : '',
-        updatedAt:
-          data.updatedAt instanceof Timestamp
-            ? data.updatedAt.toDate().toISOString()
-            : typeof data.updatedAt === 'string'
-              ? data.updatedAt
-              : '',
       });
     });
 
     return workshops;
   } catch (error: unknown) {
-    let message = 'Unknown error';
-
-    if (error instanceof Error) {
-      message = error.message;
-    }
-
-    return thunkAPI.rejectWithValue(message);
+    return thunkAPI.rejectWithValue(
+      error instanceof Error ? error.message : 'Unknown error'
+    );
   }
 });
 
-// Async thunk: add new workshop
-export const addWorkshop = createAsyncThunk(
-  'workshops/add',
-  async (newWorkshop: Omit<Workshop, 'id'>, thunkAPI) => {
-    try {
-      const docRef = await addDoc(collection(db, 'workshops'), newWorkshop);
-      return { id: docRef.id, ...newWorkshop };
-    } catch (error: unknown) {
-      let message = 'Unknown error';
-      if (error instanceof Error) {
-        message = error.message;
-      }
-      return thunkAPI.rejectWithValue(message);
-    }
+// ✅ Add new workshop
+export const addWorkshop = createAsyncThunk<
+  Workshop,
+  Omit<Workshop, 'id'>,
+  { rejectValue: string }
+>('workshops/add', async (newWorkshop, thunkAPI) => {
+  try {
+    const docRef = await addDoc(collection(db, 'workshops'), newWorkshop);
+    return { id: docRef.id, ...newWorkshop };
+  } catch (error: unknown) {
+    return thunkAPI.rejectWithValue(
+      error instanceof Error ? error.message : 'Unknown error'
+    );
   }
-);
+});
 
-// Async thunk: update existing workshop
-export const updateWorkshop = createAsyncThunk(
-  'workshops/update',
-  async ({ id, data }: { id: string; data: Partial<Workshop> }, thunkAPI) => {
-    try {
-      const docRef = doc(db, 'workshops', id);
-      await updateDoc(docRef, data);
-      return { id, data };
-    } catch (error: unknown) {
-      let message = 'Unknown error';
-      if (error instanceof Error) {
-        message = error.message;
-      }
-      return thunkAPI.rejectWithValue(message);
-    }
+// ✅ Update existing workshop
+export const updateWorkshop = createAsyncThunk<
+  { id: string; data: Partial<Workshop> },
+  { id: string; data: Partial<Workshop> },
+  { rejectValue: string }
+>('workshops/update', async ({ id, data }, thunkAPI) => {
+  try {
+    const docRef = doc(db, 'workshops', id);
+    await updateDoc(docRef, data);
+    return { id, data };
+  } catch (error: unknown) {
+    return thunkAPI.rejectWithValue(
+      error instanceof Error ? error.message : 'Unknown error'
+    );
   }
-);
+});
 
-// Async thunk: delete workshop by id
-export const deleteWorkshop = createAsyncThunk(
-  'workshops/delete',
-  async (id: string, thunkAPI) => {
-    try {
-      const docRef = doc(db, 'workshops', id);
-      await deleteDoc(docRef);
-      return id;
-    } catch (error: unknown) {
-      let message = 'Unknown error';
-      if (error instanceof Error) {
-        message = error.message;
-      }
-      return thunkAPI.rejectWithValue(message);
-    }
+// ✅ Delete workshop
+export const deleteWorkshop = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }
+>('workshops/delete', async (id, thunkAPI) => {
+  try {
+    await deleteDoc(doc(db, 'workshops', id));
+    return id;
+  } catch (error: unknown) {
+    return thunkAPI.rejectWithValue(
+      error instanceof Error ? error.message : 'Unknown error'
+    );
   }
-);
+});
 
 const workshopsSlice = createSlice({
   name: 'workshops',
   initialState,
-  reducers: {
-    // Optional synchronous reducers here if needed
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      // fetch workshops
+      // Fetch
       .addCase(fetchWorkshops.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        fetchWorkshops.fulfilled,
-        (state, action: PayloadAction<Workshop[]>) => {
-          state.loading = false;
-          state.workshops = action.payload;
-        }
-      )
+      .addCase(fetchWorkshops.fulfilled, (state, action: PayloadAction<Workshop[]>) => {
+        state.loading = false;
+        state.workshops = action.payload;
+      })
       .addCase(fetchWorkshops.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = action.payload ?? 'Failed to fetch workshops';
       })
 
-      // add workshop
+      // Add
       .addCase(addWorkshop.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        addWorkshop.fulfilled,
-        (state, action: PayloadAction<Workshop>) => {
-          state.loading = false;
-          state.workshops.push(action.payload);
-        }
-      )
+      .addCase(addWorkshop.fulfilled, (state, action: PayloadAction<Workshop>) => {
+        state.loading = false;
+        state.workshops.push(action.payload);
+      })
       .addCase(addWorkshop.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = action.payload ?? 'Failed to add workshop';
       })
 
-      // update workshop
+      // Update
       .addCase(updateWorkshop.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        updateWorkshop.fulfilled,
-        (
-          state,
-          action: PayloadAction<{ id: string; data: Partial<Workshop> }>
-        ) => {
-          state.loading = false;
-          const index = state.workshops.findIndex(
-            (w) => w.id === action.payload.id
-          );
-          if (index !== -1) {
-            state.workshops[index] = {
-              ...state.workshops[index],
-              ...action.payload.data,
-            };
-          }
+      .addCase(updateWorkshop.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.workshops.findIndex((w) => w.id === action.payload.id);
+        if (index !== -1) {
+          state.workshops[index] = {
+            ...state.workshops[index],
+            ...action.payload.data,
+          };
         }
-      )
+      })
       .addCase(updateWorkshop.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = action.payload ?? 'Failed to update workshop';
       })
 
-      // delete workshop
+      // Delete
       .addCase(deleteWorkshop.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        deleteWorkshop.fulfilled,
-        (state, action: PayloadAction<string>) => {
-          state.loading = false;
-          state.workshops = state.workshops.filter(
-            (w) => w.id !== action.payload
-          );
-        }
-      )
+      .addCase(deleteWorkshop.fulfilled, (state, action: PayloadAction<string>) => {
+        state.loading = false;
+        state.workshops = state.workshops.filter((w) => w.id !== action.payload);
+      })
       .addCase(deleteWorkshop.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = action.payload ?? 'Failed to delete workshop';
       });
   },
 });

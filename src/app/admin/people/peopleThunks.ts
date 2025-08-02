@@ -6,6 +6,7 @@ import { getCollection, updateDocument } from '@/services/firestoreService';
 import { db } from '@/lib/firebase';
 import { collection, doc, setDoc } from 'firebase/firestore';
 
+
 export const fetchPeople = createAsyncThunk<Person[]>(
   'people/fetchPeople',
   async () => getCollection<Person>('people')
@@ -13,7 +14,7 @@ export const fetchPeople = createAsyncThunk<Person[]>(
 
 export const createPerson = createAsyncThunk<
   Person,
-  { personData: Omit<Person, 'id' | 'photoUrl' | 'createdAt' | 'updatedAt'>; file?: File }
+  { personData: Omit<Person, 'id' | 'photoUrl'>; file?: File }
 >(
   'people/createPerson',
   async ({ personData, file }) => {
@@ -30,8 +31,6 @@ export const createPerson = createAsyncThunk<
       id,
       ...personData,
       photoUrl,
-      createdAt: now,
-      updatedAt: now,
     };
 
     await setDoc(personRef, newPersonData);
@@ -41,7 +40,7 @@ export const createPerson = createAsyncThunk<
 
 export const editPerson = createAsyncThunk<
   Partial<Person> & { id: string },
-  { id: string; updates: Partial<Omit<Person, 'id' | 'createdAt' | 'updatedAt'>>; file?: File }
+  { id: string; updates: Partial<Omit<Person, 'id' >>; file?: File }
 >(
   'people/editPerson',
   async ({ id, updates, file }) => {
@@ -53,8 +52,7 @@ export const editPerson = createAsyncThunk<
 
     const updatesWithMeta: Partial<Person> = {
       ...updates,
-      ...(photoUrl ? { photoUrl } : {}),
-      updatedAt: new Date().toISOString(),
+      ...(photoUrl ? { photoUrl } : {})
     };
 
     await updateDocument<Person>('people', id, updatesWithMeta);

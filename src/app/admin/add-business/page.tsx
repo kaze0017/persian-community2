@@ -8,6 +8,7 @@ import BusinessForm from './components/BusinessForm';
 import PanelHeader from '@/components/PanelHeader';
 import { uploadImage } from '@/services/storageService';
 import { Banner } from '@/types/banner';
+import { serverTimestamp } from 'firebase/firestore';
 
 export type FormData = {
   businessName: string;
@@ -106,7 +107,6 @@ export default function AddBusinessPage() {
                 large: originalUrl.replace(name, 'banner_large.webp'),
                 xlarge: originalUrl.replace(name, 'banner_xlarge.webp'),
               },
-              createdAt: Date.now(),
             };
 
             urls[key] = bannerUrls;

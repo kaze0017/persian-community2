@@ -25,7 +25,7 @@ import Image from 'next/image';
 import { fetchCategories } from '@/app/lib/categoriesSlice';
 import EventDaysBuilder from './EventDaysBuilder';
 
-type CreateEventFormValues = Omit<Event, 'id' | 'createdAt' | 'updatedAt'>;
+type CreateEventFormValues = Omit<Event, 'id'>;
 
 export default function CreateEventForm() {
   const dispatch = useAppDispatch();

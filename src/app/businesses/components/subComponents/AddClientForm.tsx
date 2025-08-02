@@ -62,7 +62,6 @@ export default function AddClientForm({
     onSave({
       ...form,
       id: crypto.randomUUID(),
-      // createdAt: null,
     } as BusinessClient);
   };
 

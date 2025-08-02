@@ -17,7 +17,6 @@ import type { RestaurantProduct } from '@/types/RestaurantProduct';
 
 import { Badge } from '@/components/ui/badge';
 import { updateProductItem } from '@/app/admin/products/productsTemplate/restaurantComponents/helpers';
-import { Timestamp } from 'firebase/firestore';
 
 type Props = {
   item: RestaurantProduct;
@@ -33,17 +32,14 @@ export default function ProductDetailsDialog({
   item,
   open,
   onClose,
-  isAdmin,
+  isAdmin = false,
   businessId,
   type,
   onUpdate,
 }: Props) {
-  // State to toggle edit mode
   const [isEditing, setIsEditing] = useState(false);
-  // Local form state
   const [form, setForm] = useState<RestaurantProduct>(item);
 
-  // Reset form and editing mode when item changes or dialog opens
   useEffect(() => {
     setForm(item);
     setIsEditing(false);
@@ -54,26 +50,26 @@ export default function ProductDetailsDialog({
       alert('Missing business or product type');
       return;
     }
-    if (form.id) {
-      try {
-        // Update in Firestore
-        await updateProductItem(businessId, type, form.id, {
-          ...form,
-          createdAt: Timestamp.now(),
-        });
 
-        onUpdate?.(form);
-        setIsEditing(false);
-        onClose();
-      } catch (error) {
-        console.error('Error updating product:', error);
-        alert('Failed to update product.');
-      }
+    if (!form.id) {
+      alert('Missing product ID');
+      return;
+    }
+
+    try {
+      await updateProductItem(businessId, type, form.id, form);
+
+      onUpdate?.(form);
+      setIsEditing(false);
+      onClose();
+    } catch (error) {
+      console.error('Error updating product:', error);
+      alert('Failed to update product.');
     }
   };
 
   const handleCancel = () => {
-    setForm(item); // revert changes
+    setForm(item);
     setIsEditing(false);
   };
 
@@ -121,7 +117,7 @@ export default function ProductDetailsDialog({
                 />
                 <Input
                   type='number'
-                  value={form.price !== undefined ? form.price : ''}
+                  value={form.price ?? ''}
                   onChange={(e) =>
                     setForm((f) => ({
                       ...f,

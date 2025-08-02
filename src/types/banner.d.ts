@@ -1,3 +1,5 @@
+import { Timestamp, FieldValue } from "firebase/firestore";
+
 export type Banner = {
   id?: string;
   alt?: string;
@@ -7,6 +9,5 @@ export type Banner = {
     large?: string;   // ~1080px
     xlarge?: string;  // ~1440px+
   };
-  original?: string;  
-  createdAt?: number;
+  original?: string;
 };
