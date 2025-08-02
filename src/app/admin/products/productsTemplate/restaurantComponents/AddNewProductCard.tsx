@@ -27,6 +27,7 @@ import { createDocument } from '../../services';
 import { v4 as uuidv4 } from 'uuid';
 import { RestaurantProduct } from '@/types/RestaurantProduct';
 import { Timestamp } from 'firebase/firestore';
+import { serverTimestamp } from 'firebase/firestore';
 
 type ProductType = 'drink' | 'meal' | 'snack' | 'dessert';
 
@@ -93,7 +94,6 @@ export default function AddNewProductCard({ type, businessId, onAdd }: Props) {
         featured: form.featured,
         type,
         category: form.category,
-        createdAt: Timestamp.now(),
       };
 
       const productPath = `businesses/${businessId}/products/${type}/items`;

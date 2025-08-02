@@ -1,4 +1,6 @@
 import { Person } from "./person";
+import { Timestamp, FieldValue } from "firebase/firestore";
+
 
 export type WorkshopCategory = 'Language' | 'Career' | 'Tech' | 'Health' | 'Other';
 
@@ -30,6 +32,4 @@ export interface Workshop {
   language?: 'English' | 'French' | 'Farsi' | 'Other';
   bannerUrl?: string;
   capacity?: number;
-  createdAt?: string;
-  updatedAt?: string;
 }

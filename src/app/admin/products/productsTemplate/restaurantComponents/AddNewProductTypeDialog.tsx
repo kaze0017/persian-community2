@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { serverTimestamp } from 'firebase/firestore';
 
 type Props = {
   businessId: string;
@@ -46,7 +47,7 @@ export default function AddNewProductTypeDialog({
     try {
       const docRef = doc(db, 'businesses', businessId, 'products', trimmedType);
 
-      await setDoc(docRef, { createdAt: Date.now() });
+      await setDoc(docRef, {});
 
       onAdded();
       onClose();

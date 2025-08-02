@@ -3,6 +3,8 @@ import { db } from '@/lib/firebase';
 import { uploadImage } from '@/services/storageService';
 import { Business } from '@/types/business';
 import { Banner } from '@/types/banner';
+import { serverTimestamp } from "firebase/firestore";
+
 
 export const getBusinessById = async (id: string) => {
   const ref = doc(db, 'businesses', id);
@@ -70,7 +72,6 @@ export const updateBusiness = async (
           large: originalUrl.replace(name, 'banner_large.webp'),
           xlarge: originalUrl.replace(name, 'banner_xlarge.webp'),
         },
-        createdAt: Date.now(),
       };
 
       urls[key] = bannerUrls;

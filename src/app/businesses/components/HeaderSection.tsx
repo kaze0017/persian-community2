@@ -11,6 +11,7 @@ import { updateDocument } from '@/services/firestoreService';
 import AdminControlsPanel from './subComponents/AdminControlsPanel';
 import Link from 'next/link';
 import { Banner } from '@/types/banner';
+import { serverTimestamp } from 'firebase/firestore';
 
 interface Props {
   businessId: string;
@@ -98,7 +99,6 @@ export default function HeaderSection({
             large: originalUrl.replace('banner.jpg', 'banner_large.webp'),
             xlarge: originalUrl.replace('banner.jpg', 'banner_xlarge.webp'),
           },
-          createdAt: Date.now(),
         };
 
         await updateDocument('businesses', businessId, {

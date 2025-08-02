@@ -1,4 +1,4 @@
-import { Timestamp } from 'firebase/firestore';
+import { Timestamp, FieldValue } from 'firebase/firestore';
 import { Business } from './business';
 import { Occasion } from './occasions';
 import { Banner } from './banner';
@@ -29,8 +29,7 @@ export type Event = {
 
   tags?: string[];
   isPublic?: boolean;
-  // createdAt?: Timestamp | null;
-  updatedAt?: Timestamp | null;
+  isOnline?: boolean;
   days?: EventDay[];  
   isFeatured?: boolean;
 };

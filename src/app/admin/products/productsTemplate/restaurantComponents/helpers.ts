@@ -63,7 +63,7 @@ export async function updateProductItem(
   businessId: string,
   type: string,
   itemId: string,
-  updatedData: Partial<RestaurantProduct> & { createdAt?: Timestamp | string }
+  updatedData: Partial<RestaurantProduct>
 ) {
 
 
@@ -77,10 +77,7 @@ export async function updateProductItem(
     itemId
   );
 
-
-  if (updatedData.createdAt && typeof updatedData.createdAt === 'string') {
-    updatedData.createdAt = Timestamp.fromDate(new Date(updatedData.createdAt));
-  }
+  
 
   await updateDoc(itemDocRef, updatedData);
 }
@@ -115,7 +112,6 @@ export async function addProductWithImage(
     featured: form.featured,
     isAvailable: form.available,
     imageUrl,
-    createdAt: Timestamp.now(),
     type,
   };
 

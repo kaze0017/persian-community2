@@ -1,3 +1,4 @@
+import { Timestamp, FieldValue } from "firebase/firestore";
 export type GalleryImage = {
     id?: string;
     url: string;
@@ -27,7 +28,6 @@ export type GalleryImage = {
     tags?: string[];
     isPublic?: boolean;
     isFeatured?: boolean;
-    // createdAt?: Timestamp;
-    updatedAt?: Timestamp;
+    updatedAt?: Timestamp | FieldValue | string;
   };
   

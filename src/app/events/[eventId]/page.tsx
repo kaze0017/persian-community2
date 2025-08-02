@@ -15,6 +15,7 @@ import EventContactMap from './components/EventContactMap';
 import EventBookCard from './components/EventBookCard';
 
 export default function EventPage() {
+  const isAdmin = useAppSelector((state) => state.user.role === 'admin');
   const { eventId } = useParams();
   const dispatch = useAppDispatch();
   const { events, selectedEvent, loading, error } = useAppSelector(
@@ -51,7 +52,6 @@ export default function EventPage() {
     address,
     coordinates,
   } = selectedEvent;
-  const isAdmin = false;
 
   return (
     <div className='max-w-[1280px] mx-auto px-4 space-y-8'>

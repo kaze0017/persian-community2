@@ -46,7 +46,7 @@ export default function ProductCategorySection({
         <SectionPanel>
           <AdminControlsPanel
             title={`${title} Settings`}
-            isAdmin={true}
+            isAdmin={isAdmin}
             buttons={[
               {
                 label: 'Add Item',

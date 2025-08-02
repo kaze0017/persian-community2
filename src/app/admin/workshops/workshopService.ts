@@ -47,8 +47,7 @@ bannerUrl = uploadedUrl.replace('banner.jpg', 'banner.webp');
       linkedInId: data.instructor?.linkedInId ?? '',
       email: data.instructor?.email ?? '',
       connectedWithLinkedIn: data.instructor?.connectedWithLinkedIn ?? false,
-      createdAt: data.instructor?.createdAt ?? '',
-      updatedAt: data.instructor?.updatedAt ?? '',
+
     },
     updatedAt: serverTimestamp(),  // Firestore timestamp
   };
@@ -68,8 +67,7 @@ bannerUrl = uploadedUrl.replace('banner.jpg', 'banner.webp');
       linkedInId: data.instructor?.linkedInId ?? '',
       email: data.instructor?.email ?? '',
       connectedWithLinkedIn: data.instructor?.connectedWithLinkedIn ?? false,
-      createdAt: data.instructor?.createdAt ?? '',
-      updatedAt: data.instructor?.updatedAt ?? '',
+
     },
     updatedAt: new Date().toISOString(),  // serializable string
   };
@@ -91,7 +89,6 @@ bannerUrl = uploadedUrl.replace('banner.jpg', 'banner.webp');
     const workshopDocRef = doc(db, 'workshops', workshopId);
     await setDoc(workshopDocRef, {
       ...firestoreData,
-      createdAt: serverTimestamp(),
     });
 
     // Update Redux with serializable data

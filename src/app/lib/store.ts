@@ -28,13 +28,7 @@ export const store = configureStore({
     people: peopleReducer,
     workshops: workshopsReducer,
 
-  },
-  // middleware: (getDefaultMiddleware) =>
-  //   getDefaultMiddleware({
-  //     serializableCheck: {
-  //       ignoredPaths: ['createdAt'],
-  //     },
-  //   }),
+  }
 });
 
 // Infer types

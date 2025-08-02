@@ -1,4 +1,3 @@
-// ✅ Fixed: no sharedLocation anymore
 import { Workshop } from '@/types/workshop';
 import { WorkshopFormValues } from '@/app/lib/validators/workshop';
 
@@ -25,7 +24,12 @@ export function mapWorkshopToFormValues(
       })),
     })),
     bannerUrl: workshop.bannerUrl ?? '',
-    instructor: workshop.instructor ?? {
+   instructor: workshop.instructor
+  ? {
+      ...workshop.instructor,
+
+    }
+  : {
       id: '',
       name: '',
       bio: '',
@@ -34,8 +38,6 @@ export function mapWorkshopToFormValues(
       linkedInId: '',
       email: '',
       connectedWithLinkedIn: false,
-      createdAt: '',
-      updatedAt: '',
     },
     price: workshop.price ?? 0,
     language: workshop.language ?? 'English',
