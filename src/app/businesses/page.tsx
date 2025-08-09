@@ -7,6 +7,7 @@ import { fetchBusinesses } from '@/app/lib/businessesSlice';
 import { useRouter } from 'next/navigation';
 import BusinessCard from './components/BusinessCard';
 import Link from 'next/link';
+import MinimalistGlassmorphic from '../components/businesses/MinimalistGlassmorphic';
 
 export default function Page() {
   const dispatch = useAppDispatch();
@@ -65,7 +66,8 @@ export default function Page() {
             })
             .map((business) => (
               <Link href={`/businesses/${business.id}`} key={business.id}>
-                <BusinessCard business={business} />
+                {/* <BusinessCard business={business} /> */}
+                <MinimalistGlassmorphic business={business} />
               </Link>
             ))}
         </div>

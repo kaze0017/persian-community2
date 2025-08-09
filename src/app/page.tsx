@@ -1,12 +1,14 @@
 import * as React from 'react';
-import { getBusinesses } from '@/lib/businesses';
 import { getFeaturedEvents } from '@/lib/events';
+import { getBusinesses } from '@/lib/businesses';
+import { getFeaturedWorkshops } from '@/lib/workShops';
 import FeaturedEventsSection from './components/FeaturedEventsSection';
 import { HydrateBusinesses } from './components/subComponents/HydrateBusinesses';
 import { HydrateEvents } from './components/subComponents/HydrateEvents';
 import BusinessesCarousel from './components/subComponents/BusinessesCarousel';
 import SectionWrapper from './components/subComponents/SectionWrapper';
 import { Business } from '@/types/business';
+import HomePage from './test/components/HomePage';
 
 export default async function Home() {
   const businessSections = [
@@ -18,6 +20,7 @@ export default async function Home() {
 
   const businesses = await getBusinesses();
   const events = await getFeaturedEvents();
+  const workShops = await getFeaturedWorkshops();
 
   const sections = businessSections.map(({ condition, title }) => ({
     title,
@@ -28,23 +31,35 @@ export default async function Home() {
   }));
 
   return (
-    <>
-      <HydrateEvents events={events}>
-        <FeaturedEventsSection events={events} />
-      </HydrateEvents>
-
+    <HydrateEvents events={events}>
       <HydrateBusinesses businesses={businesses}>
-        {sections.map(({ title, businesses }, idx) =>
+        <HomePage
+          events={events}
+          businesses={businesses}
+          workshops={workShops}
+        />
+      </HydrateBusinesses>
+    </HydrateEvents>
+  );
+}
+
+{
+  /* </HydrateEvents> */
+}
+{
+  {
+    /* <FeaturedEventsSection events={events} /> */
+  }
+  /* {sections.map(({ title, businesses }, idx) =>
           businesses.length > 0 ? (
             <SectionWrapper title={title} key={title}>
               <BusinessesCarousel
                 businesses={businesses}
                 imageOnLeft={idx % 2 === 0}
-              />
+                />
             </SectionWrapper>
           ) : null
-        )}
-      </HydrateBusinesses>
-    </>
-  );
+        )} */
 }
+//   </HydrateEvents>
+// </HydrateBusinesses>

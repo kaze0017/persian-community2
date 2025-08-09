@@ -69,14 +69,15 @@ export default function RootLayout({
     <html lang='en'>
       <body
         className={`
-    ${geistSans.variable} ${geistMono.variable}
-    antialiased bg-no-repeat bg-cover bg-center
-    overflow-y-scroll
-    min-h-screen flex flex-col w-full
-  `}
+      ${geistSans.variable} ${geistMono.variable}
+      antialiased bg-no-repeat bg-cover bg-center
+      overflow-y-scroll min-h-screen flex flex-col w-full relative
+    `}
       >
+        {/* ✅ Blurred Background Layer */}
+        <div className="absolute inset-0 bg-[url('/bg2.webp')] bg-cover bg-center opacity-30 blur-lg pointer-events-none -z-10" />
+
         <Providers>
-          {/* <MapProvider> */}
           <ThemeProvider
             attribute='class'
             defaultTheme='system'
@@ -85,13 +86,13 @@ export default function RootLayout({
           >
             <Toaster position='top-center' />
             <Header />
-            <div className='max-w-[1280px]  flex flex-col grow w-full mx-auto px-4'>
+            <div className='max-w-[1280px] flex flex-col grow w-full mx-auto px-4'>
               {children}
             </div>
             <Footer />
           </ThemeProvider>
-          {/* </MapProvider> */}
         </Providers>
+
         <SpeedInsights />
       </body>
     </html>
