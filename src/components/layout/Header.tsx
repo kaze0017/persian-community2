@@ -24,6 +24,8 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
+import { useAppSelector } from '@/app/hooks';
+import HeaderGlass from '@/components/layout/HeaderGlass';
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,6 +43,13 @@ export default function Header() {
     setIsOpen(false);
     router.push(href);
   };
+  // const userTheme = useAppSelector((state) => state.user.themeMode);
+  const userTheme = 'system';
+  console.log('userTheme', userTheme);
+
+  // if (userTheme.toLocaleLowerCase() === 'system') {
+  return <HeaderGlass />;
+  // }
 
   return (
     <header className='relative flex items-center justify-between px-4 py-2 border-b bg-background'>
