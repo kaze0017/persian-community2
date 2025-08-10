@@ -16,7 +16,7 @@ export default function EventCard({ event }: Props) {
 
   return (
     <Link href={`/events/${id}`} className='h-full'>
-      <Card className='h-full flex flex-col'>
+      <Card className='h-full flex flex-col w-full rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md shadow-lg '>
         <div className='relative h-48 w-full'>
           <Image
             src={bannerUrls?.sizes?.small || '/default-banner.jpg'}
