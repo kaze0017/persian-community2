@@ -112,16 +112,7 @@ export default function HomePage({
     return () => clearInterval(interval);
   }, [businesses]);
   return (
-    <main
-      className='
-    relative min-h-screen
-    bg-white/10 backdrop-blur-xl
-    text-white
-    p-4
-    rounded-xl
-    shadow-lg
-  '
-    >
+    <>
       <div ref={sliderRef} className='keen-slider mb-4'>
         {events.map((event, idx) => (
           <div key={idx} className='keen-slider__slide relative'>
@@ -213,6 +204,6 @@ export default function HomePage({
           </Card>
         </div>
       </div>
-    </main>
+    </>
   );
 }

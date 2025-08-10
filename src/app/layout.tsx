@@ -9,6 +9,7 @@ import { Toaster } from '@/components/ui/sonner';
 import Providers from '@/components/layout/Providers';
 import Footer from './components/Footer';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import PageContainer from './components/PageContainer';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -87,7 +88,7 @@ export default function RootLayout({
             <Toaster position='top-center' />
             <Header />
             <div className='max-w-[1280px] flex flex-col grow w-full mx-auto px-4'>
-              {children}
+              <PageContainer>{children}</PageContainer>
             </div>
             <Footer />
           </ThemeProvider>

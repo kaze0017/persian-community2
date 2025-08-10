@@ -54,8 +54,9 @@ export default function Page() {
       {loading ? (
         <div className='p-4'>Loading businesses...</div>
       ) : (
-        <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4'>
+        <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 justify-items-center'>
           {businesses
+
             .filter((biz) => {
               const matchesCategory =
                 selectedCategory === 'All' || biz.category === selectedCategory;
