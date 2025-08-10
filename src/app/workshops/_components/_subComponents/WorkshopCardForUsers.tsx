@@ -105,7 +105,7 @@ export default function WorkshopCardForUsers({ workshop }: Props) {
       <>
         <Card
           onClick={() => setOpen(true)}
-          className='cursor-pointer p-4 shadow-sm hover:shadow-md transition rounded-xl'
+          className='cursor-pointer p-4 w-full rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md shadow-lg'
         >
           <WorkshopCardHeader workshop={workshop} />
         </Card>
