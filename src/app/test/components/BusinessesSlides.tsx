@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import { CardContent } from '@/components/ui/card';
 import { Business } from '@/types/business';
 import clsx from 'clsx';
+import { filter, boxShadow } from '@/app/components/filters/logoFilter';
 
 export default function BusinessesSlides({
   businesses,
@@ -68,6 +69,7 @@ const BusinessCard = ({ business }: { business: Business }) => {
     <CardContent
       onClick={handleClick}
       className='p-4 h-32 backdrop-blur-3xl rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 bg-white/10 flex items-center cursor-pointer'
+      style={{ boxShadow }}
     >
       <div className='flex items-center gap-4 w-full'>
         <Image
@@ -75,6 +77,7 @@ const BusinessCard = ({ business }: { business: Business }) => {
           alt={business.businessName}
           width={64}
           height={64}
+          style={{ filter }}
           className='w-16 h-16 rounded-full object-cover'
         />
         <div>

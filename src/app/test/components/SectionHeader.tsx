@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-
+import { boxShadow } from '@/app/components/filters/logoFilter';
 export default function SectionHeader({
   header,
   linkPath,
@@ -15,7 +15,10 @@ export default function SectionHeader({
           {header}
         </h2>
 
-        <div className='flex-1 h-2 sm:w-px bg-border mx-4 rounded-full' />
+        <div
+          className='flex-1 h-2 sm:w-px bg-border mx-4 rounded-full'
+          style={{ boxShadow }}
+        />
 
         <Link
           href={`/${linkPath}`}
