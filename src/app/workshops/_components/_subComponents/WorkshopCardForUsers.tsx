@@ -19,6 +19,7 @@ import { parseISO, addDays, isBefore, isEqual, isSameDay } from 'date-fns';
 import WorkshopCardEventDialog from './WorkshopCardEventDialog';
 import { CalendarEvent } from './types';
 import { Button } from '@/components/ui/button';
+import { boxShadow } from '@/app/components/filters/logoFilter';
 
 interface Props {
   workshop: Workshop;
@@ -106,6 +107,7 @@ export default function WorkshopCardForUsers({ workshop }: Props) {
         <Card
           onClick={() => setOpen(true)}
           className='cursor-pointer p-4 w-full rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md shadow-lg'
+          style={{ boxShadow }}
         >
           <WorkshopCardHeader workshop={workshop} />
         </Card>

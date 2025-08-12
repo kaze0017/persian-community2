@@ -16,20 +16,16 @@ import {
 } from 'keen-slider/react';
 import 'keen-slider/keen-slider.min.css';
 import Link from 'next/link';
-import { Swiper, SwiperSlide } from 'swiper/react';
 
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
-import { EffectCoverflow, Pagination, Navigation } from 'swiper/modules';
 import BusinessesSlides from './BusinessesSlides';
 import SwiperDeckOfCards from './SwiperDeckOfCards';
 import SectionHeader from './SectionHeader';
-import GlassmorphicBusinessCards from './BusinessCard';
-// import GlassmorphicCards from './GlassmorphicCards';
-import MinimalistGlassmorphic from '@/app/components/businesses/MinimalistGlassmorphic';
+import { boxShadow } from '@/app/components/filters/logoFilter';
 
 function ThumbnailPlugin(
   mainRef: RefObject<KeenSliderInstance | null>
@@ -154,6 +150,7 @@ export default function HomePage({
             <div
               key={idx}
               className='keen-slider__slide w-[180px] min-w-[180px] max-w-[180px] rounded-xl overflow-hidden flex flex-col border border-border shadow p-2 bg-white/10 backdrop-blur-sm'
+              style={{ boxShadow }}
             >
               {/* Banner with golden ratio */}
               <div className='relative w-full aspect-[1.618]'>
