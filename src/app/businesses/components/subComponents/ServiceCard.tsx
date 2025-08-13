@@ -41,7 +41,7 @@ export default function ServiceCard({
       <h3 className='text-base font-semibold leading-tight'>{service.name}</h3>
 
       {service.description && (
-        <p className='text-xs text-gray-600 whitespace-pre-line leading-snug mt-0.5'>
+        <p className='text-xs whitespace-pre-line leading-snug mt-0.5'>
           {service.description}
         </p>
       )}

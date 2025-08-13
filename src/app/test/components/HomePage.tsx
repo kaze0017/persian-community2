@@ -149,7 +149,7 @@ export default function HomePage({
           {events.map((event, idx) => (
             <div
               key={idx}
-              className='keen-slider__slide w-[180px] min-w-[180px] max-w-[180px] rounded-xl overflow-hidden flex flex-col border border-border shadow p-2 bg-white/10 backdrop-blur-sm'
+              className='keen-slider__slide w-[180px] min-w-[180px] max-w-[180px] rounded-xl overflow-hidden flex flex-col border border-border shadow bg-white/10 backdrop-blur-sm'
               style={{ boxShadow }}
             >
               {/* Banner with golden ratio */}

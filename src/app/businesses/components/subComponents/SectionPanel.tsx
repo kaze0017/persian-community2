@@ -1,3 +1,4 @@
+import { cardClass } from '@/app/components/filters/logoFilter';
 import React from 'react';
 
 export default function SectionPanel({
@@ -6,6 +7,8 @@ export default function SectionPanel({
   children: React.ReactNode;
 }) {
   return (
-    <section className='space-y-4 border rounded-xl p-4'>{children}</section>
+    <section className={`space-y-4 border rounded-xl p-4 ${cardClass} `}>
+      {children}
+    </section>
   );
 }

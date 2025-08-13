@@ -10,6 +10,7 @@ import SectionPanel from './subComponents/SectionPanel';
 import AddClientForm from './subComponents/AddClientForm';
 import AdminControlsPanel from './subComponents/AdminControlsPanel';
 import { Trash2 } from 'lucide-react';
+import { filter } from '@/app/components/filters/logoFilter';
 
 interface Props {
   businessId: string;
@@ -105,6 +106,7 @@ export default function ClientSection({
           width={100}
           height={60}
           className='object-contain max-h-16'
+          style={{ filter }}
         />
       )}
     </div>

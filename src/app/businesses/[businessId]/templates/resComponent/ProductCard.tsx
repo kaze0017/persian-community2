@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 
 import type { RestaurantProduct } from '@/types/RestaurantProduct';
+import { cardClass, boxShadow } from '@/app/components/filters/logoFilter';
 
 type Props = {
   item: RestaurantProduct;
@@ -12,9 +13,12 @@ type Props = {
 
 export default function ProductCard({ item, onClick }: Props) {
   return (
+    // <div className='max-w-80 max-h-40'>
     <Card
       onClick={onClick}
-      className='cursor-pointer hover:shadow-md transition-shadow w-full max-w-xl'
+      // className='cursor-pointer hover:shadow-md transition-shadow w-full max-w-xl'
+      className={`${cardClass} w-full h-full`}
+      style={{ boxShadow }}
     >
       <CardContent className='p-4 flex gap-4'>
         <div className='w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden relative shrink-0'>
@@ -45,5 +49,6 @@ export default function ProductCard({ item, onClick }: Props) {
         </div>
       </CardContent>
     </Card>
+    // </div>
   );
 }

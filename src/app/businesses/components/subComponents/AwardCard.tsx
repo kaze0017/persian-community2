@@ -41,7 +41,7 @@ export default function AwardCard({
       <h3 className='text-base font-semibold'>{reward.name}</h3>
 
       {reward.description && (
-        <p className='text-xs text-gray-600 whitespace-pre-line leading-tight'>
+        <p className='text-xs whitespace-pre-line leading-tight'>
           {reward.description}
         </p>
       )}
