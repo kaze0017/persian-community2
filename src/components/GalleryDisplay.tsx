@@ -9,6 +9,7 @@ import Masonry from 'react-masonry-css';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Camera, Calendar } from 'lucide-react';
+import { cardClass } from '@/app/components/filters/logoFilter';
 
 type GalleryImage = {
   urls: {
@@ -109,7 +110,7 @@ export default function GalleryDisplay({
   return (
     <div className='space-y-6'>
       {/* Header Card */}
-      <Card>
+      <Card className={cardClass}>
         <CardContent className='p-6'>
           <div className='flex flex-col md:flex-row md:justify-between md:items-start gap-4'>
             {/* Left Column */}

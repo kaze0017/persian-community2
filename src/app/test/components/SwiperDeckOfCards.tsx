@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { CardContent } from '@/components/ui/card';
 import { Workshop } from '@/types/workshop';
 import { Button } from '@/components/ui/button';
+import { boxShadow } from '@/app/components/filters/logoFilter';
 
 export default function SwiperDeckOfCards({
   workshops,
@@ -90,7 +91,10 @@ export default function SwiperDeckOfCards({
 
 const WorkshopCard = ({ workshop }: { workshop: Workshop }) => {
   return (
-    <CardContent className='w-80 h-[518px] p-0 rounded-3xl overflow-hidden shadow-lg bg-zinc-600 backdrop-blur-3xl transition-shadow duration-300'>
+    <CardContent
+      className='w-80 h-[518px] p-0 rounded-3xl overflow-hidden shadow-lg bg-zinc-600 backdrop-blur-3xl transition-shadow duration-300'
+      style={{ boxShadow }}
+    >
       <div className='flex flex-col h-full'>
         <Image
           src={workshop.bannerUrl || '/placeholder.png'}
