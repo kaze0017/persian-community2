@@ -10,6 +10,7 @@ import Providers from '@/components/layout/Providers';
 import Footer from './components/Footer';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import PageContainer from './components/PageContainer';
+import ChatBot from './ChatBot/ChatBot';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -90,6 +91,7 @@ export default function RootLayout({
             <div className='max-w-[1280px] flex flex-col grow w-full mx-auto px-4'>
               <PageContainer>{children}</PageContainer>
             </div>
+            <ChatBot />
             <Footer />
           </ThemeProvider>
         </Providers>
