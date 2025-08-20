@@ -67,7 +67,6 @@ export const createEvent = createAsyncThunk<
   { event: Omit<Event, 'id'>; bannerFile?: File },
   { rejectValue: string }
 >('events/createEvent', async ({ event, bannerFile }, thunkAPI) => {
-  console.log('Creating event with data:', event);
   try {
     const cleanEventData = removeUndefinedFields(event);
     const id = await createDocumentWithId(EVENTS_COLLECTION, cleanEventData);
@@ -88,7 +87,6 @@ export const createEvent = createAsyncThunk<
           xlarge: uploadedUrl.replace('.jpg', '_xlarge.webp'),
         },
       };
-      console.log(`Banner uploaded for event ${id}:`, bannerUrls);
       await updateDocument(EVENTS_COLLECTION, id, { bannerUrls });
     }
 

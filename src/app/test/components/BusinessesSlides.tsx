@@ -58,7 +58,7 @@ export default function BusinessesSlides({
   );
 }
 
-const BusinessCard = ({ business }: { business: Business }) => {
+export const BusinessCard = ({ business }: { business: Business }) => {
   const router = useRouter();
 
   const handleClick = () => {

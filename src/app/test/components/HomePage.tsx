@@ -72,7 +72,6 @@ export default function HomePage({
   businesses: Business[];
   workshops: Workshop[];
 }) {
-  console.log('events', events);
   const [visibleBusinesses, setVisibleBusinesses] = useState<Business[]>([]);
 
   const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>({

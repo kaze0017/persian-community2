@@ -1,60 +1,81 @@
 'use client';
 
-import { useState, useRef, KeyboardEvent } from 'react';
-import { LucideUser, Bot, LucideMessageCircle } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { LucideUser, Bot } from 'lucide-react';
+import Image from 'next/image';
+import { filter } from '../components/filters/logoFilter';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  link: string | null;
 }
 
 export default function ChatBot() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [open, setOpen] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // 🔑 Create sessionId on first load
+  useEffect(() => {
+    let stored = sessionStorage.getItem('chatSessionId');
+    if (!stored) {
+      stored = uuidv4();
+      sessionStorage.setItem('chatSessionId', stored);
+    }
+    setSessionId(stored);
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const sendMessage = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !sessionId) return;
 
     const userMessage = input;
-    setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
+    setMessages((prev) => [
+      ...prev,
+      { role: 'user', content: userMessage, link: null },
+    ]);
     setInput('');
 
-    // Call your API
+    // Call API with sessionId
     const res = await fetch('/api/chat-search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: userMessage }),
+      body: JSON.stringify({ query: userMessage, sessionId }),
     });
     const data = await res.json();
 
     setMessages((prev) => [
       ...prev,
-      { role: 'assistant', content: data.answer },
+      { role: 'assistant', content: data.answer, link: data.link },
     ]);
 
     scrollToBottom();
   };
 
-  const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   return (
     <div className='fixed bottom-18 right-4 flex flex-col items-end'>
       <button
-        className='mb-2 p-2 rounded-full bg-blue-500/80 hover:bg-blue-500 text-white shadow-lg'
         onClick={() => setOpen(!open)}
+        className='rounded-full p-2 bg-white/10 backdrop-blur-md shadow-lg'
       >
-        <LucideMessageCircle size={24} />
+        <Image
+          src='/bot.png'
+          alt='Chat Icon'
+          width={40}
+          height={40}
+          style={{ filter }}
+        />
       </button>
 
       {open && (
@@ -63,16 +84,28 @@ export default function ChatBot() {
             {messages.map((msg, i) => (
               <div
                 key={i}
-                className={`my-1 flex items-start gap-2 ${
+                className={`my-1 flex flex-col gap-1 ${
                   msg.role === 'user' ? 'text-blue-300' : 'text-green-300'
                 }`}
               >
-                {msg.role === 'user' ? (
-                  <LucideUser size={18} />
-                ) : (
-                  <Bot size={20} className='flex-shrink-0' />
+                <div className='flex items-start gap-2'>
+                  {msg.role === 'user' ? (
+                    <LucideUser size={18} />
+                  ) : (
+                    <Bot size={20} />
+                  )}
+                  <span>{msg.content}</span>
+                </div>
+                {msg.link && (
+                  <a
+                    href={msg.link}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='text-blue-400 hover:underline'
+                  >
+                    Click here to see more details
+                  </a>
                 )}
-                <span>{msg.content}</span>
               </div>
             ))}
             <div ref={messagesEndRef} />
@@ -85,16 +118,16 @@ export default function ChatBot() {
               onChange={(e) => setInput(e.target.value)}
               placeholder='Ask your question...'
               rows={1}
-              onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+              onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault(); // prevent newline
+                  e.preventDefault();
                   sendMessage();
                 }
               }}
             />
             <button
               onClick={sendMessage}
-              className='bg-blue-500/80 hover:bg-blue-500 text-white px-3 rounded transition'
+              className='bg-blue-300/80 hover:bg-blue-300 text-white px-3 rounded transition'
             >
               Send
             </button>
