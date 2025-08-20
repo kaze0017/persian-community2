@@ -1,61 +1,63 @@
-// src/app/upload-events/page.tsx
-import React from 'react';
-import OpenAI from 'openai';
-import { Pinecone } from '@pinecone-database/pinecone';
-import { getFeaturedEvents } from '@/lib/events';
+'use client';
 
-if (!process.env.OPENAI_API_KEY) throw new Error('OPENAI_API_KEY is not set');
-if (!process.env.PINECONE_API_KEY)
-  throw new Error('PINECONE_API_KEY is not set');
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+type UploadType = 'events' | 'businesses' | 'workshops';
 
-// Initialize Pinecone client with API key
-const pinecone = new Pinecone({
-  apiKey: process.env.PINECONE_API_KEY,
-});
+export default function UploadEventsPage() {
+  const [loading, setLoading] = useState<UploadType | null>(null);
+  const [result, setResult] = useState<{
+    uploaded: number;
+    events: any[];
+  } | null>(null);
 
-const index = pinecone.Index('events-index'); // should be 2048-dim
+  const handleUpload = async (type: UploadType) => {
+    setLoading(type);
+    setResult(null);
+    try {
+      const res = await fetch(`/api/uploads/upload-${type}`, {
+        method: 'POST',
+      });
+      const data = await res.json();
+      setResult(data);
+    } catch (err) {
+      console.error(err);
+      alert(`Error uploading ${type}`);
+    } finally {
+      setLoading(null);
+    }
+  };
 
-export default async function UploadEventsPage() {
-  const events = await getFeaturedEvents();
-  console.log('events', events);
-
-  for (const event of events) {
-    const title = event.title || '';
-    const description = event.description || '';
-    const category = event.category || '';
-    const date = event.date || '';
-
-    // Create embedding (returns 1536-dim)
-    const embeddingRes = await openai.embeddings.create({
-      model: 'text-embedding-ada-002',
-      input: `${title} - ${description} - ${category}`,
-    });
-
-    let vector = embeddingRes.data[0].embedding.slice(0, 1024);
-
-    // // Pad vector to 2048 dimensions
-    // while (vector.length < 2048) {
-    //   vector.push(0);
-    // }
-
-    console.log('Embedding length after padding:', vector.length); // should print 2048
-
-    // Upsert into Pinecone
-    await index.upsert([
-      {
-        id: event.id,
-        values: vector,
-        metadata: { title, description, date, category },
-      },
-    ]);
-  }
+  const getButtonLabel = (type: UploadType) => {
+    if (loading === type)
+      return `Uploading ${type.charAt(0).toUpperCase() + type.slice(1)}...`;
+    return `Upload ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+  };
 
   return (
-    <div>
-      <h1>Events uploaded to Pinecone!</h1>
-      <p>Total events processed: {events.length}</p>
+    <div className='p-8 flex flex-col items-start gap-4'>
+      <h1 className='text-2xl font-bold mb-4'>Upload to Pinecone</h1>
+
+      <div className='flex gap-3'>
+        {(['events', 'businesses', 'workshops'] as UploadType[]).map((type) => (
+          <Button
+            key={type}
+            onClick={() => handleUpload(type)}
+            disabled={!!loading}
+            variant='default'
+            className='bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition'
+          >
+            {getButtonLabel(type)}
+          </Button>
+        ))}
+      </div>
+
+      {result && (
+        <div className='mt-6 p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-white w-full'>
+          <p className='font-medium'>Total items uploaded: {result.uploaded}</p>
+        </div>
+      )}
     </div>
   );
 }
