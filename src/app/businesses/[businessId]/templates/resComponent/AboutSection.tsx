@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import SectionPanel from '@/app/businesses/components/subComponents/SectionPanel';
 import { Business } from '@/types/business';
+import Image from 'next/image';
 
 type Props = {
   businessId: string;
@@ -52,7 +53,24 @@ export default function AboutSection({
 
   return (
     <SectionPanel>
-      {editMode ? (
+      <div className='flex items-start gap-4'>
+        <div className='flex-shrink-0 w-32 h-32 rounded-full overflow-hidden'>
+          <Image
+            src='/images/placeholders/owner.webp'
+            alt='Owner'
+            width={128}
+            height={128}
+            className='object-cover w-full h-full'
+            priority
+          />
+        </div>
+
+        {/* Description text */}
+        <p className='whitespace-pre-line flex-1 text-sm text-muted-foreground'>
+          {description || 'No description available for this business.'}
+        </p>
+      </div>
+      {/* {editMode ? (
         <div className='space-y-2'>
           <Textarea
             value={tempText}
@@ -71,9 +89,8 @@ export default function AboutSection({
         </div>
       ) : (
         <div className='flex justify-between items-start gap-4'>
-          <p className='whitespace-pre-line flex-1'>
-            {description || 'No description available.'}
-          </p>
+
+
           {isAdmin && (
             <div className='shrink-0'>
               <Button
@@ -88,7 +105,7 @@ export default function AboutSection({
             </div>
           )}
         </div>
-      )}
+      )} */}
     </SectionPanel>
   );
 }

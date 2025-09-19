@@ -8,12 +8,13 @@ export default function PageContainer({
   return (
     <main
       className='
-    relative min-h-screen
+    relative flex flex-col grow w-full max-w-[1280px] mx-auto
     bg-white/10 backdrop-blur-xl
     text-white
     p-4
     rounded-xl
     shadow-lg
+    
   '
     >
       {children}

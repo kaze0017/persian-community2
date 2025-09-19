@@ -88,9 +88,9 @@ export default function RootLayout({
           >
             <Toaster position='top-center' />
             <Header />
-            <div className='max-w-[1280px] flex flex-col grow w-full mx-auto px-4'>
-              <PageContainer>{children}</PageContainer>
-            </div>
+            {/* <div className='max-w-[1280px] flex flex-col grow w-full mx-auto px-4 border border-red-400'> */}
+            <PageContainer>{children}</PageContainer>
+            {/* </div> */}
             <ChatBot />
             <Footer />
           </ThemeProvider>

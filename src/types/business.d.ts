@@ -10,8 +10,8 @@ export type Business = {
   email?: string;
   address: string;
   coordinates?: {
-    lat: number;
-    lng: number;
+    lat?: number;
+    lng?: number;
   };
   category?: string;
   ownerImageUrl?: string;
@@ -23,6 +23,7 @@ export type Business = {
   hasPromotions?: boolean;
   isTrusted?: boolean;
   isNew?: boolean;
+  services?: BusinessService[];
 };
 
 export type BusinessConfig = {
@@ -72,6 +73,7 @@ export type BusinessService = {
   isAvailable?: boolean;
   iconUrl?: string;
   imageUrl?: string;
+  file?: File;  
 }
 
 export type BusinessRewardsConfig = {

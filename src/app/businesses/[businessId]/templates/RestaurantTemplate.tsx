@@ -62,7 +62,7 @@ export default function RestaurantTemplate({
   const featuredItems = products.filter((item) => item.isFeatured);
 
   return (
-    <main className='max-w-6xl mx-auto p-6 space-y-10'>
+    <main className='max-w-[1280px] mx-auto p-6 space-y-10 w-full'>
       <RestaurantHeader
         // businessId={businessId}
         business={business}
@@ -89,7 +89,7 @@ export default function RestaurantTemplate({
         <AboutSection
           businessId={businessId}
           business={business}
-          isAdmin={isAdmin}
+          isAdmin={false}
         />
       )}
 
@@ -108,7 +108,7 @@ export default function RestaurantTemplate({
               key={category.id}
               category={category}
               businessId={businessId}
-              isAdmin={isAdmin}
+              isAdmin={false}
             />
           ))}
 
@@ -117,12 +117,12 @@ export default function RestaurantTemplate({
           )}
           <GoogleReviewsSection
             businessId={businessId}
-            isAdmin={isAdmin}
+            isAdmin={false}
             business={business}
           />
           <ContactSection
             businessId={businessId}
-            isAdmin={isAdmin}
+            isAdmin={false}
             business={business}
           />
         </div>
