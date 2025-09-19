@@ -1,6 +1,14 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Info, Package, Wrench, Palette } from 'lucide-react';
+import {
+  Info,
+  Package,
+  Wrench,
+  Palette,
+  Star,
+  Phone,
+  BookOpen,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useParams } from 'next/navigation';
@@ -16,6 +24,7 @@ import ProductsTab from '../_components/ProductsTab';
 import ServicesTab from '../_components/ServicesTab';
 import UiTab from '../_components/UiTab';
 import AboutTab from '@/app/client/businesses/_components/AboutTab';
+import { GooglePlaceId } from '../_components/GooglePlaceId';
 
 export default function GlassTabs() {
   const { businessId }: { businessId: string } = useParams();
@@ -73,19 +82,19 @@ export default function GlassTabs() {
             {
               value: 'reviews',
               label: 'Reviews',
-              icon: Palette,
-              panel: <UiTab />,
+              icon: Star,
+              panel: <GooglePlaceId businessId={businessId} />,
             },
             {
               value: 'about',
               label: 'About',
-              icon: Palette,
+              icon: BookOpen,
               panel: <AboutTab businessId={businessId} />,
             },
             {
               value: 'contacts',
               label: 'Contacts',
-              icon: Palette,
+              icon: Phone,
               panel: <UiTab />,
             },
             {

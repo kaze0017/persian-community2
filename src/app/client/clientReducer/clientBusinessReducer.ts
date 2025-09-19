@@ -24,6 +24,44 @@ const initialState: State = {
 };
 
 // --- Thunks --- //
+import { fetchGoogleId, setGoogleId, deleteGoogleId } from '@/services/business/googleIdApi';
+// --- Thunks for Google Place ID --- //
+export const fetchBusinessGoogleId = (businessId: string) => async (dispatch: any) => {
+  try {
+    const googlePlaceId = await fetchGoogleId(businessId);
+    dispatch({
+      type: 'SET_GOOGLE_PLACE_ID',
+      payload: googlePlaceId,
+    });
+  } catch (error) {
+    console.error('Failed to fetch Google Place ID:', error);
+  }
+};
+
+export const addOrUpdateGoogleId =
+  (businessId: string, googlePlaceId: string) => async (dispatch: any) => {
+    try {
+      await setGoogleId(businessId, googlePlaceId);
+      dispatch({
+        type: 'SET_GOOGLE_PLACE_ID',
+        payload: googlePlaceId,
+      });
+    } catch (error) {
+      console.error('Failed to set Google Place ID:', error);
+    }
+  };
+
+export const removeGoogleId = (businessId: string) => async (dispatch: any) => {
+  try {
+    await deleteGoogleId(businessId);
+    dispatch({
+      type: 'DELETE_GOOGLE_PLACE_ID',
+    });
+  } catch (error) {
+    console.error('Failed to delete Google Place ID:', error);
+  }
+};
+
 
 // --- Thunks for description --- //
 export const addOrUpdateDescription =
@@ -234,6 +272,41 @@ export const clientBusinessReducer = (
             },
           }
         : state;
+      case 'SET_GOOGLE_PLACE_ID':
+  return state.selectedBusiness
+    ? {
+        ...state,
+        selectedBusiness: {
+          ...state.selectedBusiness,
+          businessConfig: {
+            ...state.selectedBusiness.businessConfig,
+            googleReviewsConfig: {
+              ...state.selectedBusiness.businessConfig?.googleReviewsConfig,
+              placeId: action.payload,
+            },
+          },
+        },
+      }
+    : state;
+
+case 'DELETE_GOOGLE_PLACE_ID':
+  return state.selectedBusiness
+    ? {
+        ...state,
+        selectedBusiness: {
+          ...state.selectedBusiness,
+          businessConfig: {
+            ...state.selectedBusiness.businessConfig,
+            googleReviewsConfig: {
+              ...state.selectedBusiness.businessConfig?.googleReviewsConfig,
+              placeId: '',
+            },
+          },
+        },
+      }
+    : state;
+
+
     default:
       return state;
   }
