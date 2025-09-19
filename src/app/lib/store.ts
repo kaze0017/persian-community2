@@ -11,6 +11,7 @@ import productsRestaurantReducer from './restaurantProductSlice';
 import tablesReducer from '@/app/admin/salon/salonSlice';
 import peopleReducer from '@/app/admin/people/peopleSlice';
 import workshopsReducer from '@/app/admin/workshops/workshopSlice';
+import clientBusinessReducer from '@/app/client/clientReducer/clientBusinessReducer';
 
 
 
@@ -27,7 +28,7 @@ export const store = configureStore({
     tables: tablesReducer,
     people: peopleReducer,
     workshops: workshopsReducer,
-
+    clientBusiness: clientBusinessReducer,
   }
 });
 

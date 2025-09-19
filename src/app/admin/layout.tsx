@@ -2,13 +2,16 @@
 'use client';
 
 import { ReactNode } from 'react';
-import AdminSidebar from '@/components/admin/AdminSidebar';
+import Sidebar from '@/components/admin/Sidebar';
+import HydrateReducers from './components/HydrateReducers';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
-    <div className='flex h-screen'>
-      <AdminSidebar />
-      <main className='flex-1 overflow-y-auto p-6 bg-muted'>{children}</main>
-    </div>
+    <HydrateReducers>
+      <div className='flex h-screen'>
+        <Sidebar />
+        <main className='flex-1 overflow-y-auto p-6 bg-muted'>{children}</main>
+      </div>
+    </HydrateReducers>
   );
 }

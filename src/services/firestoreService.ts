@@ -1,4 +1,4 @@
-import { db } from '@/lib/firebase'; // Adjust the import path as necessary
+import { db  } from '@/lib/firebase'; // Adjust the import path as necessary
 import {
   collection,
   addDoc,
@@ -91,3 +91,12 @@ export async function createDocumentWithId<T extends Record<string, any>>(
   await setDoc(newDocRef, data);
   return newDocRef.id;
 }
+
+export const getSubCollection = async <T>(
+  parentPath: string, // e.g. "businesses/abc123"
+  subCollectionName: string // e.g. "rewards"
+): Promise<(T & { id: string })[]> => {
+  const subColRef = collection(db, `${parentPath}/${subCollectionName}`);
+  const snapshot = await getDocs(subColRef);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() as T) }));
+};

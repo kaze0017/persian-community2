@@ -9,4 +9,7 @@ export interface Person {
   linkedInId?: string; 
   email?: string;    
   connectedWithLinkedIn?: boolean; 
+  businesses?: string[];
+  events?: string[];
+  workshops?: string[];
 }

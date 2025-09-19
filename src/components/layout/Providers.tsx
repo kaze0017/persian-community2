@@ -28,8 +28,9 @@ function AuthListener({ children }: { children: ReactNode }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const { role, themeMode } = await getUserSettings(user.uid); // ✅ Fetch role from Firestore
-
+        const { role, themeMode, businesses, workshops, events } =
+          await getUserSettings(user.uid); // ✅ Fetch role from Firestore
+        console.log('Fetched role:', role);
         dispatch(
           setUserFromFirebase({
             uid: user.uid,
@@ -38,6 +39,9 @@ function AuthListener({ children }: { children: ReactNode }) {
             photoURL: user.photoURL,
             role: role || null,
             themeMode: themeMode || 'dark',
+            businesses: businesses || [],
+            workshops: workshops || [],
+            events: events || [],
           })
         );
       } else {
@@ -49,6 +53,9 @@ function AuthListener({ children }: { children: ReactNode }) {
             photoURL: null,
             role: null,
             themeMode: 'dark',
+            businesses: [],
+            workshops: [],
+            events: [],
           })
         );
       }

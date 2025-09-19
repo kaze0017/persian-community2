@@ -5,6 +5,9 @@ import { db } from '@/lib/firebase';
 interface FirestoreUserData {
   themeMode?: 'light' | 'dark' | 'system';
   role?: string;
+  businesses?: string[];
+  workshops?: string[];
+  events?: string[];
   // Add more fields here as needed in the future
 }
 
@@ -27,14 +30,17 @@ export async function updateUserTheme(
 export async function getUserSettings(uid: string): Promise<{
   themeMode: 'light' | 'dark' | 'system' | null;
   role: string | null;
+  businesses: string[] | null;
+  workshops: string[] | null;
+  events: string[] | null;
 }> {
-  if (!uid) return { themeMode: null, role: null };
+  if (!uid) return { themeMode: null, role: null, businesses: [], workshops: [], events: [] };
 
   const userDocRef = doc(db, 'users', uid);
   const docSnap = await getDoc(userDocRef);
 
   if (!docSnap.exists()) {
-    return { themeMode: null, role: null };
+    return { themeMode: null, role: null, businesses: [], workshops: [], events: [] };
   }
 
   const data = docSnap.data() as FirestoreUserData;
@@ -45,6 +51,9 @@ export async function getUserSettings(uid: string): Promise<{
         ? data.themeMode
         : null,
     role: typeof data.role === 'string' ? data.role : null,
+    businesses: Array.isArray(data.businesses) ? data.businesses : [],
+    workshops: Array.isArray(data.workshops) ? data.workshops : [],
+    events: Array.isArray(data.events) ? data.events : [],
   };
 }
 

@@ -58,11 +58,31 @@ export default function BusinessesSlides({
   );
 }
 
-export const BusinessCard = ({ business }: { business: Business }) => {
+type BusinessCardProps = {
+  business?: Business;
+  section?: 'user' | 'client' | 'admin';
+};
+export const BusinessCard = ({
+  business,
+  section = 'user',
+}: BusinessCardProps) => {
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/businesses/${business.id}`);
+    if (!business?.id) {
+      router.push('/client/businesses/create');
+      return;
+    }
+
+    const paths: Record<string, string> = {
+      user: `/businesses/${business.id}`,
+      client: `/client/businesses/${business.id}`,
+      admin: `/admin/businesses/${business.id}`,
+    };
+
+    if (section && paths[section]) {
+      router.push(paths[section]);
+    }
   };
 
   return (
@@ -73,19 +93,28 @@ export const BusinessCard = ({ business }: { business: Business }) => {
     >
       <div className='flex items-center gap-4 w-full'>
         <Image
-          src={business.logoUrl || '/placeholder.png'}
-          alt={business.businessName}
+          src={
+            business
+              ? business.logoUrl || '/placeholder.png'
+              : '/images/plus.webp'
+          }
+          alt={business ? business.businessName : 'Add Business'}
           width={64}
           height={64}
           style={{ filter }}
           className='w-16 h-16 rounded-full object-cover'
         />
         <div>
-          <h3 className='text-lg font-semibold'>{business.businessName}</h3>
-          <p className='text-sm text-gray-300 line-clamp-3'>
-            {business.businessConfig?.aboutConfig?.description ||
-              'No description available'}
-          </p>
+          {business && (
+            <>
+              <h3 className='text-lg font-semibold'>{business.businessName}</h3>
+              <p className='text-sm text-gray-300 line-clamp-3'>
+                {business.businessConfig?.aboutConfig?.description ||
+                  'No description available'}
+              </p>
+            </>
+          )}
+          {!business && <h3 className='text-lg font-semibold'>Add New</h3>}
         </div>
       </div>
     </CardContent>

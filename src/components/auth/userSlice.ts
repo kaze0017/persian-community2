@@ -18,7 +18,9 @@ interface UserState {
   error: string | null;
   role: string | null;
   themeMode: 'light' | 'dark' | 'system';
-
+  businesses: string[] | null;
+  workshops: string[] | null;
+  events: string[] | null;
 }
 
 const initialState: UserState = {
@@ -30,6 +32,9 @@ const initialState: UserState = {
   error: null,
   role: null,
   themeMode: 'light',
+  businesses: [],
+  workshops: [],
+  events: [],
 };
 
 /// Async thunk for login
@@ -51,6 +56,7 @@ export const login = createAsyncThunk(
         email: user.email,
         displayName: user.displayName,
         photoURL: user.photoURL,
+
       };
     } catch (error) {
       const err = error as FirebaseError;
@@ -78,6 +84,9 @@ export const signup = createAsyncThunk(
         email: user.email,
         displayName: user.displayName,
         photoURL: user.photoURL,
+        businesses: [],
+        workshops: [],
+        events: [],
       };
     } catch (error) {
       const err = error as FirebaseError;
@@ -134,6 +143,9 @@ const userSlice = createSlice({
       state.loading = false;
       state.role = null;
       state.themeMode = 'light'; 
+      state.businesses = null;
+      state.workshops = null;
+      state.events = null;
     },
     clearError(state) {
       state.error = null;
@@ -147,6 +159,9 @@ const userSlice = createSlice({
       state.themeMode = action.payload.themeMode || 'light'; 
       state.loading = false;
       state.error = null;
+      state.businesses = action.payload.businesses || [];
+      state.workshops = action.payload.workshops || [];
+      state.events = action.payload.events || [];
     },
     setThemeMode(state, action) {
       state.themeMode = action.payload;
@@ -165,6 +180,7 @@ const userSlice = createSlice({
         state.email = action.payload.email;
         state.displayName = action.payload.displayName;
         state.photoURL = action.payload.photoURL;
+ 
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;

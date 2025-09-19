@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { Business } from '@/types/business';
 import OptimizedBanner from '@/app/components/OptimizedBanner';
+import { filter } from '@/app/components/filters/logoFilter';
 
 interface props {
   // businessId: string;
@@ -33,13 +34,14 @@ export default function RestaurantHeader({ business }: props) {
       </div>
 
       {/* Logo and Info */}
-      <section className='flex items-center gap-6 mb-8'>
+      <section className='flex items-center gap-6 mb-8 w-full'>
         <div className='w-24 h-24 rounded-full overflow-hidden flex items-center justify-center'>
           <Image
             src={business?.logoUrl || '/default-logo.png'}
             alt='Restaurant Logo'
             width={96}
             height={96}
+            style={{ filter: filter }}
           />
         </div>
         <div>

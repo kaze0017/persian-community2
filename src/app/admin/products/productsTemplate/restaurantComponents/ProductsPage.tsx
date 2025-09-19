@@ -32,40 +32,6 @@ export default function ProductsPage({ businessId }: Props) {
     string | null
   >(null);
 
-  // const fetchProducts = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const productsRef = collection(db, 'businesses', businessId, 'products');
-  //     const typeSnapshot = await getDocs(productsRef);
-
-  //     const data: ProductsByType = {};
-  //     for (const typeDoc of typeSnapshot.docs) {
-  //       const type = typeDoc.id;
-  //       const itemsRef = collection(
-  //         db,
-  //         'businesses',
-  //         businessId,
-  //         'products',
-  //         type,
-  //         'items'
-  //       );
-  //       const itemsSnapshot = await getDocs(itemsRef);
-
-  //       data[type] = {
-  //         items: itemsSnapshot.docs.map((doc) => ({
-  //           id: doc.id,
-  //           ...doc.data(),
-  //         })) as ProductItem[],
-  //       };
-  //     }
-  //     setProductsByType(data);
-  //   } catch (err) {
-  //     console.error('Failed to fetch products', err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   useEffect(() => {
     const fetchAndSetProducts = async () => {
       setLoading(true);
