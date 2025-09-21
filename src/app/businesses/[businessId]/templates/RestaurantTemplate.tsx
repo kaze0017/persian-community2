@@ -10,9 +10,11 @@ import FeaturedSection from './resComponent/FeaturedSection';
 import ProductCategorySection from './resComponent/ProductCategorySection';
 import GoogleReviewsSection from '../../components/GoogleReviewsSection';
 import ContactSection from '../../components/ContactSection';
-import { Business } from '@/types/business';
+import { Business, BusinessService } from '@/types/business';
 import AboutSection from './resComponent/AboutSection';
 import { RestaurantProduct } from '@/types/RestaurantProduct';
+import ServicesSection from '../../components/ServicesSection';
+import { fetchServices } from '@/services/business/servicesApi';
 
 interface props {
   businessId: string;
@@ -45,13 +47,31 @@ export default function RestaurantTemplate({
     },
   },
 }: props) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'products'>(
-    'products'
-  );
+  const [activeTab, setActiveTab] = useState<
+    'overview' | 'products' | 'services'
+  >('products');
 
   const dispatch = useAppDispatch();
   const products = useAppSelector((state) => state.restaurantProducts.items);
   const loading = useAppSelector((state) => state.restaurantProducts.loading);
+  const [services, setServices] = useState<BusinessService[]>([]);
+  const isAboutEnabled =
+    business.businessConfig?.aboutConfig?.isEnabled || false;
+  const isServicesEnabled =
+    business.businessConfig?.servicesConfig?.isEnabled || false;
+  useEffect(() => {
+    const loadServices = async () => {
+      try {
+        const data = await fetchServices(businessId);
+        setServices(data);
+      } catch (err) {
+        console.error('Failed to load services', err);
+      } finally {
+      }
+    };
+
+    loadServices();
+  }, [businessId]);
 
   useEffect(() => {
     if (activeTab === 'products') {
@@ -76,12 +96,22 @@ export default function RestaurantTemplate({
         >
           Menu
         </TabButton>
-        <TabButton
-          active={activeTab === 'overview'}
-          onClick={() => setActiveTab('overview')}
-        >
-          About Us
-        </TabButton>
+        {isAboutEnabled && (
+          <TabButton
+            active={activeTab === 'overview'}
+            onClick={() => setActiveTab('overview')}
+          >
+            About Us
+          </TabButton>
+        )}
+        {isServicesEnabled && (
+          <TabButton
+            active={activeTab === 'services'}
+            onClick={() => setActiveTab('services')}
+          >
+            Services
+          </TabButton>
+        )}
       </nav>
 
       {/* Content */}
@@ -92,6 +122,7 @@ export default function RestaurantTemplate({
           isAdmin={false}
         />
       )}
+      {activeTab === 'services' && <ServicesSection services={services} />}
 
       {activeTab === 'products' && (
         <div className='space-y-12'>
@@ -120,11 +151,7 @@ export default function RestaurantTemplate({
             isAdmin={false}
             business={business}
           />
-          <ContactSection
-            businessId={businessId}
-            isAdmin={false}
-            business={business}
-          />
+          <ContactSection businessId={businessId} business={business} />
         </div>
       )}
     </main>

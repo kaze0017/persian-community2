@@ -1,28 +1,70 @@
 import React, { useState } from 'react';
-import GlassPanel from '@/components/glassTabsComponent/GlassPanel';
-import { TabsContent } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import TabTitle from '../../../../components/glassTabsComponent/TabTitle';
 import { Eye, EyeOff } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import {
+  setAboutEnabled,
+  setServicesEnabled,
+  setGoogleReviewsEnabled,
+  setContactEnabled,
+} from '@/services/business/uiApi';
+import { useAppSelector } from '@/app/hooks';
 
-export default function UiTab() {
+type UiTabProps = {
+  businessId: string;
+  initialSections?: {
+    about?: boolean;
+    services?: boolean;
+    googleReviews?: boolean;
+    contact?: boolean;
+  };
+};
+
+export default function UiTab({ businessId, initialSections }: UiTabProps) {
+  const selectedBusiness = useAppSelector(
+    (state) => state.clientBusiness.selectedBusiness
+  );
   const [sections, setSections] = useState({
-    products: true,
-    services: true,
-    googleReviews: true,
-    contact: true,
+    about: selectedBusiness?.businessConfig?.aboutConfig?.isEnabled ?? false,
+    services:
+      selectedBusiness?.businessConfig?.servicesConfig?.isEnabled ?? false,
+    googleReviews:
+      selectedBusiness?.businessConfig?.googleReviewsConfig?.isEnabled ?? false,
+    contact:
+      selectedBusiness?.businessConfig?.contactConfig?.isEnabled ?? false,
   });
 
-  const toggleSection = (key: keyof typeof sections) => {
-    setSections((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
+  const toggleSection = async (key: keyof typeof sections) => {
+    const newValue = !sections[key];
 
-  const handleAddService = () => {
-    // Logic to handle adding a new service
+    // Update UI state immediately
+    setSections((prev) => ({ ...prev, [key]: newValue }));
+
+    // Sync with Firestore
+    try {
+      switch (key) {
+        case 'about':
+          await setAboutEnabled(businessId, newValue);
+          break;
+        case 'services':
+          await setServicesEnabled(businessId, newValue);
+          break;
+        case 'googleReviews':
+          await setGoogleReviewsEnabled(businessId, newValue);
+          break;
+        case 'contact':
+          await setContactEnabled(businessId, newValue);
+          break;
+      }
+    } catch (error) {
+      console.error('Failed to update section in Firestore:', error);
+      // Revert UI state on error
+      setSections((prev) => ({ ...prev, [key]: !newValue }));
+    }
   };
 
   const sectionLabels: Record<keyof typeof sections, string> = {
-    products: 'Products',
+    about: 'About',
     services: 'Services',
     googleReviews: 'Google Reviews',
     contact: 'Contact',
@@ -33,7 +75,7 @@ export default function UiTab() {
       <TabTitle
         title='Available Sections'
         hasAddBtn={false}
-        onAddType={handleAddService}
+        onAddType={() => {}}
       />
 
       {/* Toggle list */}

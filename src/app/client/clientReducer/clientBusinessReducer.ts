@@ -6,8 +6,33 @@ import {
   updateService,
   deleteService,
 } from '@/services/business/servicesApi';
-import { BusinessService } from '@/types/business';
-import { deleteDescription, setDescription } from '@/services/business/aboutApi';
+import { BusinessService, BusinessContactConfig } from '@/types/business';
+import {
+  deleteDescription,
+  setDescription,
+} from '@/services/business/aboutApi';
+import { setContacts } from '@/services/business/contactsApi';
+import {
+  fetchGoogleId,
+  setGoogleId,
+  deleteGoogleId,
+} from '@/services/business/googleIdApi';
+import {
+  setAboutEnabled as uiSetAboutEnabled,
+  setGoogleReviewsEnabled as uiSetGoogleReviewsEnabled,
+  setServicesEnabled as uiSetServicesEnabled,
+  setContactEnabled as uiSetContactEnabled,
+} from '@/services/business/uiApi';
+import {
+  saveProduct,
+  deleteProduct,
+  Product,
+  addProductType,
+  deleteProductType,
+  fetchProducts,
+} from '@/services/business/productsApi';
+import { RestaurantProduct } from '@/types/RestaurantProduct';
+import { ProductsByType } from '@/types/business';
 
 type State = {
   businesses: Business[];
@@ -24,19 +49,189 @@ const initialState: State = {
 };
 
 // --- Thunks --- //
-import { fetchGoogleId, setGoogleId, deleteGoogleId } from '@/services/business/googleIdApi';
-// --- Thunks for Google Place ID --- //
-export const fetchBusinessGoogleId = (businessId: string) => async (dispatch: any) => {
+
+
+
+
+// Add a new type
+export const addBusinessProductType =
+  (businessId: string, type: string) => async (dispatch: any) => {
+    try {
+      await addProductType(businessId, type);
+
+      dispatch({
+        type: 'ADD_PRODUCT_TYPE',
+        payload: type,
+      });
+    } catch (error) {
+      console.error('Failed to add product type:', error);
+    }
+  };
+
+// Delete a type
+export const deleteBusinessProductType =
+  (businessId: string, type: string) => async (dispatch: any) => {
+    try {
+      await deleteProductType(businessId, type);
+
+      dispatch({
+        type: 'DELETE_PRODUCT_TYPE',
+        payload: type,
+      });
+    } catch (error) {
+      console.error('Failed to delete product type:', error);
+    }
+  };
+
+// Fetch all products and types for a business
+export const fetchBusinessProducts =
+  (businessId: string) => async (dispatch: any) => {
+    try {
+      const productsByTypeArray = await fetchProducts(businessId);
+
+      // Convert array to object keyed by type
+      const productsByType: Record<string, RestaurantProduct[]> = {};
+      productsByTypeArray.forEach((p) => {
+        productsByType[p.type] = p.items;
+      });
+
+      dispatch({
+        type: 'SET_PRODUCTS_BY_TYPE',
+        payload: productsByType,
+      });
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+    }
+  };
+
+
+export const addOrUpdateProduct =
+  (businessId: string, product: Product, type: string, imgFile?: File) =>
+  async (dispatch: any) => {
+    try {
+      const savedProduct = await saveProduct(businessId, type, product, imgFile);
+      console.log('Saved product:', savedProduct);
+      dispatch({
+        type: product.id ? 'UPDATE_PRODUCT' : 'ADD_PRODUCT',
+        payload: { type, product: savedProduct }, // 👈 use saved version
+      });
+    } catch (error) {
+      console.error('Failed to save product:', error);
+    }
+  };
+
+
+export const deleteBusinessProduct =
+  (businessId: string, type: string, productId: string) =>
+  async (dispatch: any) => {
+    try {
+      await deleteProduct(businessId, type, productId);
+
+      dispatch({
+        type: 'DELETE_PRODUCT',
+        payload: { type, productId },
+      });
+    } catch (error) {
+      console.error('Failed to delete product:', error);
+    }
+  };
+// Toggle About section
+export const toggleAboutSection =
+  (businessId: string, isEnabled: boolean) => async (dispatch: any) => {
+    try {
+      await uiSetAboutEnabled(businessId, isEnabled);
+      dispatch({
+        type: 'SET_ABOUT_ENABLED',
+        payload: isEnabled,
+      });
+    } catch (error) {
+      console.error('Failed to toggle About section:', error);
+    }
+  };
+
+// Toggle Google Reviews section
+export const toggleGoogleReviewsSection =
+  (businessId: string, isEnabled: boolean) => async (dispatch: any) => {
+    try {
+      await uiSetGoogleReviewsEnabled(businessId, isEnabled);
+      dispatch({
+        type: 'SET_GOOGLE_REVIEWS_ENABLED',
+        payload: isEnabled,
+      });
+    } catch (error) {
+      console.error('Failed to toggle Google Reviews section:', error);
+    }
+  };
+
+// Toggle Services section
+export const toggleServicesSection =
+  (businessId: string, isEnabled: boolean) => async (dispatch: any) => {
+    try {
+      await uiSetServicesEnabled(businessId, isEnabled);
+      dispatch({
+        type: 'SET_SERVICES_ENABLED',
+        payload: isEnabled,
+      });
+    } catch (error) {
+      console.error('Failed to toggle Services section:', error);
+    }
+  };
+
+  // Toggle Contact section
+export const toggleContactSection =
+  (businessId: string, isEnabled: boolean) => async (dispatch: any) => {
+    try {
+      await uiSetContactEnabled(businessId, isEnabled);
+      dispatch({
+        type: 'SET_CONTACT_ENABLED',
+        payload: isEnabled,
+      });
+    } catch (error) {
+      console.error('Failed to toggle Contact section:', error);
+    }
+  };
+
+export const addOrUpdateContacts =
+  (businessId: string, contacts: BusinessContactConfig) =>
+  async (dispatch: any) => {
+    try {
+      await setContacts(businessId, contacts);
+
+      // Optimistically update Redux
+      dispatch({
+        type: 'SET_CONTACTS',
+        payload: contacts,
+      });
+    } catch (error) {
+      console.error('Failed to set contacts:', error);
+    }
+  };
+
+export const removeContacts = (businessId: string) => async (dispatch: any) => {
   try {
-    const googlePlaceId = await fetchGoogleId(businessId);
+    // remove = write an empty object
+    await setContacts(businessId, {});
+
     dispatch({
-      type: 'SET_GOOGLE_PLACE_ID',
-      payload: googlePlaceId,
+      type: 'DELETE_CONTACTS',
     });
   } catch (error) {
-    console.error('Failed to fetch Google Place ID:', error);
+    console.error('Failed to delete contacts:', error);
   }
 };
+// --- Thunks for Google Place ID --- //
+export const fetchBusinessGoogleId =
+  (businessId: string) => async (dispatch: any) => {
+    try {
+      const googlePlaceId = await fetchGoogleId(businessId);
+      dispatch({
+        type: 'SET_GOOGLE_PLACE_ID',
+        payload: googlePlaceId,
+      });
+    } catch (error) {
+      console.error('Failed to fetch Google Place ID:', error);
+    }
+  };
 
 export const addOrUpdateGoogleId =
   (businessId: string, googlePlaceId: string) => async (dispatch: any) => {
@@ -61,7 +256,6 @@ export const removeGoogleId = (businessId: string) => async (dispatch: any) => {
     console.error('Failed to delete Google Place ID:', error);
   }
 };
-
 
 // --- Thunks for description --- //
 export const addOrUpdateDescription =
@@ -135,8 +329,17 @@ export const updateBusinessService =
   (businessId: string, serviceId: string, updates: Partial<BusinessService>) =>
   async (dispatch: any) => {
     try {
-      console.log('Updating service in reducer:', businessId, serviceId, updates);
-      const updatedService = await updateService(businessId, serviceId, updates);
+      console.log(
+        'Updating service in reducer:',
+        businessId,
+        serviceId,
+        updates
+      );
+      const updatedService = await updateService(
+        businessId,
+        serviceId,
+        updates
+      );
 
       // fetch the full updated service
       dispatch({
@@ -147,7 +350,6 @@ export const updateBusinessService =
       console.error('Failed to update service:', error);
     }
   };
-
 
 // delete a service
 export const deleteBusinessService =
@@ -186,18 +388,18 @@ export const clientBusinessReducer = (
       };
     case 'CLEAR_SELECTED_BUSINESS':
       return { ...state, selectedBusiness: null };
-   case 'UPDATE_SERVICE':
-  return state.selectedBusiness
-    ? {
-        ...state,
-        selectedBusiness: {
-          ...state.selectedBusiness,
-          services: state.selectedBusiness.services?.map((s) =>
-            s.id === action.payload.id ? action.payload : s
-          ),
-        },
-      }
-    : state;
+    case 'UPDATE_SERVICE':
+      return state.selectedBusiness
+        ? {
+            ...state,
+            selectedBusiness: {
+              ...state.selectedBusiness,
+              services: state.selectedBusiness.services?.map((s) =>
+                s.id === action.payload.id ? action.payload : s
+              ),
+            },
+          }
+        : state;
 
     // --- Service-level mutations --- //
     case 'ADD_SERVICE':
@@ -240,7 +442,7 @@ export const clientBusinessReducer = (
             },
           }
         : state;
-        case 'SET_DESCRIPTION':
+    case 'SET_DESCRIPTION':
       return state.selectedBusiness
         ? {
             ...state,
@@ -272,39 +474,210 @@ export const clientBusinessReducer = (
             },
           }
         : state;
-      case 'SET_GOOGLE_PLACE_ID':
+    case 'SET_GOOGLE_PLACE_ID':
+      return state.selectedBusiness
+        ? {
+            ...state,
+            selectedBusiness: {
+              ...state.selectedBusiness,
+              businessConfig: {
+                ...state.selectedBusiness.businessConfig,
+                googleReviewsConfig: {
+                  ...state.selectedBusiness.businessConfig?.googleReviewsConfig,
+                  placeId: action.payload,
+                },
+              },
+            },
+          }
+        : state;
+
+    case 'DELETE_GOOGLE_PLACE_ID':
+      return state.selectedBusiness
+        ? {
+            ...state,
+            selectedBusiness: {
+              ...state.selectedBusiness,
+              businessConfig: {
+                ...state.selectedBusiness.businessConfig,
+                googleReviewsConfig: {
+                  ...state.selectedBusiness.businessConfig?.googleReviewsConfig,
+                  placeId: '',
+                },
+              },
+            },
+          }
+        : state;
+
+    case 'SET_CONTACTS':
+      return state.selectedBusiness
+        ? {
+            ...state,
+            selectedBusiness: {
+              ...state.selectedBusiness,
+              businessConfig: {
+                ...state.selectedBusiness.businessConfig,
+                contactConfig: action.payload,
+              },
+            },
+          }
+        : state;
+
+    case 'DELETE_CONTACTS':
+      return state.selectedBusiness
+        ? {
+            ...state,
+            selectedBusiness: {
+              ...state.selectedBusiness,
+              businessConfig: {
+                ...state.selectedBusiness.businessConfig,
+                contactConfig: {},
+              },
+            },
+          }
+        : state;
+    case 'SET_ABOUT_ENABLED':
+      return state.selectedBusiness
+        ? {
+            ...state,
+            selectedBusiness: {
+              ...state.selectedBusiness,
+              businessConfig: {
+                ...state.selectedBusiness.businessConfig,
+                aboutConfig: {
+                  ...state.selectedBusiness.businessConfig?.aboutConfig,
+                  isEnabled: action.payload,
+                },
+              },
+            },
+          }
+        : state;
+
+    case 'SET_GOOGLE_REVIEWS_ENABLED':
+      return state.selectedBusiness
+        ? {
+            ...state,
+            selectedBusiness: {
+              ...state.selectedBusiness,
+              businessConfig: {
+                ...state.selectedBusiness.businessConfig,
+                googleReviewsConfig: {
+                  ...state.selectedBusiness.businessConfig?.googleReviewsConfig,
+                  isEnabled: action.payload,
+                },
+              },
+            },
+          }
+        : state;
+
+    case 'SET_SERVICES_ENABLED':
+      return state.selectedBusiness
+        ? {
+            ...state,
+            selectedBusiness: {
+              ...state.selectedBusiness,
+              businessConfig: {
+                ...state.selectedBusiness.businessConfig,
+                servicesConfig: {
+                  ...state.selectedBusiness.businessConfig?.servicesConfig,
+                  isEnabled: action.payload,
+                },
+              },
+            },
+          }
+        : state;
+        // --- Products --- //
+    case 'ADD_PRODUCT':
+      return state.selectedBusiness
+        ? {
+            ...state,
+            selectedBusiness: {
+              ...state.selectedBusiness,
+              products: {
+                ...state.selectedBusiness.products,
+                [action.payload.type]: [
+                  ...(state.selectedBusiness.products?.[action.payload.type] ||
+                    []),
+                  action.payload.product,
+                ],
+              },
+            },
+          }
+        : state;
+
+    case 'UPDATE_PRODUCT':
+      return state.selectedBusiness
+      
+        ? {
+            ...state,
+            selectedBusiness: {
+              ...state.selectedBusiness,
+              products: {
+                ...state.selectedBusiness.products,
+                [action.payload.type]:
+                  state.selectedBusiness.products?.[action.payload.type]?.map(
+                    (p) =>
+                      p.id === action.payload.product.id
+                        ? action.payload.product
+                        : p
+                  ) || [],
+              },
+            },
+          }
+        : state;
+
+    case 'DELETE_PRODUCT':
+      return state.selectedBusiness
+        ? {
+            ...state,
+            selectedBusiness: {
+              ...state.selectedBusiness,
+              products: {
+                ...state.selectedBusiness.products,
+                [action.payload.type]:
+                  state.selectedBusiness.products?.[
+                    action.payload.type
+                  ]?.filter((p) => p.id !== action.payload.productId) || [],
+              },
+            },
+          }
+        : state;
+        case 'SET_PRODUCTS_BY_TYPE':
   return state.selectedBusiness
     ? {
         ...state,
         selectedBusiness: {
           ...state.selectedBusiness,
-          businessConfig: {
-            ...state.selectedBusiness.businessConfig,
-            googleReviewsConfig: {
-              ...state.selectedBusiness.businessConfig?.googleReviewsConfig,
-              placeId: action.payload,
-            },
+          products: action.payload, // object keyed by type
+        },
+      }
+    : state;
+
+case 'ADD_PRODUCT_TYPE':
+  return state.selectedBusiness
+    ? {
+        ...state,
+        selectedBusiness: {
+          ...state.selectedBusiness,
+          products: {
+            ...state.selectedBusiness.products,
+            [action.payload]: [], // initialize empty array for new type
           },
         },
       }
     : state;
 
-case 'DELETE_GOOGLE_PLACE_ID':
-  return state.selectedBusiness
-    ? {
-        ...state,
-        selectedBusiness: {
-          ...state.selectedBusiness,
-          businessConfig: {
-            ...state.selectedBusiness.businessConfig,
-            googleReviewsConfig: {
-              ...state.selectedBusiness.businessConfig?.googleReviewsConfig,
-              placeId: '',
-            },
-          },
-        },
-      }
-    : state;
+case 'DELETE_PRODUCT_TYPE':
+  if (!state.selectedBusiness) return state;
+
+  const { [action.payload]: _, ...restProducts } = state.selectedBusiness.products || {};
+  return {
+    ...state,
+    selectedBusiness: {
+      ...state.selectedBusiness,
+      products: restProducts,
+    },
+  };
+
 
 
     default:

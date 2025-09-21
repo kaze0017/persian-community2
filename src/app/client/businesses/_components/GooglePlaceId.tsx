@@ -48,59 +48,15 @@ export const GooglePlaceId = ({ businessId }: GooglePlaceIdProps) => {
         title='Available Services'
         hasAddBtn
         onAddType={openDialog}
-        addBtnTitle='Add New Service'
+        addBtnTitle={`${placeId ? 'Edit' : 'Add'} Google Place ID`}
       />
       <div className='mt-4 flex flex-col gap-2 sm:flex-row sm:items-center'>
-        {editing ? (
-          <>
-            <Input
-              placeholder='Enter Google Place ID'
-              value={tempPlaceId}
-              onChange={(e) => setTempPlaceId(e.target.value)}
-              className='w-full sm:w-96'
-            />
-            <Button
-              // onClick={handleAddPlaceId}
-              disabled={updating || !tempPlaceId.trim()}
-            >
-              Save
-            </Button>
-            {placeId && (
-              <Button
-                variant='destructive'
-                onClick={handleDelete}
-                disabled={updating}
-              >
-                Delete
-              </Button>
-            )}
-            <Button
-              variant='ghost'
-              onClick={() => {
-                setTempPlaceId(placeId ?? '');
-                setEditing(false);
-              }}
-              disabled={updating}
-            >
-              Cancel
-            </Button>
-          </>
-        ) : (
-          <div className='flex gap-2'>
-            {placeId ? (
-              <>
-                <p className='text-sm text-muted-foreground'>
-                  <strong>Place ID:</strong> {placeId}
-                </p>
-                <Button variant='outline' onClick={() => setEditing(true)}>
-                  Edit
-                </Button>
-              </>
-            ) : (
-              <Button onClick={() => setEditing(true)}>Add Place ID</Button>
-            )}
-          </div>
-        )}
+        <Input
+          placeholder='Enter Google Place ID'
+          value={tempPlaceId}
+          onChange={(e) => setTempPlaceId(e.target.value)}
+          className='w-full sm:w-96'
+        />
       </div>
 
       {/* Always show embed if placeId exists */}
@@ -114,6 +70,7 @@ export const GooglePlaceId = ({ businessId }: GooglePlaceIdProps) => {
         onClose={() => setDialogOpen(false)}
         onSave={handleSave}
         onDelete={handleDelete}
+        value={placeId || null}
       />
     </>
   );

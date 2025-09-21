@@ -3,25 +3,30 @@
 import React, { useState } from 'react';
 import ProductCard from './ProductCard';
 import { Button } from '@/components/ui/button';
+import { ProductsByType } from '@/types/business';
+import { RestaurantProduct } from '@/types/RestaurantProduct';
 
-type ProductItem = {
-  id: string;
-  name: string;
-  description?: string;
-  price?: number;
-  imageUrl?: string;
-  options?: string;
-  featured?: boolean;
-  available?: boolean;
-};
+// type ProductItem = {
+//   id: string;
+//   name: string;
+//   description?: string;
+//   price?: number;
+//   imageUrl?: string;
+//   options?: string;
+//   featured?: boolean;
+//   available?: boolean;
+// };
 
-type ProductsByType = Record<string, { items: ProductItem[] }>;
+// Accept the raw Redux shape: Record<string, ProductItem[]>
+// type ProductsByType = Record<string, ProductItem[]>;
 
 type Props = {
-  productsByType: ProductsByType;
+  productsByType: ProductsByType | {};
   loading: boolean;
   onAddProduct: (type: string) => void;
   onDeleteType: (type: string) => void;
+  setSelectedProduct: (product: ProductsByType | {}) => void;
+  setSelectedTypeForNewProduct: (type: string | null) => void;
 };
 
 export default function ProductTypeList({
@@ -29,6 +34,8 @@ export default function ProductTypeList({
   loading,
   onAddProduct,
   onDeleteType,
+  setSelectedProduct,
+  setSelectedTypeForNewProduct,
 }: Props) {
   const [openTypes, setOpenTypes] = useState<Record<string, boolean>>({});
 
@@ -46,7 +53,7 @@ export default function ProductTypeList({
 
   return (
     <div className='space-y-8'>
-      {Object.entries(productsByType).map(([type, { items }]) => {
+      {Object.entries(productsByType).map(([type, items]) => {
         const isOpen = openTypes[type] ?? false; // default CLOSED
 
         return (
@@ -88,9 +95,17 @@ export default function ProductTypeList({
                   No products in this type.
                 </p>
               ) : (
-                <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6'>
+                <div className='grid grid-cols-1 gap-2'>
                   {items.map((product) => (
-                    <ProductCard key={product.id} product={product} />
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onClick={() => {
+                        console.log('Clicked product', product);
+                        setSelectedProduct(product);
+                        setSelectedTypeForNewProduct(type);
+                      }}
+                    />
                   ))}
                 </div>
               )

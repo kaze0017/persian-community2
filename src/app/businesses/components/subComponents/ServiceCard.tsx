@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { BusinessService } from '@/types/business';
 import { Trash2 } from 'lucide-react';
+import { filter } from '@/app/components/filters/logoFilter';
 
 interface ServiceCardProps {
   service: BusinessService;
@@ -28,12 +29,15 @@ export default function ServiceCard({
       )}
 
       {(service.imageUrl || service.iconUrl) && (
-        <div className='w-30 h-30 mb-1 relative rounded-full overflow-hidden'>
+        // <div className='w-30 h-30 mb-1 relative  overflow-hidden'>
+        <div className='w-32 h-32 flex items-center justify-center'>
           <Image
             src={service.imageUrl || service.iconUrl!}
             alt={service.name}
-            fill
-            className='object-cover rounded-full'
+            width={128}
+            height={128}
+            className='object-contain'
+            style={{ filter }}
           />
         </div>
       )}
