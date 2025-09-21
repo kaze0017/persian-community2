@@ -11,7 +11,7 @@ import AdminControlsPanel from './subComponents/AdminControlsPanel';
 interface Props {
   businessId: string;
   business?: Business;
-  isAdmin: boolean;
+  isAdmin?: boolean;
 }
 
 export default function ContactSection({
@@ -19,6 +19,7 @@ export default function ContactSection({
   business,
   isAdmin,
 }: Props) {
+  const isEnabled = business?.businessConfig?.contactConfig?.isEnabled ?? true;
   const initialConfig = useMemo<BusinessContactConfig>(() => {
     const config = business?.businessConfig?.contactConfig || {};
     return {
@@ -99,43 +100,12 @@ export default function ContactSection({
   };
 
   return (
-    <SectionPanel>
-      <AdminControlsPanel
-        isAdmin={isAdmin}
-        title='Contact Settings'
-        updating={updating}
-        toggles={[
-          {
-            label: 'Enable',
-            checked: enabled,
-            onChange: handleToggle,
-          },
-        ]}
-        buttons={[
-          {
-            label: 'Edit Contact',
-            onClick: () => setEditing(true),
-          },
-        ]}
-      />
-
-      {enabled && (
-        <>
-          {editing ? (
-            <ContactForm
-              form={form}
-              onChange={setForm}
-              onCancel={() => setEditing(false)}
-              onSave={handleSave}
-              onFieldChange={handleFieldChange}
-              onSocialLinkChange={handleSocialLinkChange}
-              updating={updating}
-            />
-          ) : (
-            <ContactDisplay config={form} />
-          )}
-        </>
+    <>
+      {isEnabled && (
+        <SectionPanel>
+          <ContactDisplay config={form} />
+        </SectionPanel>
       )}
-    </SectionPanel>
+    </>
   );
 }

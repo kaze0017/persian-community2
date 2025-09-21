@@ -25,6 +25,7 @@ import ServicesTab from '../_components/ServicesTab';
 import UiTab from '../_components/UiTab';
 import AboutTab from '@/app/client/businesses/_components/AboutTab';
 import { GooglePlaceId } from '../_components/GooglePlaceId';
+import ContactTab from '../_components/ContactsTab';
 
 export default function GlassTabs() {
   const { businessId }: { businessId: string } = useParams();
@@ -95,13 +96,13 @@ export default function GlassTabs() {
               value: 'contacts',
               label: 'Contacts',
               icon: Phone,
-              panel: <UiTab />,
+              panel: <ContactTab businessId={businessId} />,
             },
             {
               value: 'ui',
               label: 'UI',
               icon: Palette,
-              panel: <UiTab />,
+              panel: <UiTab businessId={businessId} />,
             },
           ]}
         />

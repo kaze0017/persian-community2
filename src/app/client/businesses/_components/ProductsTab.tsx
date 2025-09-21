@@ -1,101 +1,117 @@
 'use client';
 import React from 'react';
-import GlassPanel from '@/components/glassTabsComponent/GlassPanel';
-import { TabsContent } from '@/components/ui/tabs';
 import { useState, useEffect } from 'react';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { fetchProducts } from '@/app/admin/products/productsTemplate/restaurantComponents/helpers';
 import ProductTypeList from '@/app/admin/products/productsTemplate/restaurantComponents/ProductTypeList';
 import AddNewProductTypeDialog from '@/app/admin/products/productsTemplate/restaurantComponents/AddNewProductTypeDialog';
-import AddNewProductDialog from '@/app/admin/products/productsTemplate/restaurantComponents/AddNewProductDialog';
-
-type ProductItem = {
-  id: string;
-  name: string;
-  description?: string;
-  price?: number;
-  imageUrl?: string;
-};
-
-type ProductsByType = Record<string, { items: ProductItem[] }>;
+import AddNewProductDialog from '@/app/client/businesses/_components/_subComponents/AddProductDialog';
+import { ProductsByType } from '@/types/business';
+import { useAppSelector, useAppDispatch } from '@/app/hooks';
+import {
+  fetchBusinessProducts,
+  deleteBusinessProductType,
+  addBusinessProductType,
+  deleteBusinessProduct,
+} from '../../clientReducer/clientBusinessReducer';
 
 type Props = {
   businessId: string;
 };
 
 export default function ProductsTab({ businessId }: { businessId: string }) {
-  const [productsByType, setProductsByType] = useState<ProductsByType>({});
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const [addTypeDialogOpen, setAddTypeDialogOpen] = useState(false);
   const [addProductDialogOpen, setAddProductDialogOpen] = useState(false);
   const [selectedTypeForNewProduct, setSelectedTypeForNewProduct] = useState<
     string | null
   >(null);
+  const [selectedProduct, setSelectedProduct] = useState<ProductsByType | {}>(
+    {}
+  );
 
-  useEffect(() => {
-    const fetchAndSetProducts = async () => {
-      setLoading(true);
-      try {
-        if (businessId) {
-          const products = await fetchProducts(businessId);
-          setProductsByType(products);
-        }
-      } catch (error) {
-        console.error('Failed to fetch products:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  //   const fetchAndSetProducts = async () => {
+  //     setLoading(true);
+  //     try {
+  //       if (businessId) {
+  //         const products = await fetchProducts(businessId);
+  //         setProductsByType(products);
+  //       }
+  //     } catch (error) {
+  //       console.error('Failed to fetch products:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchAndSetProducts();
-  }, [businessId]);
+  //   fetchAndSetProducts();
+  // }, [businessId]);
+  const products: ProductsByType = useAppSelector(
+    (state) => state.clientBusiness.selectedBusiness?.products || {}
+  );
 
-  const handleTypeAdded = async () => {
-    setAddTypeDialogOpen(false);
+  const handleAddType = async (type: string) => {
+    if (!businessId) return;
     setLoading(true);
-    const products = await fetchProducts(businessId);
-    setProductsByType(products);
-    setLoading(false);
-  };
-
-  const handleProductAdded = async () => {
-    setAddProductDialogOpen(false);
-    setLoading(true);
-    const products = await fetchProducts(businessId);
-    setProductsByType(products);
-    setLoading(false);
+    try {
+      await dispatch(addBusinessProductType(businessId, type));
+      setAddTypeDialogOpen(false);
+    } catch (err) {
+      console.error('Failed to add product type', err);
+      alert('Failed to add product type');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDeleteType = async (type: string) => {
+    if (!businessId) return;
     if (!window.confirm(`Delete product type "${type}" and all its items?`))
       return;
+    setLoading(true);
     try {
-      const itemsRef = collection(
-        db,
-        'businesses',
-        businessId,
-        'products',
-        type,
-        'items'
-      );
-      const itemsSnapshot = await getDocs(itemsRef);
-      const deletePromises = itemsSnapshot.docs.map((doc) =>
-        deleteDoc(doc.ref)
-      );
-      await Promise.all(deletePromises);
-
-      const typeDocRef = doc(db, 'businesses', businessId, 'products', type);
-      await deleteDoc(typeDocRef);
-      setLoading(true);
-      const products = await fetchProducts(businessId);
-      setProductsByType(products);
-      setLoading(false);
+      await dispatch(deleteBusinessProductType(businessId, type));
     } catch (err) {
       console.error('Failed to delete type', err);
       alert('Failed to delete product type');
+    } finally {
+      setLoading(false);
     }
   };
+  const handleDeleteProduct = async (type: string, productId: string) => {
+    if (!businessId) return;
+    if (!window.confirm(`Delete this product?`)) return;
+    setLoading(true);
+    try {
+      await dispatch(deleteBusinessProduct(businessId, type, productId));
+      setSelectedProduct({});
+      setAddProductDialogOpen(false);
+    } catch (err) {
+      console.error('Failed to delete product', err);
+      alert('Failed to delete product');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!businessId) return;
+
+    const fetchData = async () => {
+      setLoading(true);
+
+      await dispatch(fetchBusinessProducts(businessId));
+      setLoading(false);
+    };
+    fetchData();
+  }, [businessId]);
+
+  useEffect(() => {
+    console.log('products', products);
+  }, [products]);
+  useEffect(() => {
+    console.log('selectedProduct changed', selectedProduct);
+    setAddProductDialogOpen(!!Object.keys(selectedProduct).length);
+  }, [selectedProduct]);
 
   return (
     <>
@@ -109,25 +125,26 @@ export default function ProductsTab({ businessId }: { businessId: string }) {
             <PlusIcon className='w-4 h-4' /> Add New Type
           </button>
         </div>
-
         <ProductTypeList
-          productsByType={productsByType}
+          productsByType={products || {}}
           loading={loading}
           onAddProduct={(type) => {
             setSelectedTypeForNewProduct(type);
             setAddProductDialogOpen(true);
           }}
           onDeleteType={handleDeleteType}
+          setSelectedProduct={setSelectedProduct}
+          setSelectedTypeForNewProduct={setSelectedTypeForNewProduct}
         />
 
         <AddNewProductTypeDialog
           businessId={businessId}
           open={addTypeDialogOpen}
           onClose={() => setAddTypeDialogOpen(false)}
-          onAdded={handleTypeAdded}
+          onAdded={handleAddType}
         />
 
-        {selectedTypeForNewProduct && (
+        {/* {selectedTypeForNewProduct && (
           <AddNewProductDialog
             businessId={businessId}
             type={selectedTypeForNewProduct}
@@ -135,8 +152,21 @@ export default function ProductsTab({ businessId }: { businessId: string }) {
             onClose={() => setAddProductDialogOpen(false)}
             onAdded={handleProductAdded}
           />
-        )}
+        )} */}
       </div>
+      {selectedTypeForNewProduct && (
+        <AddNewProductDialog
+          businessId={businessId}
+          type={selectedTypeForNewProduct}
+          open={addProductDialogOpen}
+          onClose={() => {
+            setAddProductDialogOpen(false);
+            setSelectedProduct({});
+            setSelectedTypeForNewProduct(null);
+          }}
+          product={selectedProduct as any} // Fix this any
+        />
+      )}
     </>
   );
 }

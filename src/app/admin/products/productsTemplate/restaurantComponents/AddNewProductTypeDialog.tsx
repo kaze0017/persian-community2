@@ -17,7 +17,7 @@ type Props = {
   businessId: string;
   open: boolean;
   onClose: () => void;
-  onAdded: () => void;
+  onAdded: (type: string) => void;
 };
 
 export default function AddNewProductTypeDialog({
@@ -49,7 +49,7 @@ export default function AddNewProductTypeDialog({
 
       await setDoc(docRef, {});
 
-      onAdded();
+      onAdded(trimmedType);
       onClose();
     } catch (err) {
       console.error('Failed to add product type:', err);

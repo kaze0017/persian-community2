@@ -77,7 +77,7 @@ export default function RootLayout({
     `}
       >
         {/* ✅ Blurred Background Layer */}
-        <div className="absolute inset-0 bg-[url('/bg2.webp')] bg-cover bg-center opacity-30 blur-lg pointer-events-none -z-10" />
+        <div className="fixed inset-0 w-screen h-screen bg-[url('/bg2.webp')] bg-cover bg-center opacity-30 blur-lg pointer-events-none -z-10" />
 
         <Providers>
           <ThemeProvider

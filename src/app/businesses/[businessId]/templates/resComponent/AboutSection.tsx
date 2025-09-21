@@ -66,7 +66,7 @@ export default function AboutSection({
         </div>
 
         {/* Description text */}
-        <p className='whitespace-pre-line flex-1 text-sm text-muted-foreground'>
+        <p className='whitespace-pre-line flex-1 text-lg text-muted-foreground'>
           {description || 'No description available for this business.'}
         </p>
       </div>

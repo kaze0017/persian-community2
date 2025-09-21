@@ -2,25 +2,31 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { RestaurantProduct } from '@/types/RestaurantProduct';
 
-type ProductItem = {
-  id: string;
-  name: string;
-  description?: string;
-  price?: number;
-  imageUrl?: string;
-  options?: string;
-  featured?: boolean;
-  available?: boolean;
-};
+// type ProductItem = {
+//   id: string;
+//   name: string;
+//   description?: string;
+//   price?: number;
+//   imageUrl?: string;
+//   options?: string;
+//   featured?: boolean;
+//   available?: boolean;
+// };
 
 type Props = {
-  product: ProductItem;
+  product: RestaurantProduct;
+  onClick?: () => void;
 };
 
-export default function ProductCard({ product }: Props) {
+export default function ProductCard({ product, onClick }: Props) {
   return (
-    <div className='flex max-w-xl border rounded-md p-4 gap-4 shadow-sm'>
+    <div
+      className='flex max-w-xl border rounded-md p-4 gap-4 shadow-sm'
+      onClick={onClick}
+      style={{ cursor: onClick ? 'pointer' : 'default' }}
+    >
       {/* Image */}
       {product.imageUrl ? (
         <Image
@@ -72,14 +78,14 @@ export default function ProductCard({ product }: Props) {
               <CrossIcon className='w-5 h-5 text-red-600' />
             )}
           </p>
-          <p className='flex items-center gap-1'>
+          {/* <p className='flex items-center gap-1'>
             <strong>Available:</strong>{' '}
             {product.available ? (
               <CheckIcon className='w-5 h-5 text-green-600' />
             ) : (
               <CrossIcon className='w-5 h-5 text-red-600' />
             )}
-          </p>
+          </p> */}
         </div>
       </div>
     </div>

@@ -126,7 +126,7 @@ export const deleteService = async (businessId: string, serviceId: string) => {
   await deleteFolder(`businesses/${businessId}/services/${serviceId}`);
 };
 
-const deleteFolder = async (path: string) => {
+export const deleteFolder = async (path: string) => {
   const folderRef = ref(storage, path);
   const list = await listAll(folderRef);
 

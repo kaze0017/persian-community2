@@ -18,7 +18,8 @@ interface Props {
 }
 
 export default function ArtistTemplate({ business, businessId }: Props) {
-  const isAdmin = useAppSelector((state) => state.user.role === 'admin');
+  // const isAdmin = useAppSelector((state) => state.user.role === 'admin');
+  const isAdmin = false;
 
   return (
     <main className='max-w-4xl mx-auto p-6 space-y-8'>
@@ -34,11 +35,7 @@ export default function ArtistTemplate({ business, businessId }: Props) {
         isAdmin={isAdmin}
       />
       <SectionTitle title='Services' />
-      <ServicesSection
-        businessId={businessId}
-        business={business}
-        isAdmin={isAdmin}
-      />
+      {/* <ServicesSection business={business} /> */}
       <SectionTitle title='Gallery' />
       <GallerySection
         businessId={businessId}

@@ -21,13 +21,13 @@ export default function ProductCard({ item, onClick }: Props) {
       style={{ boxShadow }}
     >
       <CardContent className='p-4 flex gap-4'>
-        <div className='w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden relative shrink-0'>
+        <div className='w-24 h-24 rounded overflow-hidden relative shrink-0'>
           {item.imageUrl ? (
             <Image
               src={item.imageUrl}
               alt={item.name}
               fill
-              className='object-cover'
+              className='object-cover bg-transparent'
             />
           ) : (
             <div className='w-full h-full flex items-center justify-center text-muted-foreground text-sm'>

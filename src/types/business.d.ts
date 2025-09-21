@@ -1,5 +1,5 @@
-import { Banner } from "./banner";
-import { RestaurantProduct } from "./RestaurantProduct";
+import { Banner } from './banner';
+import { RestaurantProduct } from './RestaurantProduct';
 
 // src/types/business.ts
 export type Business = {
@@ -16,7 +16,7 @@ export type Business = {
   category?: string;
   ownerImageUrl?: string;
   logoUrl?: string;
-  bannerImageUrls?:Banner 
+  bannerImageUrls?: Banner;
   businessCardUrl?: string;
   businessConfig?: BusinessConfig;
   isSponsored?: boolean;
@@ -24,19 +24,23 @@ export type Business = {
   isTrusted?: boolean;
   isNew?: boolean;
   services?: BusinessService[];
+  products?: ProductsByType;
 };
 
+export type ProductsByType = {
+    [type: string]: RestaurantProduct[];
+};
 export type BusinessConfig = {
   headerConfig?: BusinessHeaderConfig;
-  aboutConfig?: BusinessAboutConfig
-  galleryConfig?: BusinessGalleryConfig
+  aboutConfig?: BusinessAboutConfig;
+  galleryConfig?: BusinessGalleryConfig;
   servicesConfig?: BusinessServicesConfig;
   rewardsConfig?: BusinessRewardsConfig;
   clientConfig?: BusinessClientConfig;
   googleReviewsConfig?: BusinessGoogleReviewsConfig;
   contactConfig?: BusinessContactConfig;
   productsConfig?: BusinessProductsConfig;
-}
+};
 
 export type BusinessHeaderConfig = {
   isEnabled?: boolean;
@@ -44,7 +48,7 @@ export type BusinessHeaderConfig = {
   bannerEnabled?: boolean;
   slogan?: string;
   sloganEnabled?: boolean;
-}
+};
 export type BusinessAboutConfig = {
   isEnabled?: boolean;
   ownerImageEnabled?: boolean;
@@ -62,7 +66,7 @@ export type BusinessGalleryConfig = {
 export type BusinessServicesConfig = {
   isEnabled?: boolean;
   services?: BusinessService[];
-}
+};
 
 export type BusinessService = {
   id: string;
@@ -73,13 +77,13 @@ export type BusinessService = {
   isAvailable?: boolean;
   iconUrl?: string;
   imageUrl?: string;
-  file?: File;  
-}
+  file?: File;
+};
 
 export type BusinessRewardsConfig = {
   isEnabled?: boolean;
   rewards?: BusinessReward[];
-}
+};
 
 export type BusinessReward = {
   id: string;
@@ -92,7 +96,7 @@ export type BusinessReward = {
 export type BusinessClientConfig = {
   isEnabled?: boolean;
   clients?: BusinessClient[];
-}
+};
 export type BusinessClient = {
   id: string;
   name: string;
@@ -103,10 +107,8 @@ export type BusinessClient = {
 };
 export type BusinessGoogleReviewsConfig = {
   isEnabled?: boolean;
-  placeId?: string; 
+  placeId?: string;
 };
-
-
 
 export interface BusinessContactConfig {
   isEnabled?: boolean;
@@ -124,6 +126,5 @@ export interface BusinessContactConfig {
 
 export type BusinessProductsConfig = {
   isEnabled?: boolean;
-  products?: RestaurantProduct[]
+  products?: RestaurantProduct[];
 };
-

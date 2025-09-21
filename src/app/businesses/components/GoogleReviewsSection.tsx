@@ -20,47 +20,23 @@ export default function GoogleReviewsSection({
   business,
   isAdmin,
 }: Props) {
-  const initialConfig = business?.businessConfig?.googleReviewsConfig || {};
-  const [enabled, setEnabled] = useState(initialConfig.isEnabled ?? true);
-  const [placeId, setPlaceId] = useState(initialConfig.placeId || '');
-  const [editing, setEditing] = useState(false);
-  const [updating, setUpdating] = useState(false);
-  const [tempPlaceId, setTempPlaceId] = useState(placeId);
-
-  const handleToggle = async (value: boolean) => {
-    setUpdating(true);
-    try {
-      await updateDocument('businesses', businessId, {
-        'businessConfig.googleReviewsConfig.isEnabled': value,
-      });
-
-      setEnabled(value);
-    } catch (err) {
-      console.error('Failed to toggle Google Reviews:', err);
-    } finally {
-      setUpdating(false);
-    }
-  };
-
-  const handleSavePlaceId = async () => {
-    setUpdating(true);
-    try {
-      await updateDocument('businesses', businessId, {
-        'businessConfig.googleReviewsConfig.placeId': tempPlaceId,
-      });
-
-      setPlaceId(tempPlaceId);
-      setEditing(false);
-    } catch (err) {
-      console.error('Failed to update placeId:', err);
-    } finally {
-      setUpdating(false);
-    }
-  };
+  const isEnabled =
+    business?.businessConfig?.googleReviewsConfig?.isEnabled ?? true;
+  const placeId = business?.businessConfig?.googleReviewsConfig?.placeId || '';
 
   return (
-    <SectionPanel>
-      <AdminControlsPanel
+    <>
+      {isEnabled && (
+        <SectionPanel>
+          {isEnabled && placeId && <GoogleReviewEmbed placeId={placeId} />}
+        </SectionPanel>
+      )}
+    </>
+  );
+}
+
+{
+  /* <AdminControlsPanel
         isAdmin={isAdmin}
         title='Google Reviews Settings'
         updating={updating}
@@ -81,9 +57,11 @@ export default function GoogleReviewsSection({
             disabled: updating,
           },
         ]}
-      />
+      /> */
+}
 
-      {editing && (
+{
+  /* {editing && (
         <div className='flex flex-col sm:flex-row items-center gap-2 mt-4'>
           <Input
             placeholder='Enter Google Place ID'
@@ -102,17 +80,53 @@ export default function GoogleReviewsSection({
             onClick={() => setEditing(false)}
             disabled={updating}
           >
-            Cancel
+          Cancel
           </Button>
         </div>
-      )}
+      )} */
+}
 
-      {isAdmin && enabled && placeId && (
+{
+  /* {isAdmin && enabled && placeId && (
         <p className='mt-4 text-sm text-muted-foreground'>
           <strong>Place ID:</strong> {placeId}
         </p>
-      )}
-      {enabled && placeId && <GoogleReviewEmbed placeId={placeId} />}
-    </SectionPanel>
-  );
+      )} */
 }
+// const initialConfig = business?.businessConfig?.googleReviewsConfig || {};
+// const [enabled, setEnabled] = useState(initialConfig.isEnabled ?? true);
+// const [placeId, setPlaceId] = useState(initialConfig.placeId || '');
+// const [editing, setEditing] = useState(false);
+// const [updating, setUpdating] = useState(false);
+// const [tempPlaceId, setTempPlaceId] = useState(placeId);
+
+// const handleToggle = async (value: boolean) => {
+//   setUpdating(true);
+//   try {
+//     await updateDocument('businesses', businessId, {
+//       'businessConfig.googleReviewsConfig.isEnabled': value,
+//     });
+
+//     setEnabled(value);
+//   } catch (err) {
+//     console.error('Failed to toggle Google Reviews:', err);
+//   } finally {
+//     setUpdating(false);
+//   }
+// };
+
+// const handleSavePlaceId = async () => {
+//   setUpdating(true);
+//   try {
+//     await updateDocument('businesses', businessId, {
+//       'businessConfig.googleReviewsConfig.placeId': tempPlaceId,
+//     });
+
+//     setPlaceId(tempPlaceId);
+//     setEditing(false);
+//   } catch (err) {
+//     console.error('Failed to update placeId:', err);
+//   } finally {
+//     setUpdating(false);
+//   }
+// };
