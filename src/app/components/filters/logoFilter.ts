@@ -16,3 +16,10 @@
   `;
 
   export const cardClass = `w-full h-full rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md shadow-lg`;
+
+  export const textGlow = `
+  0 0 2.5px ${color},
+  0 0 5px ${color},
+  0 0 10px ${color},
+  0 0 20px ${color}
+`;
