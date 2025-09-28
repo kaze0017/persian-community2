@@ -8,7 +8,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase"; // adjust your firebase import
-import { uploadImage } from "../storageService"; // your upload function
+import { uploadImage } from "../../../services/storageService"; // your upload function
 import { Event } from "@/types/event";
 
 // Add event
@@ -23,6 +23,7 @@ export const addEvent = async (
     const eventRef = doc(userEventsRef); // auto ID
     const eventId = eventRef.id;
 
+    console.log("User Events userId and eventId:", userId, eventId);
     let bannerUrl: string | undefined = undefined;
 
     // Upload banner if provided
@@ -50,7 +51,7 @@ export const addEvent = async (
       title: event.title,
       description: event.description,
       date: event.date,
-      bannerUrl,
+      bannerUrls: bannerUrl ? { sizes: { large: bannerUrl } } : undefined,
     });
 
     return newEvent;
@@ -90,7 +91,7 @@ export const updateEvent = async (
       `clients/${userId}/events/${eventId}/banner`,
       "banner.jpg"
     );
-    updates.bannerUrls = { sizes: { large: bannerUrl } };
+    updates.bannerUrls = { sizes: { large: bannerUrl, medium: bannerUrl, small: bannerUrl, xlarge: bannerUrl } };
   }
 
   await updateDoc(eventRef, updates);
@@ -101,7 +102,8 @@ export const updateEvent = async (
     ...("title" in updates ? { title: updates.title } : {}),
     ...("description" in updates ? { description: updates.description } : {}),
     ...("date" in updates ? { date: updates.date } : {}),
-    ...(bannerUrl ? { bannerUrl } : {}),
+    ...(bannerUrl ? { bannerUrls: { sizes: { large: bannerUrl, medium: bannerUrl, small: bannerUrl, xlarge: bannerUrl } } } : {}),
+    clientId: userId,
   });
 };
 

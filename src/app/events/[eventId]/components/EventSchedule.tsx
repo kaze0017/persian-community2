@@ -11,6 +11,7 @@ import { updateDocument } from '@/services/firestoreService';
 
 import { EventDay } from '@/types/event';
 import { Button } from '@/components/ui/button';
+import GlassPanel from '@/components/glassTabsComponent/GlassPanel';
 
 type FormData = {
   days: EventDay[];
@@ -53,64 +54,75 @@ export default function EventSchedule({
     }
   };
 
-  const content = (
-    <>
-      {isAdmin && (
-        <AdminControlsPanel
-          isAdmin={isAdmin}
-          title='Event Details'
-          updating={false}
-          toggles={[]}
-          uploads={[]}
-          buttons={[
-            {
-              label: editing ? 'View Schedule' : 'Edit Schedule',
-              onClick: () => setEditing((v) => !v),
-            },
-          ]}
-        />
-      )}
+  // const content = (
+  //   <>
+  //     {isAdmin && (
+  //       <AdminControlsPanel
+  //         isAdmin={isAdmin}
+  //         title='Event Details'
+  //         updating={false}
+  //         toggles={[]}
+  //         uploads={[]}
+  //         buttons={[
+  //           {
+  //             label: editing ? 'View Schedule' : 'Edit Schedule',
+  //             onClick: () => setEditing((v) => !v),
+  //           },
+  //         ]}
+  //       />
+  //     )}
 
-      {editing ? (
-        <FormProvider {...methods}>
-          <form onSubmit={methods.handleSubmit(onSubmit)}>
-            {dayFields.map((day, index) => (
-              <div key={day.id} className='mb-6'>
-                <EventDayPanel dayIndex={index} namePrefix={`days.${index}`} />
-                <button
-                  type='button'
-                  className='mt-2 text-red-600 hover:underline'
-                  onClick={() => removeDay(index)}
-                >
-                  Remove Day
-                </button>
-              </div>
-            ))}
-            <div className='flex items-start gap-2 mt-4'>
-              <Button
-                type='button'
-                variant='secondary'
-                className='min-w-[140px]'
-                onClick={() =>
-                  appendDay({
-                    date: '',
-                    blocks: [],
-                  })
-                }
-              >
-                + Add Day
-              </Button>
+  //     {editing ? (
+  //       <FormProvider {...methods}>
+  //         <form onSubmit={methods.handleSubmit(onSubmit)}>
+  //           {dayFields.map((day, index) => (
+  //             <div key={day.id} className='mb-6'>
+  //               <EventDayPanel dayIndex={index} namePrefix={`days.${index}`} />
+  //               <button
+  //                 type='button'
+  //                 className='mt-2 text-red-600 hover:underline'
+  //                 onClick={() => removeDay(index)}
+  //               >
+  //                 Remove Day
+  //               </button>
+  //             </div>
+  //           ))}
+  //           <div className='flex items-start gap-2 mt-4'>
+  //             <Button
+  //               type='button'
+  //               variant='secondary'
+  //               className='min-w-[140px]'
+  //               onClick={() =>
+  //                 appendDay({
+  //                   date: '',
+  //                   blocks: [],
+  //                 })
+  //               }
+  //             >
+  //               + Add Day
+  //             </Button>
 
-              <Button type='submit' className='min-w-[140px]'>
-                Save Schedule
-              </Button>
-            </div>
-          </form>
-        </FormProvider>
+  //             <Button type='submit' className='min-w-[140px]'>
+  //               Save Schedule
+  //             </Button>
+  //           </div>
+  //         </form>
+  //       </FormProvider>
+  //     ) : (
+  //       currentDays.map((day) => <EventDayTimeline key={day.date} day={day} />)
+  //     )}
+  //   </>
+  // );
+  // return isAdmin ? <SectionPanel>{content}</SectionPanel> : content;
+  return (
+    <GlassPanel>
+      {currentDays.length === 0 ? (
+        <p className='text-muted-foreground'>
+          No schedule available for this event.
+        </p>
       ) : (
         currentDays.map((day) => <EventDayTimeline key={day.date} day={day} />)
       )}
-    </>
+    </GlassPanel>
   );
-  return isAdmin ? <SectionPanel>{content}</SectionPanel> : content;
 }

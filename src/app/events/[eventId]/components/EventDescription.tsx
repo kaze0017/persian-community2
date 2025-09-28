@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import SectionPanel from '@/app/businesses/components/subComponents/SectionPanel';
 import AdminControlsPanel from '@/app/businesses/components/subComponents/AdminControlsPanel';
 import { updateDocument } from '@/services/firestoreService';
+import GlassPanel from '@/components/glassTabsComponent/GlassPanel';
 
 type Props = {
   description: string;
@@ -42,7 +43,7 @@ export default function EventDescription({
   };
   const content = (
     <>
-      <AdminControlsPanel
+      {/* <AdminControlsPanel
         isAdmin={isAdmin}
         title='Event Description'
         updating={false}
@@ -58,8 +59,9 @@ export default function EventDescription({
               ]
             : []
         }
-      />
-      <Card className='p-4'>
+      /> */}
+      <GlassPanel>
+        {/* <Card className='p-4'> */}
         <h2 className='text-xl font-semibold mb-2'>Event Description</h2>
         {editing ? (
           <>
@@ -89,7 +91,8 @@ export default function EventDescription({
             {localDescription}
           </p>
         )}
-      </Card>
+        {/* </Card> */}
+      </GlassPanel>
     </>
   );
   return isAdmin ? <SectionPanel> {content} </SectionPanel> : content;

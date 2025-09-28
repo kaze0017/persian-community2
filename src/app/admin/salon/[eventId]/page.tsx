@@ -17,40 +17,57 @@ const StageCanvas = dynamic(() => import('./StageCanvas'), {
 });
 import { useParams } from 'next/navigation';
 
-export default function SalonEditorPage() {
+export default function SalonEditorPage({
+  eventId,
+  clientId,
+}: {
+  eventId?: string;
+  clientId?: string;
+}) {
   const params = useParams();
-  const eventId = params.eventId as string;
+  // const eventId = params.eventId as string;
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    async function fetchLayout() {
-      if (!eventId) return;
+    if (!eventId || !clientId) return;
 
+    const fetchLayout = async () => {
       try {
-        const docRef = doc(db, 'events', eventId, 'layout', 'current');
+        const docRef = doc(
+          db,
+          'users',
+          clientId,
+          'events',
+          eventId,
+          'layout',
+          'current'
+        );
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           const data = docSnap.data();
 
-          // Defensive: Check if fields exist, default to empty array if not
-          const floor = data.floor ?? [];
-          const placedTables = data.placedTables ?? [];
+          // Safely extract with defaults
+          const floor = Array.isArray(data?.floor) ? data.floor : [];
+          const placedTables = Array.isArray(data?.placedTables)
+            ? data.placedTables
+            : [];
 
-          // Dispatch to initialize your redux slices
+          // Dispatch into Redux
           dispatch(setShapes(floor));
           dispatch(setPlacedTables(placedTables));
-          dispatch(setTables(placedTables)); // Assuming you want to reset tables here
+          dispatch(setTables(placedTables)); // ✅ only if your tables slice should mirror placedTables
         } else {
-          console.log('No saved layout found.');
+          console.log('ℹ️ No saved layout found for this event.');
         }
       } catch (error) {
-        console.error('Error fetching layout:', error);
+        console.error('❌ Error fetching layout:', error);
       }
-    }
+    };
 
     fetchLayout();
-  }, [dispatch, eventId]);
+  }, [dispatch, eventId, clientId]);
+
   return (
     <div className='p-6 space-y-4'>
       <h2 className='text-2xl font-semibold'>Salon Layout Editor</h2>
@@ -75,7 +92,7 @@ export default function SalonEditorPage() {
         </TabsContent>
 
         <TabsContent value='preview'>
-          <PreviewCanvas />
+          <PreviewCanvas clientId={clientId} eventId={eventId} />
         </TabsContent>
       </Tabs>
     </div>

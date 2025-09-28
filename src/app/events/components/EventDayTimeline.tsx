@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button';
 import { EventDay } from '@/types/event';
 import { ICONS } from '@/app/admin/events/add-event/components/IconPicker';
 import { EventBlock } from '@/types/event'; // if defined
+import GlassPanel from '@/components/glassTabsComponent/GlassPanel';
+import { filter } from '@/app/components/filters/logoFilter';
 
 type Props = {
   day: EventDay;
@@ -38,36 +40,52 @@ export default function EventDayTimeline({ day }: Props) {
   };
 
   return (
-    <Card className='mb-6'>
+    <GlassPanel className='mb-6'>
       <CardHeader>
         <Button
           variant='ghost'
           onClick={toggleExpanded}
           className='w-full justify-between text-left px-0'
         >
-          <span className='flex items-center gap-2 font-semibold text-lg'>
+          <span
+            className='flex items-center gap-2 font-semibold text-lg'
+            style={{ filter }}
+          >
             <CalendarClock className='w-5 h-5' /> {day.date}
           </span>
           {expanded ? (
-            <ChevronDown className='w-4 h-4' />
+            <ChevronDown className='w-4 h-4' style={{ filter }} />
           ) : (
-            <ChevronRight className='w-4 h-4' />
+            <ChevronRight className='w-4 h-4' style={{ filter }} />
           )}
         </Button>
       </CardHeader>
 
       {expanded && (
-        <CardContent>
-          <VerticalTimeline lineColor='#e5e7eb'>
+        <div>
+          <VerticalTimeline lineColor='transparent'>
             {day.blocks.map((block, index) => (
               <VerticalTimelineElement
                 key={index}
-                contentArrowStyle={{ borderRight: '7px solid #e5e7eb' }}
+                contentArrowStyle={{
+                  borderRight: '7px solid #e5e7eb',
+                  filter,
+                }}
+                contentStyle={{
+                  background: 'transparent',
+                  border: '1px solid #e5e7eb',
+                  color: '#fff',
+                  filter,
+                }} // 👈 box background + text color
                 date={`${block.start} - ${block.end}`}
                 icon={renderIcon(block.iconName)}
-                iconStyle={{ background: '#3b82f6', color: '#fff' }}
+                iconStyle={{
+                  color: '#fff',
+                  filter,
+                }}
+                dateClassName='ml-4 mr-4 text-gray-500' // 👈 pushes text away from icon
               >
-                <h3 className='text-lg font-bold text-red-600 dark:font-light'>
+                <h3 className='text-xl font-bold text-red-600 dark:font-light'>
                   {block.title}
                 </h3>
                 <ul className='mt-2 list-disc list-inside text-sm text-gray-600'>
@@ -78,8 +96,8 @@ export default function EventDayTimeline({ day }: Props) {
               </VerticalTimelineElement>
             ))}
           </VerticalTimeline>
-        </CardContent>
+        </div>
       )}
-    </Card>
+    </GlassPanel>
   );
 }

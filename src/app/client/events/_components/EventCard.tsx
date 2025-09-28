@@ -10,10 +10,10 @@ import Image from 'next/image';
 
 type EventCardProps = {
   event: Event | null;
-  section?: 'user' | 'client' | 'admin';
+  mode?: 'user' | 'client' | 'admin';
 };
 
-export default function EventCard({ event, section }: EventCardProps) {
+export default function EventCard({ event, mode }: EventCardProps) {
   const router = useRouter();
 
   const handleClick = () => {
@@ -23,13 +23,13 @@ export default function EventCard({ event, section }: EventCardProps) {
     }
 
     const paths: Record<string, string> = {
-      user: `/businesses/${event.id}`,
-      client: `/client/businesses/${event.id}`,
-      admin: `/admin/businesses/${event.id}`,
+      user: `/events/${event.id}`,
+      client: `/client/events/${event.id}`,
+      admin: `/admin/events/${event.id}`,
     };
 
-    if (section && paths[section]) {
-      router.push(paths[section]);
+    if (mode && paths[mode]) {
+      router.push(paths[mode]);
     }
   };
 
@@ -44,17 +44,17 @@ export default function EventCard({ event, section }: EventCardProps) {
           <Image
             src={event ? '/images/calender.png' : '/images/plus.webp'}
             alt={event ? event.title : 'Add Event'}
-            width={event ? 64 : 140}
-            height={event ? 64 : 140}
+            width={event ? 140 : 60}
+            height={event ? 140 : 60}
             className={textGlow}
             style={{
-              position: event ? 'relative' : 'absolute',
+              position: event ? 'absolute' : 'relative',
               zIndex: -1,
               filter: filter,
             }}
           />
-          {event && (
-            <div className='text-center'>
+          {event && event.date && (
+            <div className='text-center' style={{ filter: filter }}>
               <span className='block text-2xl font-bold'>
                 {new Date(event.date).getDate()}
               </span>
@@ -63,6 +63,11 @@ export default function EventCard({ event, section }: EventCardProps) {
                   month: 'short',
                 })}
               </span>
+            </div>
+          )}
+          {event && !event.date && (
+            <div className='text-center'>
+              <span className='block text-sm'>NA</span>
             </div>
           )}
         </div>

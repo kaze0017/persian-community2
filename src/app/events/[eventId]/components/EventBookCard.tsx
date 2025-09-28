@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import AdminControlsPanel from '@/app/businesses/components/subComponents/AdminControlsPanel';
 import SectionPanel from '@/app/businesses/components/subComponents/SectionPanel';
+import GlassPanel from '@/components/glassTabsComponent/GlassPanel';
 
 interface EventBookCardProps {
   eventId: string;
@@ -34,7 +35,7 @@ export default function EventBookCard({
   };
 
   return (
-    <SectionPanel>
+    <GlassPanel>
       {isAdmin && (
         <AdminControlsPanel
           isAdmin={isAdmin}
@@ -50,7 +51,7 @@ export default function EventBookCard({
           ]}
         />
       )}
-      <Card>
+      <div>
         <CardHeader>
           <CardTitle>Reserve Your Seat</CardTitle>
         </CardHeader>
@@ -82,7 +83,7 @@ export default function EventBookCard({
             {isPaid && price ? `Book Tickets (${price})` : 'Book Tickets'}
           </Button>
         </CardFooter>
-      </Card>
-    </SectionPanel>
+      </div>
+    </GlassPanel>
   );
 }
