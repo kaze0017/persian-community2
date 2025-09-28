@@ -10,6 +10,9 @@ import Image from 'next/image';
 import Konva from 'konva';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { uploadImage } from '@/services/storageService';
+import { useParams } from 'next/navigation';
+import { updateDoc } from 'firebase/firestore';
 
 function cleanObject<T>(obj: T): T {
   if (Array.isArray(obj)) {
@@ -26,7 +29,13 @@ function cleanObject<T>(obj: T): T {
   return obj;
 }
 
-export default function PreviewCanvas() {
+export default function PreviewCanvas({
+  clientId,
+  eventId,
+}: {
+  clientId?: string;
+  eventId?: string;
+}) {
   const placedTables = useAppSelector((state) => state.tables.placedTables);
   const floor = useAppSelector((state) => state.tables.shapes);
   const stageRef = useRef<Konva.Stage>(null);
@@ -34,10 +43,27 @@ export default function PreviewCanvas() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  const eventId = '0xek3FrR5b6bwjK2S0vf';
+  const eventIdLocal = eventId || '0xek3FrR5b6bwjK2S0vf';
+  function dataURLtoFile(dataurl: string, filename: string) {
+    const arr = dataurl.split(',');
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    const mime = mimeMatch ? mimeMatch[1] : 'image/png';
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+  }
 
   const handleSaveLayout = async () => {
-    if (!eventId) {
+    if (!clientId) {
+      setSaveError('No user ID provided');
+      return;
+    }
+
+    if (!eventIdLocal) {
       setSaveError('No event ID provided');
       return;
     }
@@ -46,9 +72,17 @@ export default function PreviewCanvas() {
     setSaveError(null);
 
     try {
-      const docRef = doc(db, 'events', eventId, 'layout', 'current');
+      // 1️⃣ Save layout JSON
+      const docRef = doc(
+        db,
+        'users',
+        clientId,
+        'events',
+        eventIdLocal,
+        'layout',
+        'current'
+      );
 
-      // Clean data before saving to avoid undefined fields
       const dataToSave = cleanObject({
         floor,
         placedTables,
@@ -57,8 +91,25 @@ export default function PreviewCanvas() {
 
       await setDoc(docRef, dataToSave);
 
+      // 2️⃣ Convert dataURL to File and upload
+      if (imageUrl) {
+        const file = dataURLtoFile(imageUrl, 'layout.png');
+        const url = await uploadImage(
+          file,
+          `clients/${clientId}/events/${eventIdLocal}`
+        );
+
+        console.log('Uploaded layout image URL:', url);
+
+        // 3️⃣ Save the URL in parent event doc
+        const eventDocRef = doc(db, 'users', clientId, 'events', eventIdLocal);
+        await updateDoc(eventDocRef, {
+          eventLayoutUrl: url,
+        });
+      }
+
       setIsSaving(false);
-      alert('Layout saved successfully!');
+      alert('Layout and preview saved successfully!');
     } catch (error) {
       setIsSaving(false);
       setSaveError('Failed to save layout: ' + (error as Error).message);

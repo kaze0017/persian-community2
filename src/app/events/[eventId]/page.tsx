@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import {
@@ -13,24 +13,54 @@ import EventSchedule from './components/EventSchedule';
 import EventTagsSponsorsOrganizers from './components/EventTagsSponsorsOrganizers';
 import EventContactMap from './components/EventContactMap';
 import EventBookCard from './components/EventBookCard';
+import { getEvent } from '@/app/client/events/eventsApi';
+import { Event } from '@/types/event';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 export default function EventPage() {
-  const isAdmin = useAppSelector((state) => state.user.role === 'admin');
+  const isAdmin = false;
   const { eventId } = useParams();
   const dispatch = useAppDispatch();
   const { events, selectedEvent, loading, error } = useAppSelector(
     (state) => state.events
   );
+  const [event, setEvent] = useState<Event | null>(null);
 
   useEffect(() => {
     if (typeof eventId !== 'string') return;
 
-    const existing = events.find((e) => e.id === eventId);
-    if (existing) {
-      dispatch(setSelectedEvent(eventId));
-    } else {
-      dispatch(fetchEventById(eventId));
-    }
+    let isMounted = true;
+
+    const loadEvent = async () => {
+      try {
+        // Find in store first
+        const existing = events.find((e) => e.id === eventId);
+        let targetEvent: Event | null = existing ?? null;
+
+        // Fetch from backend if not in store
+        if (!existing) {
+          const result = await dispatch(fetchEventById(eventId)).unwrap();
+          targetEvent = result as Event;
+        }
+
+        // Refresh from Firestore for freshest data
+        if (targetEvent) {
+          const fresh = await getEvent(targetEvent.clientId, targetEvent.id);
+          if (isMounted) {
+            setEvent(fresh ?? targetEvent);
+          }
+        }
+      } catch (err) {
+        console.error('❌ Failed to load event:', err);
+      }
+    };
+
+    loadEvent();
+
+    return () => {
+      isMounted = false;
+    };
   }, [eventId, events, dispatch]);
 
   if (loading || !selectedEvent) {
@@ -41,55 +71,68 @@ export default function EventPage() {
     return <div className='text-center py-10 text-red-500'>{error}</div>;
   }
 
-  const {
-    title,
-    date,
-    bannerUrls,
-    description,
-    sponsors,
-    tags,
-    organizers,
-    address,
-    coordinates,
-  } = selectedEvent;
+  // const {
+  //   title,
+  //   date,
+  //   bannerUrls,
+  //   description,
+  //   sponsors,
+  //   tags,
+  //   organizers,
+  //   address,
+  //   coordinates,
+  // } = selectedEvent;
 
   return (
     <div className='max-w-[1280px] mx-auto px-4 space-y-8'>
-      <EventHeaderBanner
-        title={title}
-        date={date}
-        bannerUrls={bannerUrls}
-        eventId={eventId as string}
-        isAdmin={isAdmin}
-      />
+      {event && (
+        <>
+          <EventHeaderBanner
+            title={event.title}
+            date={event.date}
+            bannerUrls={event.bannerUrls}
+            eventId={eventId as string}
+            isAdmin={isAdmin}
+          />
 
-      <EventDescription
-        description={description}
-        isAdmin={isAdmin}
-        eventId={eventId as string}
-      />
+          <EventDescription
+            description={event?.description || ''}
+            isAdmin={isAdmin}
+            eventId={eventId as string}
+          />
 
-      <EventBookCard eventId={eventId as string} isAdmin={isAdmin} />
-      <EventSchedule
-        days={selectedEvent.days || []}
-        isAdmin={isAdmin}
-        eventId={eventId as string}
-      />
+          <EventSchedule
+            days={event?.days || []}
+            isAdmin={isAdmin}
+            eventId={eventId as string}
+          />
 
-      <EventTagsSponsorsOrganizers
-        tags={tags}
-        sponsors={sponsors}
-        organizers={organizers}
-        eventId={eventId as string}
-        isAdmin={isAdmin}
-      />
+          <EventBookCard eventId={eventId as string} isAdmin={isAdmin} />
 
-      <EventContactMap
-        address={address}
-        coordinates={coordinates}
-        isAdmin={isAdmin}
-        eventId={eventId as string}
-      />
+          <EventTagsSponsorsOrganizers
+            tags={event?.tags || []}
+            sponsors={event?.sponsors || []}
+            organizers={event?.organizers || []}
+            eventId={eventId as string}
+            isAdmin={isAdmin}
+          />
+
+          <Image
+            src={event.eventLayoutUrl || '/images/event-layout-placeholder.png'}
+            alt='Event Layout'
+            width={800}
+            height={400}
+            className='w-full h-auto rounded-lg'
+          />
+
+          <EventContactMap
+            address={event.address}
+            coordinates={event.coordinates}
+            isAdmin={isAdmin}
+            eventId={eventId as string}
+          />
+        </>
+      )}
     </div>
   );
 }

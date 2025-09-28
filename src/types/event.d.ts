@@ -5,6 +5,7 @@ import { Banner } from './banner';
 
 export type Event = {
   id: string;
+  clientId: string;
   title: string;
   description: string;
   date: string; 
@@ -13,9 +14,9 @@ export type Event = {
   category: string;
   occasion?: Occasion;
   address: string; 
-  coordinates: {
-    lat: number;
-    lng: number;
+  coordinates?: {
+    lat?: number;
+    lng?: number;
   };
   bannerUrls?: Banner;
   sponsors?: Business[];
@@ -32,6 +33,7 @@ export type Event = {
   isOnline?: boolean;
   days?: EventDay[];  
   isFeatured?: boolean;
+  eventLayoutUrl?: string;
 };
 
 export type EventDay = {

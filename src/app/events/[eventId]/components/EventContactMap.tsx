@@ -9,11 +9,12 @@ import MapDisplay from '@/app/admin/MapDisplay';
 import MapSelector from '@/app/admin/MapSelector'; // Assuming you have this to pick location
 import { Input } from '@/components/ui/input';
 import { updateDocument } from '@/services/firestoreService';
+import GlassPanel from '@/components/glassTabsComponent/GlassPanel';
 
 type Props = {
   address: string;
   coordinates?: {
-    lat: number;
+    lat?: number;
     lng: number;
   };
   isAdmin?: boolean;
@@ -70,8 +71,8 @@ export default function EventContactMap({
   }
 
   return (
-    <SectionPanel>
-      <AdminControlsPanel
+    <GlassPanel>
+      {/* <AdminControlsPanel
         isAdmin={isAdmin}
         title='Contact and Map'
         updating={false}
@@ -97,10 +98,10 @@ export default function EventContactMap({
               ]
             : []
         }
-      />
+      /> */}
 
       <section className='flex flex-col gap-4 md:flex-row'>
-        <Card className='p-4 space-y-3 w-full md:w-1/2'>
+        <div className='p-4 space-y-3 w-full md:w-1/2'>
           <h3 className='text-lg font-semibold'>Contact Info</h3>
           <div className='flex items-center gap-2 text-muted-foreground'>
             <MapPin className='w-4 h-4' />
@@ -114,7 +115,7 @@ export default function EventContactMap({
               <span>{address || 'No address provided'}</span>
             )}
           </div>
-        </Card>
+        </div>
 
         <div className='w-full md:w-1/2 rounded-xl overflow-hidden min-h-[220px]'>
           {editing ? (
@@ -130,6 +131,6 @@ export default function EventContactMap({
           )}
         </div>
       </section>
-    </SectionPanel>
+    </GlassPanel>
   );
 }

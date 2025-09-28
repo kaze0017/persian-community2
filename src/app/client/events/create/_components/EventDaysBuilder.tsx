@@ -3,15 +3,13 @@
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import EventDayPanel from './EventDayPanel';
-import { useEffect } from 'react';
 
 type Props = {
   name?: string; // default: 'days'
-  setDirty?: (dirty: boolean) => void;
 };
 
-export default function EventDaysBuilder({ name = 'days', setDirty }: Props) {
-  const { control, watch } = useFormContext();
+export default function EventDaysBuilder({ name = 'days' }: Props) {
+  const { control } = useFormContext();
 
   const {
     fields: dayFields,
@@ -21,14 +19,10 @@ export default function EventDaysBuilder({ name = 'days', setDirty }: Props) {
     control,
     name,
   });
-  const watchedDays = watch(name);
-  useEffect(() => {
-    if (watchedDays) setDirty?.(true);
-  }, [watchedDays, setDirty]);
 
   return (
     <div className='space-y-6'>
-      {/* <h3 className='text-xl font-semibold'>Event Schedule</h3> */}
+      <h3 className='text-xl font-semibold'>Event Schedule</h3>
 
       {dayFields.map((day, dayIndex) => {
         const dayName = `${name}.${dayIndex}`;

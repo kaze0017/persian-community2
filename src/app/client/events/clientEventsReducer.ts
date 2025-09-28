@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { Event } from "@/types/event";
-import * as eventApi from "@/services/business/eventsApi";
+import * as eventApi from "@/app/client/events/eventsApi";
 
 interface ClientEventState {
   events: Event[];
@@ -25,6 +25,7 @@ export const fetchUserEvents = createAsyncThunk(
 export const addUserEvent = createAsyncThunk(
   "clientEvents/addUserEvent",
   async ({ userId, event, bannerFile }: { userId: string; event: Omit<Event, "id">; bannerFile?: File }) => {
+    console.log("Adding event:", event, "with banner file:", bannerFile);
     return await eventApi.addEvent(userId, event, bannerFile);
   }
 );
