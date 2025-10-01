@@ -94,7 +94,7 @@ export default function CreateEventForm() {
       }
 
       const resultAction = await dispatch(
-        addUserEvent({ userId: clientId, event: data, bannerFile })
+        addUserEvent({ clientId: clientId, event: data, bannerFile })
       );
       if (addUserEvent.fulfilled.match(resultAction)) {
         router.push('/client/events');

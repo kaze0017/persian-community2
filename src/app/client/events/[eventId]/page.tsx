@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Info,
   Calendar,
@@ -11,24 +11,32 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { useParams } from 'next/navigation';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 
-// Import your reusable component
 import GlassTabsComponent from '@/components/glassTabsComponent/GlassTabsComponent';
-
-// Import tab panels
 import EventInfoTab from './_components/EventInfoTab';
-import { Event } from '@/types/event'; // 👈 import your type
 import EventScheduleTab from './_components/EventScheduleTab';
 import EventLayoutTab from './_components/EventLayoutTab';
+import EventUiTab from './_components/EventUITab';
+import EventDeleteTab from './_components/EventDeleteTab';
+import { fetchUserEvents } from '../clientEventsReducer';
+import { Event } from '@/types/event';
 
 export default function GlassTabs() {
   const { eventId }: { eventId: string } = useParams();
   const clientId = useAppSelector((s) => s.user?.uid || '');
   const dispatch = useAppDispatch();
 
-  // Select event directly from Redux
-  const matchedEvent = useAppSelector((s) =>
-    s.clientEvents.events.find((e: Event) => e.id === eventId)
-  );
+  const events = useAppSelector((s) => s.clientEvents.events);
+  const loading = useAppSelector((s) => s.clientEvents.loading);
+
+  // Find the event in the Redux store
+  let matchedEvent = events.find((e: Event) => e.id === eventId);
+
+  // Fetch events if not present
+  useEffect(() => {
+    if (!matchedEvent && clientId) {
+      dispatch(fetchUserEvents(clientId));
+    }
+  }, [matchedEvent, clientId, dispatch]);
 
   const { handleSubmit } = useForm();
   const [dirty, setDirty] = React.useState(false);
@@ -37,6 +45,15 @@ export default function GlassTabs() {
     console.log('Saving...', data);
     setDirty(false);
   };
+
+  // Optionally show a loading state while fetching
+  if (!matchedEvent) {
+    return (
+      <div className='w-full max-w-6xl mx-auto p-4 md:p-6 text-center text-white'>
+        {loading ? 'Loading event...' : 'Event not found'}
+      </div>
+    );
+  }
 
   return (
     <div className='w-full max-w-6xl mx-auto p-4 md:p-6'>
@@ -79,13 +96,13 @@ export default function GlassTabs() {
               value: 'ui',
               label: 'UI',
               icon: MonitorSmartphone,
-              panel: <div>UI settings coming soon...</div>,
+              panel: <EventUiTab event={matchedEvent} clientId={clientId} />,
             },
             {
               value: 'delete',
               label: 'Delete',
               icon: MonitorSmartphone,
-              panel: <div>Delete settings coming soon...</div>,
+              panel: <EventDeleteTab eventId={eventId} clientId={clientId} />,
             },
           ]}
         />
