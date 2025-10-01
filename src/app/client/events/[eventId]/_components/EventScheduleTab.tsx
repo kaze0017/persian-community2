@@ -19,7 +19,7 @@ export default function EventScheduleTab({
   event: Event | undefined;
   onSubmit: (data: Partial<Event>) => void;
 }) {
-  const userId = useAppSelector((s) => s.user?.uid || '');
+  const clientId = useAppSelector((s) => s.user?.uid || '');
   const [dirty, setDirty] = useState(false);
 
   const methods = useForm<ScheduleValues>({
@@ -49,7 +49,7 @@ export default function EventScheduleTab({
 
       const updates: Partial<Event> = { days: parsedDays };
 
-      await updateEvent(userId, event.id, updates);
+      await updateEvent(clientId, event.id, updates);
       onSubmit(updates);
       setDirty(false);
     } catch (err) {

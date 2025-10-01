@@ -34,6 +34,11 @@ export default function TablesCanvas() {
   const [newSeats, setNewSeats] = useState(4);
   const [newCount, setNewCount] = useState(1);
 
+  // Fixed colors
+  const tableBorderColor = '#60a5fa'; // Blue
+  const seatBorderColor = '#f87171'; // Red
+  const borderWidth = 3;
+
   useEffect(() => {
     const updateSize = () => {
       if (containerRef.current) {
@@ -47,12 +52,11 @@ export default function TablesCanvas() {
   }, []);
 
   const canvasHeight = 320;
-  const shapeWidth = 100;
   const shapeHeight = newShape === 'rect' ? 60 : 100;
   const centerX =
     newShape === 'circle' || newShape === 'row'
       ? containerWidth / 2
-      : (containerWidth - shapeWidth) / 2;
+      : (containerWidth - 100) / 2;
   const centerY =
     newShape === 'circle' || newShape === 'row'
       ? canvasHeight / 2
@@ -91,7 +95,7 @@ export default function TablesCanvas() {
 
   return (
     <div className='space-y-6'>
-      <div className='flex gap-4 items-end'>
+      <div className='flex gap-4 items-end flex-wrap'>
         <label className='flex flex-col space-y-1'>
           Table Shape:
           <Select
@@ -137,37 +141,54 @@ export default function TablesCanvas() {
         </Button>
       </div>
 
+      {/* Glassmorphic preview container */}
       <div
         ref={containerRef}
-        className='w-full border bg-gray-100 relative'
+        className='relative w-full rounded-2xl shadow-lg 
+                   bg-white/10 backdrop-blur-md border border-white/20 
+                   p-4'
         style={{ height: canvasHeight }}
       >
-        <h3 className='mb-2 font-semibold'>Preview Table with Seats</h3>
+        <h3 className='mb-2 font-semibold text-white drop-shadow'>
+          Preview Table with Seats
+        </h3>
         <Stage width={containerWidth} height={canvasHeight}>
           <Layer>
             <Group x={centerX} y={centerY}>
               {newShape === 'circle' ? (
-                <Circle x={0} y={0} radius={50} fill='#60a5fa' />
+                <Circle
+                  x={0}
+                  y={0}
+                  radius={50}
+                  fill='transparent'
+                  stroke={tableBorderColor}
+                  strokeWidth={borderWidth}
+                />
               ) : newShape === 'row' ? null : (
                 <Rect
                   width={100}
                   height={shapeHeight}
-                  fill='#60a5fa'
+                  fill='transparent'
+                  stroke={tableBorderColor}
+                  strokeWidth={borderWidth}
                   cornerRadius={8}
                 />
               )}
+
               {(newShape === 'circle'
                 ? getCircleSeatPositions(50, newSeats)
                 : newShape === 'row'
-                ? getRowSeatPositions(newSeats)
-                : getRectSeatPositions(100, shapeHeight, newSeats, newShape)
+                  ? getRowSeatPositions(newSeats)
+                  : getRectSeatPositions(100, shapeHeight, newSeats, newShape)
               ).map(({ x, y, seatRadius }, i) => (
                 <Circle
                   key={i}
                   x={x}
                   y={y}
                   radius={seatRadius}
-                  fill='#f87171'
+                  fill='transparent'
+                  stroke={seatBorderColor}
+                  strokeWidth={borderWidth}
                 />
               ))}
             </Group>

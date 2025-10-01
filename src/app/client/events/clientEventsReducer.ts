@@ -17,31 +17,32 @@ const initialState: ClientEventState = {
 // Async thunks
 export const fetchUserEvents = createAsyncThunk(
   "clientEvents/fetchUserEvents",
-  async (userId: string) => {
-    return await eventApi.getUserEvents(userId);
+  async (clientId: string) => {
+    return await eventApi.getUserEvents(clientId);
   }
 );
 
 export const addUserEvent = createAsyncThunk(
   "clientEvents/addUserEvent",
-  async ({ userId, event, bannerFile }: { userId: string; event: Omit<Event, "id">; bannerFile?: File }) => {
+  async ({ clientId, event, bannerFile }: { clientId: string; event: Omit<Event, "id">; bannerFile?: File }) => {
     console.log("Adding event:", event, "with banner file:", bannerFile);
-    return await eventApi.addEvent(userId, event, bannerFile);
+    return await eventApi.addEvent(clientId, event, bannerFile);
   }
 );
 
 export const updateUserEvent = createAsyncThunk(
   "clientEvents/updateUserEvent",
-  async ({ userId, eventId, updates, bannerFile }: { userId: string; eventId: string; updates: Partial<Event>; bannerFile?: File }) => {
-    await eventApi.updateEvent(userId, eventId, updates, bannerFile);
-    return { eventId, updates };
+  async ({ clientId, id, updates, bannerFile }: { clientId: string; id: string; updates: Partial<Event>; bannerFile?: File }) => {
+    console.log("Updating event:", updates, "with banner file:", bannerFile);
+    await eventApi.updateEvent(clientId, id, updates, bannerFile ?? undefined);
+    return { id, updates };
   }
 );
 
 export const deleteUserEvent = createAsyncThunk(
   "clientEvents/deleteUserEvent",
-  async ({ userId, eventId }: { userId: string; eventId: string }) => {
-    await eventApi.deleteEvent(userId, eventId);
+  async ({ clientId, eventId }: { clientId: string; eventId: string }) => {
+    await eventApi.deleteEvent(clientId, eventId);
     return eventId;
   }
 );
@@ -72,8 +73,8 @@ const clientEventSlice = createSlice({
 
       // Update
       .addCase(updateUserEvent.fulfilled, (state, action) => {
-        const { eventId, updates } = action.payload;
-        const index = state.events.findIndex((e) => e.id === eventId);
+        const { id, updates } = action.payload;
+        const index = state.events.findIndex((e) => e.id === id);
         if (index >= 0) {
           state.events[index] = { ...state.events[index], ...updates };
         }

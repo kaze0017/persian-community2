@@ -3,6 +3,8 @@ import { Business } from './business';
 import { Occasion } from './occasions';
 import { Banner } from './banner';
 
+
+
 export type Event = {
   id: string;
   clientId: string;
@@ -34,6 +36,29 @@ export type Event = {
   days?: EventDay[];  
   isFeatured?: boolean;
   eventLayoutUrl?: string;
+  eventConfig?: {
+    scheduleConfig?: {
+      isEnabled?: boolean;
+    };
+    contactConfig?: {
+      isEnabled?: boolean;
+    };
+    organizersConfig?: {
+      isEnabled?: boolean;
+    };
+    sponsorsConfig?: {
+      isEnabled?: boolean;
+    };
+    layoutConfig?: {
+      isEnabled?: boolean;
+    };
+    tagsConfig?: {
+      isEnabled?: boolean;
+    };
+    ticketsConfig?: {
+      isEnabled?: boolean;
+    }
+  }
 };
 
 export type EventDay = {

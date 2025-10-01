@@ -37,7 +37,6 @@ export default function EventInfoTab({
   const [tags, setTags] = useState<string[]>(event?.tags || []);
   const [tagInput, setTagInput] = useState('');
   const [dirty, setDirty] = useState(false);
-  const userId = useAppSelector((s) => s.user?.uid || '');
 
   const { register, handleSubmit, setValue, reset } = useForm<EventInfoValues>({
     defaultValues: {
@@ -79,14 +78,14 @@ export default function EventInfoTab({
       // if (bannerFile) {
       //   const url = await uploadImage(
       //     bannerFile,
-      //     `clients/${userId}/events/${event?.id}/banner`,
+      //     `clients/${clientId}/events/${event?.id}/banner`,
       //     'banner.jpg'
       //   );
       //   updates.bannerUrls = {
       //     sizes: { large: url, medium: url, small: url, xlarge: url },
       //   };
       // }
-      await updateEvent(userId, event.id, updates, bannerFile);
+      await updateEvent(clientId, event.id, updates, bannerFile);
       onSubmit(updates);
       setDirty(false);
     } catch (err) {

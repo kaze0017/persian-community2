@@ -15,7 +15,7 @@ type Props = {
   address: string;
   coordinates?: {
     lat?: number;
-    lng: number;
+    lng?: number;
   };
   isAdmin?: boolean;
   eventId?: string; // Optional, if you need to update event
@@ -42,16 +42,17 @@ export default function EventContactMap({
 
   const onUpdate = (
     address: string,
-    coordinates?: { lat: number; lng: number }
+    coordinates?: { lat?: number; lng?: number }
   ) => {
     if (!eventId) return;
 
     const updatedData: {
       address?: string;
-      coordinates?: { lat: number; lng: number };
+      coordinates?: { lat?: number; lng?: number };
     } = {};
     if (address) updatedData.address = address;
-    if (coordinates) updatedData.coordinates = coordinates;
+    if (coordinates?.lat && coordinates?.lng)
+      updatedData.coordinates = coordinates;
 
     updateDocument('events', eventId, updatedData)
       .then(() => {
@@ -63,12 +64,12 @@ export default function EventContactMap({
   };
 
   // Handle save action
-  function handleSave() {
-    if (onUpdate && coordinates) {
-      onUpdate(address, coordinates);
-    }
-    setEditing(false);
-  }
+  // function handleSave() {
+  //   if (onUpdate && coordinates && coordinates.lat && coordinates.lng) {
+  //     onUpdate(address, { coordinates });
+  //   }
+  //   setEditing(false);
+  // }
 
   return (
     <GlassPanel>
@@ -127,7 +128,16 @@ export default function EventContactMap({
               }}
             />
           ) : (
-            coordinates && <MapDisplay coordinates={coordinates} />
+            coordinates &&
+            coordinates.lat &&
+            coordinates.lng && (
+              <MapDisplay
+                coordinates={{
+                  lat: coordinates.lat,
+                  lng: coordinates.lng,
+                }}
+              />
+            )
           )}
         </div>
       </section>

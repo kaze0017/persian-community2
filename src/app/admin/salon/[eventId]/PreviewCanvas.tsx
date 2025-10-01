@@ -8,11 +8,9 @@ import { useAppSelector } from '@/app/hooks';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Konva from 'konva';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { uploadImage } from '@/services/storageService';
-import { useParams } from 'next/navigation';
-import { updateDoc } from 'firebase/firestore';
 
 function cleanObject<T>(obj: T): T {
   if (Array.isArray(obj)) {
@@ -44,6 +42,7 @@ export default function PreviewCanvas({
   const [saveError, setSaveError] = useState<string | null>(null);
 
   const eventIdLocal = eventId || '0xek3FrR5b6bwjK2S0vf';
+
   function dataURLtoFile(dataurl: string, filename: string) {
     const arr = dataurl.split(',');
     const mimeMatch = arr[0].match(/:(.*?);/);
@@ -62,7 +61,6 @@ export default function PreviewCanvas({
       setSaveError('No user ID provided');
       return;
     }
-
     if (!eventIdLocal) {
       setSaveError('No event ID provided');
       return;
@@ -138,7 +136,11 @@ export default function PreviewCanvas({
   };
 
   return (
-    <div className='flex flex-col gap-4'>
+    <div
+      className='relative p-6 rounded-2xl shadow-lg
+                 bg-white/10 backdrop-blur-md border border-white/20
+                 flex flex-col gap-4 max-w-4xl mx-auto'
+    >
       {/* Invisible / Offscreen Stage with WHITE bg and FLOOR */}
       <div className='absolute -z-50 opacity-0 pointer-events-none'>
         <Stage ref={stageRef} width={800} height={600}>
@@ -147,7 +149,6 @@ export default function PreviewCanvas({
             <FloorShapes floor={floor} />
             <PlacedTables
               tables={placedTables}
-              // selectedId={null}
               onSelect={() => {}}
               onDragEnd={() => {}}
             />
@@ -162,18 +163,24 @@ export default function PreviewCanvas({
           width={800}
           height={600}
           alt='Salon Preview'
-          className='border'
+          className='rounded-xl border border-white/30 shadow-md'
         />
       )}
 
       <div className='flex gap-4'>
-        <Button onClick={handleDownload}>Download as PNG</Button>
-        <Button onClick={handleSaveLayout} disabled={isSaving}>
+        <Button onClick={handleDownload} className='rounded-xl'>
+          Download as PNG
+        </Button>
+        <Button
+          onClick={handleSaveLayout}
+          disabled={isSaving}
+          className='rounded-xl'
+        >
           {isSaving ? 'Saving...' : 'Save Layout'}
         </Button>
       </div>
 
-      {saveError && <p className='text-red-600'>{saveError}</p>}
+      {saveError && <p className='text-red-500'>{saveError}</p>}
     </div>
   );
 }

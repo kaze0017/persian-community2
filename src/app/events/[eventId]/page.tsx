@@ -84,7 +84,7 @@ export default function EventPage() {
   // } = selectedEvent;
 
   return (
-    <div className='max-w-[1280px] mx-auto px-4 space-y-8'>
+    <div className='max-w-[1280px] mx-auto px-4 space-y-8 w-full'>
       {event && (
         <>
           <EventHeaderBanner
@@ -100,37 +100,46 @@ export default function EventPage() {
             isAdmin={isAdmin}
             eventId={eventId as string}
           />
+          {event.days && event.eventConfig?.scheduleConfig?.isEnabled && (
+            <EventSchedule
+              days={event?.days || []}
+              isAdmin={isAdmin}
+              eventId={eventId as string}
+            />
+          )}
 
-          <EventSchedule
-            days={event?.days || []}
-            isAdmin={isAdmin}
-            eventId={eventId as string}
-          />
+          {event.eventConfig?.ticketsConfig?.isEnabled && (
+            <EventBookCard eventId={eventId as string} isAdmin={isAdmin} />
+          )}
+          {event.eventConfig?.tagsConfig?.isEnabled && (
+            <EventTagsSponsorsOrganizers
+              tags={event?.tags || []}
+              sponsors={event?.sponsors || []}
+              organizers={event?.organizers || []}
+              eventId={eventId as string}
+              isAdmin={isAdmin}
+            />
+          )}
 
-          <EventBookCard eventId={eventId as string} isAdmin={isAdmin} />
-
-          <EventTagsSponsorsOrganizers
-            tags={event?.tags || []}
-            sponsors={event?.sponsors || []}
-            organizers={event?.organizers || []}
-            eventId={eventId as string}
-            isAdmin={isAdmin}
-          />
-
-          <Image
-            src={event.eventLayoutUrl || '/images/event-layout-placeholder.png'}
-            alt='Event Layout'
-            width={800}
-            height={400}
-            className='w-full h-auto rounded-lg'
-          />
-
-          <EventContactMap
-            address={event.address}
-            coordinates={event.coordinates}
-            isAdmin={isAdmin}
-            eventId={eventId as string}
-          />
+          {event.eventConfig?.layoutConfig?.isEnabled && (
+            <Image
+              src={
+                event.eventLayoutUrl || '/images/event-layout-placeholder.png'
+              }
+              alt='Event Layout'
+              width={800}
+              height={400}
+              className='w-full h-auto rounded-lg'
+            />
+          )}
+          {event.eventConfig?.contactConfig?.isEnabled && (
+            <EventContactMap
+              address={event.address}
+              coordinates={event.coordinates}
+              isAdmin={isAdmin}
+              eventId={eventId as string}
+            />
+          )}
         </>
       )}
     </div>
