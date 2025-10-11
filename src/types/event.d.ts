@@ -1,26 +1,36 @@
 import { Timestamp, FieldValue } from 'firebase/firestore';
 import { Business } from './business';
 import { Occasion } from './occasions';
-import { Banner } from './banner';
 
+export type LatLng = {
+  lat: number;
+  lng: number;
+};
 
+export type MarkerData = {
+  id: string;
+  eventId: string; // Optional eventId to associate marker with an event
+  position: LatLng;
+  title: string;
+  description: string;
+  imageUrls: string[];
+  isPinned: boolean;
+};
 
 export type Event = {
   id: string;
   clientId: string;
   title: string;
   description: string;
-  date: string; 
-  time: string; 
-  location: string; 
+  date: string | Timestamp;
+  time: string;
+  location: string;
   category: string;
   occasion?: Occasion;
-  address: string; 
-  coordinates?: {
-    lat?: number;
-    lng?: number;
-  };
-  bannerUrls?: Banner;
+  address: string;
+  coordinates?: LatLng; // Event's primary location
+  path?: LatLng[]; // Hiking trail path
+  markers?: MarkerData[]; // Markers along the path
   sponsors?: Business[];
   ownerImageUrl?: string;
   organizers?: {
@@ -29,11 +39,10 @@ export type Event = {
     contact: string;
     imageUrl?: string;
   }[];
-
   tags?: string[];
   isPublic?: boolean;
   isOnline?: boolean;
-  days?: EventDay[];  
+  days?: EventDay[];
   isFeatured?: boolean;
   eventLayoutUrl?: string;
   eventConfig?: {
@@ -57,20 +66,41 @@ export type Event = {
     };
     ticketsConfig?: {
       isEnabled?: boolean;
-    }
-  }
+    };
+  };
+  createdAt?: Timestamp | FieldValue;
+  updatedAt?: Timestamp | FieldValue;
+  path?: LatLng[];
+  markers?: MarkerData[];
 };
 
 export type EventDay = {
-  date: string;      
+  date: string;
   blocks: EventBlock[];
 };
 
 export type EventBlock = {
   start: string;
-  end: string;  
-  title: string; 
+  end: string;
+  title: string;
   description?: string;
   activities: string[] | string;
-  iconName?: string; 
+  iconName?: string;
 };
+
+
+export interface MarkerData {
+  id: string;
+  position: LatLng;
+  title: string;
+  description: string;
+  imageUrls: string[];
+  isPinned: boolean;
+}
+
+
+export interface HikeMapData {
+  eventId: string;
+  path: LatLng[];
+  markers: MarkerData[];
+}

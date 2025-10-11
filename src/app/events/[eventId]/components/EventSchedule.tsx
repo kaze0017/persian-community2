@@ -4,7 +4,7 @@ import { useState } from 'react';
 import SectionPanel from '@/app/businesses/components/subComponents/SectionPanel';
 import AdminControlsPanel from '@/app/businesses/components/subComponents/AdminControlsPanel';
 import EventDayTimeline from '@/app/events/components/EventDayTimeline';
-import EventDayPanel from '@/app/admin/events/add-event/components/EventDayPanel';
+import EventDayPanel from '@/app/client/events/create/_components/CreateEventForm/EventDayPanel';
 
 import { useForm, FormProvider, useFieldArray } from 'react-hook-form';
 import { updateDocument } from '@/services/firestoreService';

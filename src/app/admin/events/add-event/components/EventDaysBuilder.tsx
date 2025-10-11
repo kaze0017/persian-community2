@@ -2,7 +2,7 @@
 
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import EventDayPanel from './EventDayPanel';
+import EventDayPanel from '../../../../client/events/create/_components/CreateEventForm/EventDayPanel';
 import { useEffect } from 'react';
 
 type Props = {

@@ -13,7 +13,8 @@ import peopleReducer from '@/app/admin/people/peopleSlice';
 import workshopsReducer from '@/app/admin/workshops/workshopSlice';
 import clientBusinessReducer from '@/app/client/clientReducer/clientBusinessReducer';
 import clientEventsReducer from '@/app/client/events/clientEventsReducer';
-
+import SiteEventReducer from '@/app/events/siteEventReducer';
+import pinImageReducer from '@/app/components/hikeMap/pinImagesReducer';
 
 
 export const store = configureStore({
@@ -31,6 +32,8 @@ export const store = configureStore({
     workshops: workshopsReducer,
     clientBusiness: clientBusinessReducer,
     clientEvents: clientEventsReducer,
+    siteEvent: SiteEventReducer,
+    pinImages: pinImageReducer,
   }
 });
 

@@ -19,6 +19,7 @@ import EventUiTab from './_components/EventUITab';
 import EventDeleteTab from './_components/EventDeleteTab';
 import { fetchUserEvents } from '../clientEventsReducer';
 import { Event } from '@/types/event';
+import HikeMap from '@/app/components/hikeMap/HikeMap';
 
 export default function GlassTabs() {
   const { eventId }: { eventId: string } = useParams();
@@ -103,6 +104,12 @@ export default function GlassTabs() {
               label: 'Delete',
               icon: MonitorSmartphone,
               panel: <EventDeleteTab eventId={eventId} clientId={clientId} />,
+            },
+            {
+              value: 'hikeMap',
+              label: 'Hike Map',
+              icon: MonitorSmartphone,
+              panel: <HikeMap eventId={eventId} />,
             },
           ]}
         />

@@ -38,7 +38,8 @@ export const addEvent = async (
     const newEvent: Event = {
       ...event,
       id: eventId,
-      bannerUrls: bannerUrl ? { sizes: { large: bannerUrl } } : undefined,
+      bannerUrls: bannerUrl ? { sizes: { small: bannerUrl, medium: bannerUrl, large: bannerUrl } } : undefined,
+      clientId,
     };
 
     // Save under user subcollection
@@ -51,7 +52,8 @@ export const addEvent = async (
       title: event.title,
       description: event.description,
       date: event.date,
-      bannerUrls: bannerUrl ? { sizes: { large: bannerUrl } } : undefined,
+      bannerUrls: bannerUrl ? { sizes: { large: bannerUrl, medium: bannerUrl, small: bannerUrl } } : undefined,
+      clientId,
     });
 
     return newEvent;
@@ -89,6 +91,7 @@ export const updateEvent = async (
     console.log("Updating event 0:", 'clientId:', clientId, 'id:', id, 'updates:', updates);
 
     const eventRef = doc(db, "users", clientId, "events", id);
+    updates.clientId = clientId; // Ensure clientId is set
 
     console.log("Updating event 0.1:", id, "with updates:", updates);
 
@@ -121,6 +124,7 @@ export const updateEvent = async (
       ...("title" in updates ? { title: updates.title } : {}),
       ...("description" in updates ? { description: updates.description } : {}),
       ...("date" in updates ? { date: updates.date } : {}),
+      ...("clientId" in updates ? { clientId: updates.clientId } : {}),
       ...(bannerUrl
         ? {
             bannerUrls: {

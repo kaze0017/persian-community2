@@ -1,14 +1,13 @@
 'use client';
-
 import { useForm, useFieldArray, FormProvider } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { createEvent } from '@/app/admin/events/reducer/eventsSlice';
 import { Event } from '@/types/event';
 import { useRouter } from 'next/navigation';
-
+import { collection, query, where, getDocs, limit } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import MapSelector from '@/app/admin/MapSelector';
 import BusinessSelect from '@/components/BusinessSelector';
-
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -19,13 +18,14 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { fetchCategories } from '@/app/lib/categoriesSlice';
 import EventDaysBuilder from './EventDaysBuilder';
 import { addUserEvent } from '@/app/client/events/clientEventsReducer';
 import { add } from 'date-fns';
+import { generateAIEvent } from '../utils/generateAIEvent';
 
 type CreateEventFormValues = Omit<Event, 'id'>;
 
@@ -37,7 +37,61 @@ export default function CreateEventForm() {
   const client = useAppSelector((state) => state.user);
   const clientId = client.uid || '';
 
-  // Fetch categories once on mount
+  const [previousEvents, setPreviousEvents] = useState<Partial<Event>[]>([]);
+  const [bannerFile, setBannerFile] = useState<File | undefined>();
+  const [inspirationImage, setInspirationImage] = useState<File | undefined>();
+  const [imageText, setImageText] = useState<string>('');
+
+  // Fetch previous events on mount
+  useEffect(() => {
+    const fetchPreviousEvents = async () => {
+      try {
+        const q = query(
+          collection(db, 'events'),
+          where('clientId', '==', clientId),
+          limit(3)
+        );
+        const querySnapshot = await getDocs(q);
+        const events = querySnapshot.docs.map(
+          (doc) => doc.data() as Partial<Event>
+        );
+        setPreviousEvents(events);
+      } catch (err) {
+        console.error('Error fetching previous events:', err);
+      }
+    };
+    if (clientId) {
+      fetchPreviousEvents();
+    }
+  }, [clientId]);
+
+  // Process inspiration image via API route
+  useEffect(() => {
+    const processImage = async () => {
+      if (!inspirationImage) {
+        setImageText('');
+        return;
+      }
+      try {
+        const formData = new FormData();
+        formData.append('image', inspirationImage);
+        const res = await fetch('/api/process-image', {
+          method: 'POST',
+          body: formData,
+        });
+        if (!res.ok) {
+          throw new Error('Failed to process image');
+        }
+        const { text } = await res.json();
+        setImageText(text || '');
+      } catch (err) {
+        console.error('Error processing image:', err);
+        setImageText('');
+      }
+    };
+    processImage();
+  }, [inspirationImage]);
+
   useEffect(() => {
     dispatch(fetchCategories());
   }, [dispatch]);
@@ -48,13 +102,23 @@ export default function CreateEventForm() {
       tags: [],
       organizers: [],
       isPublic: true,
+      isOnline: false,
       days: [],
+      isFeatured: false,
+      eventConfig: {
+        scheduleConfig: { isEnabled: true },
+        contactConfig: { isEnabled: true },
+        organizersConfig: { isEnabled: true },
+        sponsorsConfig: { isEnabled: true },
+        layoutConfig: { isEnabled: true },
+        tagsConfig: { isEnabled: true },
+        ticketsConfig: { isEnabled: true },
+      },
     },
   });
 
   const { register, handleSubmit, setValue, control, watch } = methods;
   const sponsors = watch('sponsors') || [];
-
   const {
     fields: organizerFields,
     append: appendOrganizer,
@@ -66,7 +130,6 @@ export default function CreateEventForm() {
 
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
-  const [bannerFile, setBannerFile] = useState<File | undefined>();
 
   useEffect(() => {
     setValue('tags', tags);
@@ -74,7 +137,6 @@ export default function CreateEventForm() {
 
   const onSubmit = async (data: CreateEventFormValues) => {
     try {
-      // 🔁 Parse activity strings to arrays
       if (Array.isArray(data.days)) {
         data.days = data.days.map((day) => ({
           ...day,
@@ -104,6 +166,172 @@ export default function CreateEventForm() {
     }
   };
 
+  const handleGenerateAIEvent = async (
+    section: keyof CreateEventFormValues | 'all'
+  ) => {
+    try {
+      const currentValues = methods.getValues();
+      const res = await fetch('/api/generate-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...currentValues,
+          section,
+          previousEvents,
+          imageText,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error('Failed to generate OpenAI event:', errorData);
+        return;
+      }
+
+      const aiEvent = await res.json();
+      let { date, time } = aiEvent;
+      if (date && date.includes('T') && !time) {
+        const dateTime = new Date(date);
+        date = dateTime.toISOString().split('T')[0];
+        time = dateTime.toISOString().split('T')[1].slice(0, 5);
+      }
+
+      setValue('title', aiEvent.title || '');
+      setValue('description', aiEvent.description || '');
+      setValue('date', date || '');
+      setValue('time', time || '');
+      setValue('location', aiEvent.location || '');
+      setValue('category', aiEvent.category || 'General');
+      setValue('address', aiEvent.address || '');
+      setValue('coordinates.lat', aiEvent.coordinates?.lat || 0);
+      setValue('coordinates.lng', aiEvent.coordinates?.lng || 0);
+      setValue('tags', aiEvent.tags || []);
+      setValue('sponsors', aiEvent.sponsors || []);
+      setValue(
+        'organizers',
+        aiEvent.organizers ||
+          (aiEvent.organizer
+            ? [
+                {
+                  name: aiEvent.organizer.name || '',
+                  contact: aiEvent.organizer.contact || '',
+                },
+              ]
+            : [])
+      );
+      setValue('isPublic', aiEvent.isPublic ?? true);
+      setValue('isOnline', aiEvent.isOnline ?? false);
+      setValue('days', aiEvent.days || []);
+      setValue('isFeatured', aiEvent.isFeatured ?? false);
+      setValue('eventLayoutUrl', aiEvent.eventLayoutUrl || undefined);
+      setValue(
+        'eventConfig',
+        aiEvent.eventConfig || {
+          scheduleConfig: { isEnabled: true },
+          contactConfig: { isEnabled: true },
+          organizersConfig: { isEnabled: true },
+          sponsorsConfig: { isEnabled: true },
+          layoutConfig: { isEnabled: true },
+          tagsConfig: { isEnabled: true },
+          ticketsConfig: { isEnabled: true },
+        }
+      );
+
+      if (aiEvent.tags) {
+        setTags(aiEvent.tags);
+      }
+
+      console.log('OpenAI event generated for section:', section, aiEvent);
+    } catch (err: unknown) {
+      console.error('Error generating OpenAI event:', err);
+    }
+  };
+
+  const handleGenerateVertexAIEvent = async (
+    section: keyof CreateEventFormValues | 'all'
+  ) => {
+    try {
+      const currentValues = methods.getValues();
+      const res = await fetch('/api/generate-vertex-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...currentValues,
+          section,
+          previousEvents,
+          imageText,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error('Failed to generate Vertex AI event:', errorData);
+        return;
+      }
+
+      const vertexEvent = await res.json();
+      let { date, time } = vertexEvent;
+      if (date && date.includes('T') && !time) {
+        const dateTime = new Date(date);
+        date = dateTime.toISOString().split('T')[0];
+        time = dateTime.toISOString().split('T')[1].slice(0, 5);
+      }
+
+      setValue('title', vertexEvent.title || '');
+      setValue('description', vertexEvent.description || '');
+      setValue('date', date || '');
+      setValue('time', time || '');
+      setValue('location', vertexEvent.location || '');
+      setValue('category', vertexEvent.category || 'General');
+      setValue('address', vertexEvent.address || '');
+      setValue('coordinates.lat', vertexEvent.coordinates?.lat || 0);
+      setValue('coordinates.lng', vertexEvent.coordinates?.lng || 0);
+      setValue('tags', vertexEvent.tags || []);
+      setValue('sponsors', vertexEvent.sponsors || []);
+      setValue(
+        'organizers',
+        vertexEvent.organizers ||
+          (vertexEvent.organizer
+            ? [
+                {
+                  name: vertexEvent.organizer.name || '',
+                  contact: vertexEvent.organizer.contact || '',
+                },
+              ]
+            : [])
+      );
+      setValue('isPublic', vertexEvent.isPublic ?? true);
+      setValue('isOnline', vertexEvent.isOnline ?? false);
+      setValue('days', vertexEvent.days || []);
+      setValue('isFeatured', vertexEvent.isFeatured ?? false);
+      setValue('eventLayoutUrl', vertexEvent.eventLayoutUrl || undefined);
+      setValue(
+        'eventConfig',
+        vertexEvent.eventConfig || {
+          scheduleConfig: { isEnabled: true },
+          contactConfig: { isEnabled: true },
+          organizersConfig: { isEnabled: true },
+          sponsorsConfig: { isEnabled: true },
+          layoutConfig: { isEnabled: true },
+          tagsConfig: { isEnabled: true },
+          ticketsConfig: { isEnabled: true },
+        }
+      );
+
+      if (vertexEvent.tags) {
+        setTags(vertexEvent.tags);
+      }
+
+      console.log(
+        'Vertex AI event generated for section:',
+        section,
+        vertexEvent
+      );
+    } catch (err: unknown) {
+      console.error('Error generating Vertex AI event:', err);
+    }
+  };
+
   return (
     <FormProvider {...methods}>
       <form
@@ -112,14 +340,32 @@ export default function CreateEventForm() {
       >
         <h2 className='text-2xl font-semibold'>Create New Event</h2>
 
-        <div>
+        <div className='relative'>
           <label className='block font-medium mb-1'>Title</label>
           <Input {...register('title', { required: 'Title is required' })} />
+          <Button
+            type='button'
+            variant='ghost'
+            className='absolute top-0 right-0'
+            onClick={() => handleGenerateAIEvent('title')}
+            title='Generate OpenAI Title'
+          >
+            <Sparkles className='w-4 h-4 text-blue-500' />
+          </Button>
         </div>
 
-        <div>
+        <div className='relative'>
           <label className='block font-medium mb-1'>Description</label>
           <Textarea {...register('description')} rows={3} />
+          <Button
+            type='button'
+            variant='ghost'
+            className='absolute top-0 right-0'
+            onClick={() => handleGenerateAIEvent('description')}
+            title='Generate OpenAI Description'
+          >
+            <Sparkles className='w-4 h-4 text-blue-500' />
+          </Button>
         </div>
         <div className='flex items-center space-x-2 mt-2'>
           <input
@@ -133,7 +379,7 @@ export default function CreateEventForm() {
           </label>
         </div>
 
-        <div className='grid md:grid-cols-2 gap-4'>
+        <div className='grid md:grid-cols-2 gap-4 relative'>
           <div>
             <label className='block font-medium mb-1'>Date</label>
             <Input type='date' {...register('date', { required: true })} />
@@ -142,17 +388,44 @@ export default function CreateEventForm() {
             <label className='block font-medium mb-1'>Time</label>
             <Input type='time' {...register('time', { required: true })} />
           </div>
+          <Button
+            type='button'
+            variant='ghost'
+            className='absolute top-0 right-0'
+            onClick={() => handleGenerateAIEvent('date')}
+            title='Generate OpenAI Date/Time'
+          >
+            <Sparkles className='w-4 h-4 text-blue-500' />
+          </Button>
         </div>
         <EventDaysBuilder />
 
-        <div>
+        <div className='relative'>
           <label className='block font-medium mb-1'>Location</label>
           <Input {...register('location')} />
+          <Button
+            type='button'
+            variant='ghost'
+            className='absolute top-0 right-0'
+            onClick={() => handleGenerateAIEvent('location')}
+            title='Generate OpenAI Location'
+          >
+            <Sparkles className='w-4 h-4 text-blue-500' />
+          </Button>
         </div>
 
-        <div>
+        <div className='relative'>
           <label className='block font-medium mb-1'>Address</label>
           <Input {...register('address')} />
+          <Button
+            type='button'
+            variant='ghost'
+            className='absolute top-0 right-0'
+            onClick={() => handleGenerateAIEvent('address')}
+            title='Generate OpenAI Address'
+          >
+            <Sparkles className='w-4 h-4 text-blue-500' />
+          </Button>
         </div>
 
         <MapSelector
@@ -163,7 +436,7 @@ export default function CreateEventForm() {
           }}
         />
 
-        <div>
+        <div className='relative'>
           <label className='block font-medium mb-1'>Category</label>
           <Select onValueChange={(value) => setValue('category', value)}>
             <SelectTrigger>
@@ -177,9 +450,18 @@ export default function CreateEventForm() {
               ))}
             </SelectContent>
           </Select>
+          <Button
+            type='button'
+            variant='ghost'
+            className='absolute top-0 right-0'
+            onClick={() => handleGenerateAIEvent('category')}
+            title='Generate OpenAI Category'
+          >
+            <Sparkles className='w-4 h-4 text-blue-500' />
+          </Button>
         </div>
 
-        <div className='grid grid-cols-2 gap-4'>
+        <div className='grid grid-cols-2 gap-4 relative'>
           <div>
             <label className='block font-medium mb-1'>Latitude</label>
             <Input
@@ -196,9 +478,18 @@ export default function CreateEventForm() {
               {...register('coordinates.lng', { valueAsNumber: true })}
             />
           </div>
+          <Button
+            type='button'
+            variant='ghost'
+            className='absolute top-0 right-0'
+            onClick={() => handleGenerateAIEvent('coordinates')}
+            title='Generate OpenAI Coordinates'
+          >
+            <Sparkles className='w-4 h-4 text-blue-500' />
+          </Button>
         </div>
 
-        <div>
+        <div className='relative'>
           <label className='block font-medium mb-1'>Event Banner</label>
           <Input
             type='file'
@@ -221,14 +512,59 @@ export default function CreateEventForm() {
           />
         )}
 
-        {/* Sponsors */}
-        <BusinessSelect
-          value={sponsors}
-          onChange={(selected) => setValue('sponsors', selected)}
-        />
+        <div className='relative'>
+          <label className='block font-medium mb-1'>
+            Inspiration Image (Optional)
+          </label>
+          <Input
+            type='file'
+            accept='image/*'
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                setInspirationImage(file);
+              } else {
+                setInspirationImage(undefined);
+                setImageText('');
+              }
+            }}
+          />
+        </div>
+        {inspirationImage && (
+          <Image
+            src={URL.createObjectURL(inspirationImage)}
+            alt='Inspiration Image Preview'
+            className='mt-2 max-h-48 object-cover rounded-lg'
+            width={300}
+            height={150}
+          />
+        )}
+        {imageText && (
+          <div className='mt-2'>
+            <label className='block font-medium mb-1'>
+              Extracted Image Text
+            </label>
+            <Textarea value={imageText} readOnly rows={3} />
+          </div>
+        )}
 
-        {/* Tags */}
-        <div>
+        <div className='relative'>
+          <BusinessSelect
+            value={sponsors}
+            onChange={(selected) => setValue('sponsors', selected)}
+          />
+          <Button
+            type='button'
+            variant='ghost'
+            className='absolute top-0 right-0'
+            onClick={() => handleGenerateAIEvent('sponsors')}
+            title='Generate OpenAI Sponsors'
+          >
+            <Sparkles className='w-4 h-4 text-blue-500' />
+          </Button>
+        </div>
+
+        <div className='relative'>
           <label className='block font-medium mb-2'>Tags</label>
           <div className='flex gap-2 mb-2'>
             <Input
@@ -264,10 +600,18 @@ export default function CreateEventForm() {
               </div>
             ))}
           </div>
+          <Button
+            type='button'
+            variant='ghost'
+            className='absolute top-0 right-0'
+            onClick={() => handleGenerateAIEvent('tags')}
+            title='Generate OpenAI Tags'
+          >
+            <Sparkles className='w-4 h-4 text-blue-500' />
+          </Button>
         </div>
 
-        {/* Organizers */}
-        <div>
+        <div className='relative'>
           <label className='block font-medium mb-2'>Organizers</label>
           <div className='space-y-4'>
             {organizerFields.map((field, index) => (
@@ -307,21 +651,58 @@ export default function CreateEventForm() {
               <Plus className='w-4 h-4 mr-1' /> Add Organizer
             </Button>
           </div>
+          <Button
+            type='button'
+            variant='ghost'
+            className='absolute top-0 right-0'
+            onClick={() => handleGenerateAIEvent('organizers')}
+            title='Generate OpenAI Organizers'
+          >
+            <Sparkles className='w-4 h-4 text-blue-500' />
+          </Button>
         </div>
 
-        {/* Public toggle */}
-        <div className='pt-2'>
+        <div className='pt-2 relative'>
           <label className='flex items-center gap-2'>
             <input type='checkbox' {...register('isPublic')} />
             <span>Make this a public event</span>
           </label>
+          <Button
+            type='button'
+            variant='ghost'
+            className='absolute top-0 right-0'
+            onClick={() => handleGenerateAIEvent('isPublic')}
+            title='Generate OpenAI Event Settings'
+          >
+            <Sparkles className='w-4 h-4 text-blue-500' />
+          </Button>
         </div>
 
         {error && <p className='text-red-500'>{error}</p>}
 
-        <Button type='submit' disabled={loading}>
-          {loading ? 'Creating...' : 'Create Event'}
-        </Button>
+        <div className='flex gap-4'>
+          <Button type='submit' disabled={loading}>
+            {loading ? 'Creating...' : 'Create Event'}
+          </Button>
+          <div className='flex gap-2'>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => handleGenerateAIEvent('all')}
+            >
+              <Sparkles className='w-4 h-4 mr-1 text-blue-500' /> OpenAI Full
+              Event
+            </Button>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => handleGenerateVertexAIEvent('all')}
+            >
+              <Sparkles className='w-4 h-4 mr-1 text-red-500' /> Vertex AI Full
+              Event
+            </Button>
+          </div>
+        </div>
       </form>
     </FormProvider>
   );
