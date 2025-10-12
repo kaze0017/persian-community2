@@ -20,6 +20,8 @@ import {
 import { X } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { uploadImage } from '@/services/storageService';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 const libraries: ('drawing' | 'geometry' | 'places')[] = [
   'drawing',
@@ -40,7 +42,7 @@ interface HikeMapProps {
 }
 
 export default function HikeMap({ eventId }: HikeMapProps) {
-  const images = useSelector((state: any) => state.pinImages.images);
+  // const images = useSelector((state: any) => state.pinImages.images);
   const clientId = useSelector((state: any) => state.user?.uid || ''); // Assuming user state has uid
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
@@ -54,22 +56,45 @@ export default function HikeMap({ eventId }: HikeMapProps) {
   const [history, setHistory] = useState<Action[]>([]);
   const [future, setFuture] = useState<Action[]>([]);
   const [selectedMarker, setSelectedMarker] = useState<MarkerData | null>(null);
+  const [images, setImages] = useState<{ file: File; tempSrc: string }[]>([]);
 
-  const handleSaveAll = useCallback(() => {
+  const handleSaveAll = useCallback(async () => {
     const data: HikeMapData = {
       eventId,
       path,
       markers,
     };
-    console.log('Uploading images for event:', images);
-    images.forEach((img: any) => {
-      uploadImage(
-        img.file,
-        `${clientId}/events/${eventId}/pins`,
-        img.file.name
-      );
-    });
+    console.log('***Uploading images for event:', data);
+    await Promise.all(
+      images.map(async (img: any) => {
+        console.log('img to upload:', img);
+        const url = await uploadImage(
+          img.file,
+          `clients/${clientId}/events/${eventId}/pins`,
+          img.file.name
+        );
+        data.markers?.forEach((marker) => {
+          if (marker.description && marker.description.includes(img.tempSrc)) {
+            marker.description = marker.description
+              .split(img.tempSrc)
+              .join(url);
+          }
+        });
+        console.log('***Uploaded image URL:', url);
+      })
+    );
     console.log('Saving data:', data);
+    try {
+      const docRef = doc(db, 'users', clientId, 'events', eventId); // event document
+      await setDoc(
+        docRef,
+        { hikeMap: data }, // store data under the hikeMap field
+        { merge: true } // preserve other fields in the document
+      );
+      console.log('✅ Hike map saved successfully!');
+    } catch (error) {
+      console.error('❌ Failed to save hike map:', error);
+    }
   }, [eventId, path, markers]);
 
   const handleCancel = useCallback(() => {
@@ -294,6 +319,7 @@ export default function HikeMap({ eventId }: HikeMapProps) {
               pinId={selectedMarker.id}
               marker={selectedMarker}
               handleUpdateMarker={handleUpdateMarker}
+              setImages={setImages}
             />
           )}
         </DialogContent>

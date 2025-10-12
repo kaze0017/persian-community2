@@ -22,6 +22,7 @@ export default function EventUiTab({ event, clientId }: EventUiTabProps) {
     organizers: event.eventConfig?.organizersConfig?.isEnabled ?? false,
     layout: event.eventConfig?.layoutConfig?.isEnabled ?? false,
     contact: event.eventConfig?.contactConfig?.isEnabled ?? false,
+    hikeMap: event.eventConfig?.hikeMapConfig?.isEnabled ?? false,
   });
 
   const [dirty, setDirty] = useState(false);
@@ -51,6 +52,7 @@ export default function EventUiTab({ event, clientId }: EventUiTabProps) {
         organizersConfig: { isEnabled: sections.organizers },
         layoutConfig: { isEnabled: sections.layout },
         contactConfig: { isEnabled: sections.contact },
+        hikeMapConfig: { isEnabled: sections.hikeMap },
       },
       clientId: clientId,
       id: event.id,
@@ -78,6 +80,7 @@ export default function EventUiTab({ event, clientId }: EventUiTabProps) {
     organizers: 'Organizers',
     layout: 'Layout',
     contact: 'Contact',
+    hikeMap: 'Hike Map',
   };
 
   return (

@@ -11,6 +11,7 @@ import EventTagsSponsorsOrganizers from './components/EventTagsSponsorsOrganizer
 import EventContactMap from './components/EventContactMap';
 import EventBookCard from './components/EventBookCard';
 import Image from 'next/image';
+import EventHike from './components/EventHike';
 
 export default function EventPage() {
   const isAdmin = false;
@@ -40,6 +41,7 @@ export default function EventPage() {
   }
 
   const event = selectedEvent;
+  console.log('Event data:', event.hikeMap);
 
   return (
     <div className='max-w-[1280px] mx-auto px-4 space-y-8 w-full'>
@@ -96,6 +98,9 @@ export default function EventPage() {
           isAdmin={isAdmin}
           eventId={eventId as string}
         />
+      )}
+      {event.eventConfig?.hikeMapConfig?.isEnabled && event.hikeMap && (
+        <EventHike hikeMap={event.hikeMap} />
       )}
     </div>
   );

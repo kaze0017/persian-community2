@@ -8,10 +8,11 @@ import { useState, useRef, useEffect } from 'react';
 import { uploadImage } from '@/services/storageService';
 import { updateDocument } from '@/services/firestoreService';
 import { Banner } from '@/types/banner';
+import { Timestamp } from 'firebase/firestore';
 
 type Props = {
   title: string;
-  date: string;
+  date: string | Timestamp;
   bannerUrls?: Banner;
   eventId: string;
   isAdmin?: boolean;
@@ -33,10 +34,20 @@ export default function EventHeaderBanner({
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingDate, setEditingDate] = useState(false);
   const [localTitle, setLocalTitle] = useState(title);
-  const [localDate, setLocalDate] = useState(date);
+  const [localDate, setLocalDate] = useState(
+    typeof date === 'string' ? date : date.toDate().toISOString().split('T')[0]
+  );
 
   useEffect(() => setLocalTitle(title), [title]);
-  useEffect(() => setLocalDate(date), [date]);
+  useEffect(
+    () =>
+      setLocalDate(
+        typeof date === 'string'
+          ? date.split('T')[0]
+          : date.toDate().toISOString().split('T')[0]
+      ),
+    [date]
+  );
 
   const handleBannerChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) return;

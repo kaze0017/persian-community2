@@ -20,6 +20,14 @@ export type MarkerData = {
 export type Event = {
   id: string;
   clientId: string;
+  bannerUrls?: {
+    sizes: {
+      small: string;
+      medium: string;
+      large: string;
+      xlarge: string;
+    };
+  }
   title: string;
   description: string;
   date: string | Timestamp;
@@ -67,11 +75,15 @@ export type Event = {
     ticketsConfig?: {
       isEnabled?: boolean;
     };
+    hikeMapConfig?: {
+      isEnabled?: boolean;
+    };
   };
   createdAt?: Timestamp | FieldValue;
   updatedAt?: Timestamp | FieldValue;
   path?: LatLng[];
   markers?: MarkerData[];
+  hikeMap?:any;
 };
 
 export type EventDay = {

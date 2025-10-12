@@ -2,6 +2,7 @@ import type { Node as TiptapNode } from "@tiptap/pm/model"
 import { NodeSelection, Selection, TextSelection } from "@tiptap/pm/state"
 import type { Editor } from "@tiptap/react"
 import { v4 as uuidv4 } from 'uuid';
+import { Dispatch, SetStateAction } from "react"
 
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
@@ -292,40 +293,33 @@ export const handleImageUpload = async (
   file: File,
   eventId: string,
   pinId: string,
-  reducerAddImage: (tempSrc: string, file: File) => void,
-  onProgress?: (event: { progress: number }) => void,
-  abortSignal?: AbortSignal,
+  setImages?: Dispatch<SetStateAction<{ file: File; tempSrc: string }[]>>
 ): Promise<string> => {
-  console.log("handleImageUpload called with file:",  eventId, pinId, file)
+  console.log("handleImageUpload called with:", eventId, pinId, file);
+
   // Validate file
   if (!file) {
-    throw new Error("No file provided")
+    throw new Error("No file provided");
   }
 
   if (file.size > MAX_FILE_SIZE) {
     throw new Error(
       `File size exceeds maximum allowed (${MAX_FILE_SIZE / (1024 * 1024)}MB)`
-    )
+    );
   }
 
-  // For demo/testing: Simulate upload progress. In production, replace the following code
-  // with your own upload implementation.
-  // for (let progress = 0; progress <= 100; progress += 10) {
-  //   if (abortSignal?.aborted) {
-  //     throw new Error("Upload cancelled")
-  //   }
-  //   await new Promise((resolve) => setTimeout(resolve, 500))
-  //   onProgress?.({ progress })
-  // }
-  
-  const uniqueId = uuidv4();
-  const tempSrc = `${eventId}/${pinId}/${uniqueId}.jpg`;
-  reducerAddImage(tempSrc, file);
-  console.log("Simulated upload complete. Image URL:", tempSrc)
+  // Generate a temporary preview URL
+  const previewUrl = URL.createObjectURL(file);
 
-  return  tempSrc
-}
+  // Optionally update React state if setImages is provided
+  if (setImages) {
+    setImages((prev) => [...prev, { file, tempSrc: previewUrl }]);
+  }
 
+  // Here you would implement actual upload logic (Firebase, S3, etc.)
+  // For now we just return the preview URL
+  return previewUrl;
+};
 
 type ProtocolOptions = {
   /**

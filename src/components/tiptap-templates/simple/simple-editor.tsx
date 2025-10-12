@@ -64,7 +64,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useWindowSize } from '@/hooks/use-window-size';
 import { useCursorVisibility } from '@/hooks/use-cursor-visibility';
 import { useDispatch, useSelector } from 'react-redux';
-import { addPinImage } from '@/app/components/hikeMap/pinImagesReducer';
+// import { addPinImage } from '@/app/components/hikeMap/pinImagesReducer';
+import { motion } from 'framer-motion';
 
 // --- Components ---
 import { ThemeToggle } from '@/components/tiptap-templates/simple/theme-toggle';
@@ -81,9 +82,15 @@ import { add } from 'date-fns';
 interface SimpleEditorProps {
   className?: string;
   onUpdate?: ({ editor }: { editor: Editor }) => void;
+  onReady?: (editor: Editor) => void; // ✅ add this
+  setImages?: React.Dispatch<
+    React.SetStateAction<{ file: File; tempSrc: string }[]>
+  >;
+
   content?: any;
   eventId: string;
   pinId: string;
+  editable?: boolean;
 }
 
 const MainToolbarContent = ({
@@ -195,9 +202,12 @@ const MobileToolbarContent = ({
 export function SimpleEditor({
   eventId,
   pinId,
+  setImages,
   className,
   onUpdate,
+  onReady,
   content: initialContent,
+  editable = true,
 }: SimpleEditorProps) {
   console.log(
     'SimpleEditor rendered with eventId:',
@@ -206,9 +216,9 @@ export function SimpleEditor({
     pinId
   );
   const dispatch = useDispatch();
-  const reducerAddImage = (tempSrc: string, file: File) => {
-    dispatch(addPinImage({ tempSrc, file }));
-  };
+  // const reducerAddImage = (tempSrc: string, file: File) => {
+  //   dispatch(addPinImage({ tempSrc, file }));
+  // };
   const pinImages = useSelector((state: any) => state.pinImages);
   React.useEffect(() => {
     console.log('Current pinImages state:', pinImages);
@@ -262,7 +272,7 @@ export function SimpleEditor({
             file,
             eventId,
             pinId,
-            reducerAddImage
+            setImages
             // onProgress,
             // abortSignal
           );
@@ -272,6 +282,24 @@ export function SimpleEditor({
       }),
     ],
     content: null,
+    onCreate: ({ editor }) => {
+      console.log('Editor created', editor.getJSON());
+
+      // ✅ Assign content
+      if (!initialContent) {
+        editor.commands.setContent([
+          {
+            type: 'paragraph',
+            content: [{ type: 'text', text: 'Start typing here...' }],
+          },
+        ]);
+      } else {
+        editor.commands.setContent(initialContent);
+      }
+
+      // ✅ Call the onReady callback so parent knows editor is ready
+      if (onReady) onReady(editor);
+    },
     onUpdate,
   });
 
@@ -287,35 +315,38 @@ export function SimpleEditor({
   }, [isMobile, mobileView]);
 
   return (
-    <div className={`simple-editor-wrapper ${className ?? ''}`}>
+    <div
+      className={`simple-editor-wrapper  rounded-2xl p-4 md:p-6 bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl gap-2`}
+    >
       <EditorContext.Provider value={{ editor }}>
-        <Toolbar
-          ref={toolbarRef}
-          style={{
-            ...(isMobile
-              ? {
-                  bottom: `calc(100% - ${height - rect.y}px)`,
-                }
-              : {
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                }),
-          }}
-        >
-          {mobileView === 'main' ? (
-            <MainToolbarContent
-              onHighlighterClick={() => setMobileView('highlighter')}
-              onLinkClick={() => setMobileView('link')}
-              isMobile={isMobile}
-            />
-          ) : (
-            <MobileToolbarContent
-              type={mobileView === 'highlighter' ? 'highlighter' : 'link'}
-              onBack={() => setMobileView('main')}
-            />
-          )}
-        </Toolbar>
-
+        {editable && (
+          <Toolbar
+            ref={toolbarRef}
+            style={{
+              ...(isMobile
+                ? {
+                    bottom: `calc(100% - ${height - rect.y}px)`,
+                  }
+                : {
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                  }),
+            }}
+          >
+            {mobileView === 'main' ? (
+              <MainToolbarContent
+                onHighlighterClick={() => setMobileView('highlighter')}
+                onLinkClick={() => setMobileView('link')}
+                isMobile={isMobile}
+              />
+            ) : (
+              <MobileToolbarContent
+                type={mobileView === 'highlighter' ? 'highlighter' : 'link'}
+                onBack={() => setMobileView('main')}
+              />
+            )}
+          </Toolbar>
+        )}
         <EditorContent
           editor={editor}
           role='presentation'
