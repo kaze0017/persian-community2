@@ -1,14 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { VertexAI } from "@google-cloud/vertexai";
+import { GoogleAuth } from "google-auth-library";
+
 
 interface ChatMessage {
   role: 'user' | 'bot';
   text: string;
 }
+const auth = new GoogleAuth({
+  credentials: process.env.GOOGLE_CREDENTIALS
+    ? JSON.parse(process.env.GOOGLE_CREDENTIALS)
+    : undefined,
+  projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+});
 
 const vertexAI = new VertexAI({
   project: process.env.GOOGLE_CLOUD_PROJECT_ID,
   location: "us-central1",
+  ...( { auth } as any ),
 });
 
 const model = vertexAI.getGenerativeModel({
