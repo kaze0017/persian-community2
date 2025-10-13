@@ -99,9 +99,9 @@ export default function EventPage() {
           eventId={eventId as string}
         />
       )}
-      {event.eventConfig?.hikeMapConfig?.isEnabled && event.hikeMap && (
+      {/* {event.eventConfig?.hikeMapConfig?.isEnabled && event.hikeMap && (
         <EventHike hikeMap={event.hikeMap} />
-      )}
+      )} */}
     </div>
   );
 }
