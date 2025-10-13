@@ -19,7 +19,7 @@ type EventInfoValues = {
   description: string;
   address: string;
   contact: string;
-  coordinates: { lat?: number; lng?: number };
+  coordinates: { lat?: number | undefined; lng?: number | undefined };
   sponsors: Business[];
   tags: string[];
 };

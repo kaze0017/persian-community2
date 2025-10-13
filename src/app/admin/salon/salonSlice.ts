@@ -1,6 +1,6 @@
 // salonSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Table, Shape } from './[eventId]/types';
+import { Table, Shape } from './types';
 
 interface TableGroup {
   key: string;

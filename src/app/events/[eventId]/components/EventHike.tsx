@@ -63,17 +63,24 @@ export default function EventHike({ hikeMap }: EventHikeProps) {
   const memoizedMarkers = useMemo(() => {
     return markers
       .filter((m) => m.isPinned)
-      .map((m) => (
-        <Marker
-          key={m.id}
-          position={m.position}
-          title={m.title}
-          onClick={() => {
-            setSelectedMarker(m);
-            setOpenInfo(m.id);
-          }}
-        />
-      ));
+      .map((m) => {
+        const pos = m.position;
+        if (!pos?.lat || !pos?.lng) {
+          // fallback position if lat/lng are missing
+          return null;
+        }
+        return (
+          <Marker
+            key={m.id}
+            position={{ lat: pos.lat, lng: pos.lng }}
+            onClick={() => {
+              setSelectedMarker(m);
+              setOpenInfo(m.id);
+            }}
+          />
+        );
+      })
+      .filter(Boolean); // remove nulls
   }, [markers]);
 
   useEffect(() => {
@@ -89,11 +96,15 @@ export default function EventHike({ hikeMap }: EventHikeProps) {
         <GoogleMap
           onLoad={onMapLoad}
           mapContainerStyle={{ height: '100%', width: '100%' }}
-          center={path.length > 0 ? path[0] : { lat: 46.495, lng: -80.986 }}
+          center={
+            path.length > 0
+              ? { lat: path[0].lat ?? 0, lng: path[0].lng ?? 0 }
+              : { lat: 46.495, lng: -80.986 }
+          }
           zoom={14}
         >
           <Polyline
-            path={path}
+            path={path.map((p) => ({ lat: p.lat!, lng: p.lng! }))}
             options={{
               strokeWeight: 5,
               strokeColor: '#34a853',

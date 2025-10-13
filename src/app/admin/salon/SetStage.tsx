@@ -10,7 +10,7 @@ import {
   setAvailableGroups,
   removeATableFromAvailableGroupsByKey,
   updatePlacedTable,
-} from '../salonSlice';
+} from './salonSlice';
 
 import DraggableTableSummary from './subComponents/DraggableTableSummary';
 import FloorShapes from './subComponents/FloorShapes';
@@ -114,8 +114,8 @@ export default function PlaceTablesTab() {
             dragData.shape === 'rect'
               ? 60
               : dragData.shape === 'square'
-              ? 100
-              : dragData.height,
+                ? 100
+                : dragData.height,
           radius: dragData.shape === 'circle' ? 50 : dragData.radius,
         },
       ])

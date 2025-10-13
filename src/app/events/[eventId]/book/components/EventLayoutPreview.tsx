@@ -2,14 +2,14 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Rect } from 'react-konva';
-import FloorShapes from '@/app/admin/salon/[eventId]/subComponents/FloorShapes';
-import PlacedTables from '@/app/admin/salon/[eventId]/subComponents/PlacedTables';
+import FloorShapes from '@/app/admin/salon/subComponents/FloorShapes';
+import PlacedTables from '@/app/admin/salon//subComponents/PlacedTables';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Konva from 'konva';
-import { Floor, Table } from '@/app/admin/salon/[eventId]/types';
+import { Floor, Table } from '@/app/admin/salon/types';
 
 interface EventLayoutPreviewProps {
   eventId: string;

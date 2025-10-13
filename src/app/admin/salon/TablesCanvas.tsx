@@ -20,7 +20,7 @@ import {
 } from './helpers';
 import { TableShape, Table } from './types';
 import { v4 as uuidv4 } from 'uuid';
-import { addTables as addTablesAction, removeTable } from '../salonSlice';
+import { addTables as addTablesAction, removeTable } from './salonSlice';
 import TableSummary from './subComponents/TableSummery';
 
 export default function TablesCanvas() {

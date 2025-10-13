@@ -23,7 +23,7 @@
     "@fullcalendar/react": "^6.1.18",
     "@google-cloud/vertexai": "^1.10.0",
     "@google-cloud/vision": "^5.3.3",
-    "@hookform/resolvers": "^5.1.1",
+    "@hookform/resolvers": "^3.10.0",
     "@next/bundle-analyzer": "^15.4.5",
     "@pinecone-database/pinecone": "^6.1.2",
     "@radix-ui/react-accordion": "^1.2.11",
@@ -104,7 +104,7 @@
     "use-media": "^1.5.0",
     "uuid": "^11.1.0",
     "yet-another-react-lightbox": "^3.23.4",
-    "zod": "^3.23.8"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

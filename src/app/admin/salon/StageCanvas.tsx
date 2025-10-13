@@ -11,7 +11,7 @@ import {
   undoLastShape,
   removeShape,
   updateShape, // <-- import updateShape here
-} from '../salonSlice';
+} from './salonSlice';
 import Konva from 'konva';
 
 type ToolType = 'rect' | 'circle' | 'triangle';

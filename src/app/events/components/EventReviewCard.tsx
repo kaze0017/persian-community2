@@ -28,7 +28,7 @@ export default function EventReviewCard({ ev }: EventReviewCardProps) {
           src={
             ev.bannerUrls?.sizes?.small
               ? ev.bannerUrls?.sizes?.small
-              : `/images/events/${ev.bannerUrls?.original || 'default.jpg'}`
+              : `/images/events/${ev.bannerUrls?.sizes?.large || 'default.jpg'}`
           }
           alt={ev.title}
           width={64}

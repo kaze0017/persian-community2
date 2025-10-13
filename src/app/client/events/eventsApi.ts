@@ -38,7 +38,7 @@ export const addEvent = async (
     const newEvent: Event = {
       ...event,
       id: eventId,
-      bannerUrls: bannerUrl ? { sizes: { small: bannerUrl, medium: bannerUrl, large: bannerUrl } } : undefined,
+      bannerUrls: bannerUrl ? { sizes: { small: bannerUrl, medium: bannerUrl, large: bannerUrl, xlarge: bannerUrl } } : undefined,
       clientId,
     };
 

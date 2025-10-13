@@ -31,8 +31,8 @@ export default function PreviewCanvas({
   clientId,
   eventId,
 }: {
-  clientId?: string;
-  eventId?: string;
+  clientId: string;
+  eventId: string;
 }) {
   const placedTables = useAppSelector((state) => state.tables.placedTables);
   const floor = useAppSelector((state) => state.tables.shapes);
@@ -40,8 +40,6 @@ export default function PreviewCanvas({
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-
-  const eventIdLocal = eventId || '0xek3FrR5b6bwjK2S0vf';
 
   function dataURLtoFile(dataurl: string, filename: string) {
     const arr = dataurl.split(',');
@@ -61,7 +59,7 @@ export default function PreviewCanvas({
       setSaveError('No user ID provided');
       return;
     }
-    if (!eventIdLocal) {
+    if (!eventId) {
       setSaveError('No event ID provided');
       return;
     }
@@ -76,7 +74,7 @@ export default function PreviewCanvas({
         'users',
         clientId,
         'events',
-        eventIdLocal,
+        eventId,
         'layout',
         'current'
       );
@@ -94,13 +92,13 @@ export default function PreviewCanvas({
         const file = dataURLtoFile(imageUrl, 'layout.png');
         const url = await uploadImage(
           file,
-          `clients/${clientId}/events/${eventIdLocal}`
+          `clients/${clientId}/events/${eventId}`
         );
 
         console.log('Uploaded layout image URL:', url);
 
         // 3️⃣ Save the URL in parent event doc
-        const eventDocRef = doc(db, 'users', clientId, 'events', eventIdLocal);
+        const eventDocRef = doc(db, 'users', clientId, 'events', eventId);
         await updateDoc(eventDocRef, {
           eventLayoutUrl: url,
         });

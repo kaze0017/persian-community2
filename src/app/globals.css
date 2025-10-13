@@ -252,3 +252,18 @@ html {
 .flip-card-back {
   transform: rotateY(180deg);
 }
+
+
+ .grok-glow {
+  font-size: 4rem;
+  color: #8AA0C5;
+  /* soft bluish-gray */
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow:
+    0 0 1px #a0b0d5,
+    0 0 1px #9aaed8,
+    0 0 2px #8fa0d0,
+    0 0 3px #7f8dbf;
+  /* subtle bluish-purple glow */
+}

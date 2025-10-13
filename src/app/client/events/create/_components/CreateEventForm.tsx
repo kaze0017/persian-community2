@@ -1,7 +1,8 @@
 'use client';
 import { useForm, useFieldArray, FormProvider } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { createEvent } from '@/app/admin/events/reducer/eventsSlice';
+// import { createEvent } from '@/app/admin/events/reducer/eventsSlice';
+// import { addUserEvent } from '@/app/client/events/clientEventsReducer';
 import { Event } from '@/types/event';
 import { useRouter } from 'next/navigation';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
@@ -32,7 +33,9 @@ type CreateEventFormValues = Omit<Event, 'id'>;
 export default function CreateEventForm() {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { loading, error } = useAppSelector((state) => state.events);
+  // const { loading, error } = useAppSelector((state) => state.events);
+  const loading = false;
+  const error = false;
   const { categories } = useAppSelector((state) => state.categories);
   const client = useAppSelector((state) => state.user);
   const clientId = client.uid || '';

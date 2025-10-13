@@ -33,9 +33,10 @@ export default function TechTemplate({ business, businessId, isAdmin }: Props) {
       />
       <SectionTitle title='Services' />
       <ServicesSection
-        businessId={businessId}
-        business={business}
-        isAdmin={isAdmin}
+        services={business.services || []}
+        // businessId={businessId}
+        // business={business}
+        // isAdmin={isAdmin}
       />
       {/* <SectionTitle title='Gallery' />
       <GallerySection

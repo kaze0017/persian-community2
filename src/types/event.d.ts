@@ -3,8 +3,8 @@ import { Business } from './business';
 import { Occasion } from './occasions';
 
 export type LatLng = {
-  lat: number;
-  lng: number;
+  lat?: number;
+  lng?: number;
 };
 
 export type MarkerData = {
@@ -30,7 +30,7 @@ export type Event = {
   }
   title: string;
   description: string;
-  date: string | Timestamp;
+  date: string ;
   time: string;
   location: string;
   category: string;
@@ -84,6 +84,7 @@ export type Event = {
   path?: LatLng[];
   markers?: MarkerData[];
   hikeMap?:any;
+
 };
 
 export type EventDay = {

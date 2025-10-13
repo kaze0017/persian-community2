@@ -7,7 +7,7 @@ import TablesCanvas from './TablesCanvas';
 import SetStage from './SetStage';
 import PreviewCanvas from './PreviewCanvas';
 import { useAppDispatch } from '@/app/hooks';
-import { setShapes, setPlacedTables, setTables } from '../salonSlice';
+import { setShapes, setPlacedTables, setTables } from './salonSlice';
 
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -15,17 +15,15 @@ import { db } from '@/lib/firebase';
 const StageCanvas = dynamic(() => import('./StageCanvas'), {
   ssr: false,
 });
-import { useParams } from 'next/navigation';
+// import { useParams } from 'next/navigation';
 
 export default function SalonEditorPage({
   eventId,
   clientId,
 }: {
-  eventId?: string;
-  clientId?: string;
+  eventId: string;
+  clientId: string;
 }) {
-  const params = useParams();
-  // const eventId = params.eventId as string;
   const dispatch = useAppDispatch();
 
   useEffect(() => {

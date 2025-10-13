@@ -62,40 +62,40 @@ function removeUndefinedFields<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj));
 }
 
-export const createEvent = createAsyncThunk<
-  Event,
-  { event: Omit<Event, 'id'>; bannerFile?: File },
-  { rejectValue: string }
->('events/createEvent', async ({ event, bannerFile }, thunkAPI) => {
-  try {
-    const cleanEventData = removeUndefinedFields(event);
-    const id = await createDocumentWithId(EVENTS_COLLECTION, cleanEventData);
+// export const createEvent = createAsyncThunk<
+//   Event,
+//   { event: Omit<Event, 'id'>; bannerFile?: File },
+//   { rejectValue: string }
+// >('events/createEvent', async ({ event, bannerFile }, thunkAPI) => {
+//   try {
+//     const cleanEventData = removeUndefinedFields(event);
+//     const id = await createDocumentWithId(EVENTS_COLLECTION, cleanEventData);
 
-    let bannerUrls: Banner | undefined;
-    if (bannerFile) {
-      const uploadedUrl = await uploadImage(
-        bannerFile,
-        `events/${id}/banner`,
-        'banner.jpg'
-      );
-      bannerUrls = {
-        original: uploadedUrl,
-        sizes: {
-          small: uploadedUrl.replace('.jpg', '_small.webp'),
-          medium: uploadedUrl.replace('.jpg', '_medium.webp'),
-          large: uploadedUrl.replace('.jpg', '_large.webp'),
-          xlarge: uploadedUrl.replace('.jpg', '_xlarge.webp'),
-        },
-      };
-      await updateDocument(EVENTS_COLLECTION, id, { bannerUrls });
-    }
+//     let bannerUrls: Banner | undefined;
+//     if (bannerFile) {
+//       const uploadedUrl = await uploadImage(
+//         bannerFile,
+//         `events/${id}/banner`,
+//         'banner.jpg'
+//       );
+//       bannerUrls = {
+//         original: uploadedUrl,
+//         sizes: {
+//           small: uploadedUrl.replace('.jpg', '_small.webp'),
+//           medium: uploadedUrl.replace('.jpg', '_medium.webp'),
+//           large: uploadedUrl.replace('.jpg', '_large.webp'),
+//           xlarge: uploadedUrl.replace('.jpg', '_xlarge.webp'),
+//         },
+//       };
+//       await updateDocument(EVENTS_COLLECTION, id, { bannerUrls });
+//     }
 
-    return { ...cleanEventData, bannerUrls, id };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to create event';
-    return thunkAPI.rejectWithValue(message);
-  }
-});
+//     return { ...cleanEventData, bannerUrls, id };
+//   } catch (error) {
+//     const message = error instanceof Error ? error.message : 'Failed to create event';
+//     return thunkAPI.rejectWithValue(message);
+//   }
+// });
 
 
 
@@ -173,18 +173,18 @@ const eventSlice = createSlice({
       })
 
       // createEvent
-      .addCase(createEvent.pending, state => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(createEvent.fulfilled, (state, action: PayloadAction<Event>) => {
-        state.events.push(action.payload);
-        state.loading = false;
-      })
-      .addCase(createEvent.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload ?? 'Failed to create event';
-      })
+    //   .addCase(createEvent.pending, state => {
+    //     state.loading = true;
+    //     state.error = null;
+    //   })
+    //   .addCase(createEvent.fulfilled, (state, action: PayloadAction<Event>) => {
+    //     state.events.push(action.payload);
+    //     state.loading = false;
+    //   })
+    //   .addCase(createEvent.rejected, (state, action) => {
+    //     state.loading = false;
+    //     state.error = action.payload ?? 'Failed to create event';
+    //   })
 
       // updateEvent
       .addCase(updateEvent.pending, state => {

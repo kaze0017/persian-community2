@@ -255,16 +255,24 @@ export default function HikeMap({ eventId }: HikeMapProps) {
   const memoizedMarkers = useMemo(() => {
     return markers
       .filter((m) => m.isPinned)
-      .map((m) => (
-        <Marker
-          key={m.id}
-          position={m.position}
-          onClick={() => {
-            setSelectedMarker(m);
-            setOpenInfo(m.id);
-          }}
-        />
-      ));
+      .map((m) => {
+        const pos = m.position;
+        if (!pos?.lat || !pos?.lng) {
+          // fallback position if lat/lng are missing
+          return null;
+        }
+        return (
+          <Marker
+            key={m.id}
+            position={{ lat: pos.lat, lng: pos.lng }}
+            onClick={() => {
+              setSelectedMarker(m);
+              setOpenInfo(m.id);
+            }}
+          />
+        );
+      })
+      .filter(Boolean); // remove nulls
   }, [markers]);
 
   if (loadError) return <div className='text-red-500'>Error loading map</div>;
@@ -292,7 +300,7 @@ export default function HikeMap({ eventId }: HikeMapProps) {
           options={{ disableDoubleClickZoom: true }}
         >
           <Polyline
-            path={path}
+            path={path.map((p) => ({ lat: p.lat!, lng: p.lng! }))}
             options={{
               strokeWeight: 5,
               strokeColor: '#34a853',
@@ -300,6 +308,7 @@ export default function HikeMap({ eventId }: HikeMapProps) {
               clickable: false,
             }}
           />
+
           {memoizedMarkers}
         </GoogleMap>
       </div>

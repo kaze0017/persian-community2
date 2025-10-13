@@ -24,7 +24,9 @@ import { Button } from '@/components/ui/button';
 export default function CreateEventForm() {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { loading, error } = useAppSelector((state) => state.events);
+  // const { loading, error } = useAppSelector((state) => state.events);
+  const loading = false;
+  const error = false;
   const { categories } = useAppSelector((state) => state.categories);
   const client = useAppSelector((state) => state.user);
   const clientId = client.uid || '';
