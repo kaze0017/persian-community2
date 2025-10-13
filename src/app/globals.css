@@ -267,3 +267,12 @@ html {
     0 0 3px #7f8dbf;
   /* subtle bluish-purple glow */
 }
+
+:root {
+  --filter-color: #06b6d4;
+  /* Cyan color for the filter effect */
+}
+
+i {
+  filter: drop-shadow(0 0 10px var(--filter-color)) brightness(0) saturate(100%) invert(60%) sepia(100%) hue-rotate(180deg);
+}

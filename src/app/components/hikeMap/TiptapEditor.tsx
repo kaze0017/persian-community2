@@ -9,6 +9,7 @@ import { X, Save, Cpu, Check, ArrowRight } from 'lucide-react'; // X for Cancel,
 import { filter } from '../filters/logoFilter';
 import { DialogTitle } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import ButtonWithIcon from '@/components/btns/ButtonWithIcon';
 
 interface TiptapEditorProps {
   marker: MarkerData;
@@ -75,7 +76,24 @@ export default function TiptapEditor({
     dialog?.close();
   }, []);
 
-  // --- Send chat message to AI ---
+  // --- Toggle chat panel ---
+  const toggleChat = () => {
+    setShowChat((prev) => !prev);
+    if (!showChat) {
+      setChatHistory([
+        {
+          role: 'bot',
+          text: 'Hi! 🤖 What would you like to do with your content? Tailor, add to it, or generate something new?',
+        },
+      ]);
+    }
+  };
+
+  interface ChatMessage {
+    role: 'user' | 'bot';
+    text: string;
+  }
+
   const handleSendChat = useCallback(async () => {
     if (!chatInput.trim()) return;
 
@@ -91,7 +109,8 @@ export default function TiptapEditor({
         (n) => n.type === 'paragraph' || n.type === 'heading'
       );
 
-      const response = await fetch('/api/generate-vertex-marker', {
+      // 🧠 Call your OpenAI route
+      const response = await fetch('/api/generate-openai-marker', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -99,7 +118,7 @@ export default function TiptapEditor({
           text: chatInput,
           tone: 'friendly',
           history: newHistory.slice(-6), // send recent context only
-          currentContent: hasExistingContent ? currentContent : null, // 🧩 include existing content if present
+          currentContent: hasExistingContent ? currentContent : null,
         }),
       });
 
@@ -165,24 +184,11 @@ export default function TiptapEditor({
     }
   }, [chatHistory, chatInput]);
 
-  // --- Toggle chat panel ---
-  const toggleChat = () => {
-    setShowChat((prev) => !prev);
-    if (!showChat) {
-      setChatHistory([
-        {
-          role: 'bot',
-          text: 'Hi! 🤖 What would you like to do with your content? Tailor, add to it, or generate something new?',
-        },
-      ]);
-    }
-  };
-  console.log('marker', marker);
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    if (editorRef.current) {
-      console.log('Editor is ready:', editorRef.current);
-    }
-  }, [editorRef.current]);
+    // 👇 Scroll to bottom whenever chatHistory changes
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatHistory]);
 
   return (
     <div className='w-full flex flex-col h-full p-4 gap-1.5'>
@@ -202,8 +208,7 @@ export default function TiptapEditor({
                 tooltip: 'Discard changes',
                 onClick: handleCancel,
                 variant: 'outline' as ButtonVariant,
-                className:
-                  'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700',
+                className: 'bg-grok-teal-600 hover:bg-grok-teal-100 text-white',
               },
               {
                 key: 'save',
@@ -212,7 +217,7 @@ export default function TiptapEditor({
                 tooltip: 'Save all map data',
                 onClick: handleSave,
                 variant: 'outline' as ButtonVariant,
-                className: 'bg-grok-teal-600 hover:bg-grok-teal-700 text-white',
+                className: 'bg-grok-teal-600 hover:bg-grok-teal-100 text-white',
               },
               {
                 key: 'ai',
@@ -220,14 +225,23 @@ export default function TiptapEditor({
                 icon: <Cpu className='w-4 h-4' style={{ filter }} />,
                 onClick: toggleChat,
                 variant: 'outline' as ButtonVariant,
-                className: '', // ✅ empty string, not 'outline'
+                className: 'bg-grok-teal-600 hover:bg-grok-teal-100 text-white',
               },
+              // {
+              //   key: 'open ai',
+              //   label: 'Open AI Assist',
+              //   icon: <Cpu className='w-4 h-4' style={{ filter }} />,
+              //   onClick: toggleChat,
+              //   variant: 'outline' as ButtonVariant,
+              //   className: '', // ✅ empty string, not 'outline'
+              // },
             ].map(({ key, label, icon, onClick, variant, className }) => (
               <Button
                 key={key}
                 onClick={onClick}
                 variant={variant} // ✅ matches ButtonVariant
                 className={`flex items-center gap-1 ${className ?? ''}`}
+                style={{ filter }}
               >
                 {icon}
                 <span className='hidden sm:inline'>{label}</span>
@@ -251,14 +265,11 @@ export default function TiptapEditor({
         }}
         onReady={(editor) => {
           editorRef.current = editor;
-          console.log('✅ Editor is ready:', editor);
         }}
         content={
-          initialContent
-          //  ||
-          // marker.description.length > 0
-          //   ? JSON.parse(marker.description)
-          //   : { type: 'doc', content: [] }
+          marker.description.length > 0
+            ? JSON.parse(marker.description)
+            : initialContent
         }
         setImages={setImages}
         editable={editable}
@@ -290,7 +301,10 @@ export default function TiptapEditor({
                   {msg.text}
                 </div>
               ))}
+              {/* 👇 dummy div for scroll-to-bottom */}
+              <div ref={chatEndRef} />
             </div>
+
             <div className='flex gap-2'>
               <input
                 type='text'
@@ -317,3 +331,93 @@ export default function TiptapEditor({
     </div>
   );
 }
+
+// --- Send chat message to AI ---
+// const handleSendChat = useCallback(async () => {
+//   if (!chatInput.trim()) return;
+
+//   const userMessage: ChatMessage = { role: 'user', text: chatInput };
+//   const newHistory = [...chatHistory, userMessage];
+//   setChatHistory(newHistory);
+//   setChatInput('');
+
+//   try {
+//     // ✅ Get current editor content (if any)
+//     const currentContent = editorRef.current?.getJSON();
+//     const hasExistingContent = currentContent?.content?.some(
+//       (n) => n.type === 'paragraph' || n.type === 'heading'
+//     );
+
+//     const response = await fetch('/api/generate-vertex-marker', {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify({
+//         action: 'chat',
+//         text: chatInput,
+//         tone: 'friendly',
+//         history: newHistory.slice(-6), // send recent context only
+//         currentContent: hasExistingContent ? currentContent : null, // 🧩 include existing content if present
+//       }),
+//     });
+
+//     const raw = await response.text();
+
+//     // 🧩 Try to extract JSON
+//     let jsonCandidate: string | null = null;
+//     let parsedOuter: any;
+//     try {
+//       parsedOuter = JSON.parse(raw);
+//       if (typeof parsedOuter.message === 'string') {
+//         const match =
+//           parsedOuter.message.match(/```json\s*([\s\S]*?)```/) ||
+//           parsedOuter.message.match(/\{[\s\S]*\}/);
+//         jsonCandidate = match ? match[1] || match[0] : null;
+//       } else if (parsedOuter.type === 'doc') {
+//         jsonCandidate = raw;
+//       }
+//     } catch {
+//       const match =
+//         raw.match(/```json\s*([\s\S]*?)```/) || raw.match(/\{[\s\S]*\}/);
+//       jsonCandidate = match ? match[1] || match[0] : null;
+//     }
+
+//     let parsedJSON: JSONContent | null = null;
+//     if (jsonCandidate) {
+//       try {
+//         parsedJSON = JSON.parse(jsonCandidate);
+//       } catch (err) {
+//         console.warn('⚠️ JSON parse failed:', err);
+//       }
+//     }
+
+//     // ✅ If valid Tiptap JSON, merge and update
+//     if (parsedJSON?.type === 'doc' && Array.isArray(parsedJSON.content)) {
+//       const current = editorRef.current?.getJSON();
+//       const imageNodes =
+//         current?.content?.filter((n: JSONContent) => n.type === 'image') ||
+//         [];
+
+//       const mergedContent: JSONContent = {
+//         ...parsedJSON,
+//         content: [...parsedJSON.content, ...imageNodes],
+//       };
+
+//       editorRef.current?.commands.setContent(mergedContent);
+//       setChatHistory((prev) => [
+//         ...prev,
+//         { role: 'bot', text: '✨ I’ve improved your content in the editor!' },
+//       ]);
+//     } else {
+//       setChatHistory((prev) => [
+//         ...prev,
+//         { role: 'bot', text: parsedOuter?.message || raw },
+//       ]);
+//     }
+//   } catch (error) {
+//     console.error('Chat failed:', error);
+//     setChatHistory((prev) => [
+//       ...prev,
+//       { role: 'bot', text: '❌ Failed to respond.' },
+//     ]);
+//   }
+// }, [chatHistory, chatInput]);
