@@ -54,6 +54,11 @@ export default function UserAuthMenu() {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' className='w-48'>
+        <DropdownMenuItem>
+          <Link href='/client' className='w-full'>
+            Client Panel
+          </Link>{' '}
+        </DropdownMenuItem>
         {user.role === 'admin' && (
           <DropdownMenuItem>
             <Link href='/admin' className='w-full'>
